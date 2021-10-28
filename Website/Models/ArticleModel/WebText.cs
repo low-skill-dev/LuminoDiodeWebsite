@@ -1,4 +1,6 @@
-﻿namespace Website.Models.ArticleModel
+﻿using LuminoDiodeRandomDataGenerators;
+
+namespace Website.Models.ArticleModel
 {
 	public class WebText
 	{
@@ -7,5 +9,11 @@
 		public bool? IsBold;
 		public bool? IsItalic;
 
+#if DEBUG
+		public static WebText GenerateRandom()
+		{
+			return new WebText() { Text = RandomDataGenerator.String(), Link = RandomDataGenerator.String() };
+		}
+#endif
 	}
 }
