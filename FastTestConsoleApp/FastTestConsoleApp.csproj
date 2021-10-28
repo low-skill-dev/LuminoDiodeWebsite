@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>exe</OutputType>
@@ -7,10 +7,10 @@
 
   <ItemGroup>
     <PackageReference Include="LuminoDiode.RandomDataGenerators" Version="10.1.2" />
+    <PackageReference Include="Utf8Json" Version="1.3.7" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Repository\Repository.csproj" />
     <ProjectReference Include="..\Website\Website.csproj" />
   </ItemGroup>
 
