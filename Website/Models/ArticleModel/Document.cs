@@ -7,19 +7,19 @@ using Utf8Json;
 
 namespace Website.Models.ArticleModel
 {
-	public class Article 
+	public class Document 
 	{
 		public int? Id { get; set; }
 		public string Title {  get; set; }
 		public int AuthorUserId { get; set; }
 		public string[] Tags { get; set; }
 		public DateTime CreatedDateTime {  get; set; }
-		public ArticleParagraph[] Paragraphs { get; set; }
+		public DocumentParagraph[] Paragraphs { get; set; }
 
 #if DEBUG
-		public static Article GenerateRandom()
+		public static Document GenerateRandom()
 		{
-			return new Article { Title = RandomDataGenerator.String(), Tags = RandomDataGenerator.ArrayOf(RandomDataGenerator.String, 5), Paragraphs = RandomDataGenerator.ArrayOf(ArticleParagraph.GenerateRandom) };
+			return new Document { Title = RandomDataGenerator.String(), Tags = RandomDataGenerator.ArrayOf(RandomDataGenerator.String, 5), Paragraphs = RandomDataGenerator.ArrayOf(DocumentParagraph.GenerateRandom) };
 		}
 #endif
 		public override string ToString()

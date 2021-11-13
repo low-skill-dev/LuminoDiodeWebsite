@@ -8,7 +8,6 @@ namespace Website.Models.ArticleModel
 		public string? Link;
 		public bool? IsBold;
 		public bool? IsItalic;
-
 #if DEBUG
 		public static WebText GenerateRandom()
 		{
