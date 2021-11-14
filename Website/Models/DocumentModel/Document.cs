@@ -5,7 +5,7 @@ using LuminoDiodeRandomDataGenerators;
 using System;
 using Utf8Json;
 
-namespace Website.Models.ArticleModel
+namespace Website.Models.DocumentModel
 {
 	public class Document 
 	{

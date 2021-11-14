@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LuminoDiodeRandomDataGenerators;
 using System.ComponentModel.DataAnnotations;
 
-namespace Website.Models.ArticleModel
+namespace Website.Models.DocumentModel
 {
 	public class DocumentParagraph
 	{

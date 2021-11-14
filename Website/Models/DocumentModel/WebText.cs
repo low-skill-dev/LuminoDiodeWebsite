@@ -1,6 +1,6 @@
 ﻿using LuminoDiodeRandomDataGenerators;
 
-namespace Website.Models.ArticleModel
+namespace Website.Models.DocumentModel
 {
 	public class WebText
 	{
