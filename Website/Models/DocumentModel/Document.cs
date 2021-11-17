@@ -1,30 +1,36 @@
-﻿using System.Text.Json.Serialization;
-using System.Collections.Generic;
-using System.Linq;
-using LuminoDiodeRandomDataGenerators;
+﻿using RandomDataGenerator;
 using System;
-using Utf8Json;
+using System.Linq;
 
 namespace Website.Models.DocumentModel
 {
-	public class Document 
+	public class Document
 	{
 		public int? Id { get; set; }
-		public string Title {  get; set; }
+		public string Title { get; set; }
 		public int AuthorUserId { get; set; }
 		public string[] Tags { get; set; }
-		public DateTime CreatedDateTime {  get; set; }
+		public DateTime CreatedDateTime { get; set; }
 		public DocumentParagraph[] Paragraphs { get; set; }
 
-#if DEBUG
-		public static Document GenerateRandom()
-		{
-			return new Document { Title = RandomDataGenerator.String(), Tags = RandomDataGenerator.ArrayOf(RandomDataGenerator.String, 5), Paragraphs = RandomDataGenerator.ArrayOf(DocumentParagraph.GenerateRandom) };
-		}
-#endif
 		public override string ToString()
 		{
 			return Utf8Json.JsonSerializer.ToJsonString(this);
 		}
+
+#if DEBUG
+		static Random rnd = new Random();
+		public static Document GenerateRandom()
+		{
+			return new Document
+			{
+				Title = new RandomDataGenerator.Randomizers.RandomizerTextWords(new RandomDataGenerator.FieldOptions.FieldOptionsTextWords { }).Generate(),
+				AuthorUserId = 0,
+				Tags = new string[rnd.Next(1, 6)].Select(x => new RandomDataGenerator.Randomizers.RandomizerTextWords(new RandomDataGenerator.FieldOptions.FieldOptionsTextWords { }).Generate()).ToArray(),
+				CreatedDateTime = DateTime.Now,
+				Paragraphs = new DocumentParagraph[rnd.Next(2, 15)].Select(x => DocumentParagraph.GenerateRandom()).ToArray()
+			};
+		}
+#endif
 	}
 }
