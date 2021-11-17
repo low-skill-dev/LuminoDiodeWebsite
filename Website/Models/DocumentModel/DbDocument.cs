@@ -1,5 +1,5 @@
-﻿using Utf8Json;
-using System;
+﻿using System;
+using Utf8Json;
 
 namespace Website.Models.DocumentModel
 {
@@ -12,22 +12,22 @@ namespace Website.Models.DocumentModel
 		public DateTime CreatedDateTime { get; set; }
 		public byte[] Utf8JsonSerializedParagraphs { get; set; }
 
-		public static DbDocument FromArticle(Document article) => new DbDocument
+		public static DbDocument FromDocument(Document article) => new DbDocument
 		{
-			Id = article.Id?? null,
+			Id = article.Id ?? null,
 			Title = article.Title,
 			AuthorUserId = article.AuthorUserId,
 			Tags = article.Tags,
 			CreatedDateTime = article.CreatedDateTime,
 			Utf8JsonSerializedParagraphs = JsonSerializer.Serialize(article.Paragraphs)
 		};
-		public Document ToArticle() => new Document
+		public Document ToDocument() => new Document
 		{
 			Id = this.Id,
 			Title = this.Title,
 			AuthorUserId = this.AuthorUserId,
 			Tags = this.Tags,
-			CreatedDateTime= this.CreatedDateTime,
+			CreatedDateTime = this.CreatedDateTime,
 			Paragraphs = JsonSerializer.Deserialize<DocumentParagraph[]>(this.Utf8JsonSerializedParagraphs)
 		};
 	}
