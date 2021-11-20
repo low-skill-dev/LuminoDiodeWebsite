@@ -1,0 +1,8 @@
+﻿@model Website.Models.DocumentModel.DocumentParagraph
+
+<div>
+@foreach(var webtext in @Model.TextParts)
+{
+    Html.RenderPartial("~/Views/Shared/PartialViews/Document/_WebTextPartialView.cshtml",webtext);
+}
+</div>

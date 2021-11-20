@@ -1,0 +1,7 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Website.Models.DocumentModel.Document
+
+@foreach(var paragraph in Model.Paragraphs)
+{
+    Html.RenderPartial("~/Views/Shared/PartialViews/Document/_ParagraphTextPartialView.cshtml", paragraph);
+}

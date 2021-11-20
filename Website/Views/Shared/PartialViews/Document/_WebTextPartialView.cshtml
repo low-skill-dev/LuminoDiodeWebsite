@@ -1,0 +1,35 @@
+﻿@model Website.Models.DocumentModel.WebText
+
+@{
+	bool hasLink = !string.IsNullOrWhiteSpace(Model.Link);
+	bool isBold = Model.IsBold ?? false;
+	bool isItalic = Model.IsItalic ?? false;
+}
+
+@if (hasLink)
+{
+	@:<a href="@(Model.Link)">
+}
+@if (Model.IsBold ?? false)
+{
+	@:<strong>
+}
+@if (Model.IsItalic ?? false)
+{
+	@:<i>
+}
+
+	@Model.Text
+
+@if (Model.IsItalic ?? false)
+{
+	@:</i>
+}
+@if (Model.IsBold ?? false)
+{
+	@:</strong>
+}
+@if (hasLink)
+{
+	@:</a>
+}
