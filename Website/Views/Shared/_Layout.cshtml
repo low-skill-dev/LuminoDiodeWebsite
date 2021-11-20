@@ -1,0 +1,53 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@*
+    For mo
+    re information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link href="~/css/bootstrap.css" rel="stylesheet" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-sm navbar-light bg-info ">
+        <div class="container">
+            <a class="navbar-brand" asp-controller="Home">
+                <b>PRACC</b>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav" style="font-family:'Century Gothic'">
+                    <li class="nav-item"><a class="nav-link" asp-controller="Home"><b>Home</b></a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Project"><b>Projects</b></a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Document"><b>Documents</b></a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="User"><b>Users</b></a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Dbg"><b>DebugCtrller</b></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="">
+        <main role="main" class="container">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer">
+        <div class="container flex-lg-row">
+            <img style="align-self:center; height:40px; margin-top:5px" src="~/StaticFiles/Images/Logo/PRACC_ProjectsAccumulator_small_long.png" />
+        </div>
+    </footer>
+
+    <script src="~/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>
