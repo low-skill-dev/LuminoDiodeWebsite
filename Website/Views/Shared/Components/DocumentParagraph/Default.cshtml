@@ -1,0 +1,8 @@
+﻿@model Website.Models.DocumentModel.DocumentParagraph
+
+<div>
+@foreach(var webtext in @Model.TextParts)
+{
+    @(Component.InvokeAsync("WebText",webtext).Result)
+}
+</div>
