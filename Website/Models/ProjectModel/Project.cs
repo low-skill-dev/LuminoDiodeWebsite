@@ -4,7 +4,7 @@
 	{
 		public enum PROJECT_TYPE
 		{
-			Common=0
+			Common = 0
 		}
 		public int Id { get; set; }
 		public PROJECT_TYPE ProjectType { get; set; }

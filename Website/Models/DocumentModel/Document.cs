@@ -26,7 +26,9 @@ namespace Website.Models.DocumentModel
 			{
 				Title = new RandomDataGenerator.Randomizers.RandomizerTextWords(new RandomDataGenerator.FieldOptions.FieldOptionsTextWords { }).Generate(),
 				AuthorUserId = 0,
-				Tags = new string[rnd.Next(1, 6)].Select(x => new RandomDataGenerator.Randomizers.RandomizerTextWords(new RandomDataGenerator.FieldOptions.FieldOptionsTextWords { }).Generate()).ToArray(),
+				Tags = new string[rnd.Next(1, 6)]
+					.Select(x => new string(new RandomDataGenerator.Randomizers.RandomizerTextLipsum(new RandomDataGenerator.FieldOptions.FieldOptionsTextLipsum { }).Generate()
+					.Split(' ')[rnd.Next(0,7)].Where(x=> char.IsLetterOrDigit(x)).ToArray())).ToArray(),
 				CreatedDateTime = DateTime.Now,
 				Paragraphs = new DocumentParagraph[rnd.Next(2, 15)].Select(x => DocumentParagraph.GenerateRandom()).ToArray()
 			};

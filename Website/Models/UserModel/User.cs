@@ -4,9 +4,9 @@
 	{
 		public enum USER_TYPE
 		{
-			Common=0,
-			Moderator=1,
-			Admin=2
+			Common = 0,
+			Moderator = 1,
+			Admin = 2
 		}
 
 		public int Id { get; set; }
