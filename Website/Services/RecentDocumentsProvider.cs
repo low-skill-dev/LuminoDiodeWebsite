@@ -11,21 +11,42 @@ using System.Threading.Tasks;
 
 namespace Website.Services
 {
-	public class RecentDocumentsProvider:BackgroundService
+	//public interface IRecentDocumentsBackgroundService
+	//{
+	//	public IQueryable<Website.Models.DocumentModel.DbDocument> RecentDocuments { get; private set; }
+
+	//	protected async override Task ExecuteAsync(CancellationToken ct);
+	//}
+
+
+	/// <summary>
+	/// Provides recent posted document by making requsts to db by the interval.
+	/// </summary>
+	public class RecentDocumentsBackgroundService : BackgroundService
 	{
-		private WebsiteContext context;
+		private IServiceScopeFactory DbContextScopeFactory;
 		private int Interval_msec = 1000 * 60 * 1; // 1 min interval
+
+		public RecentDocumentsBackgroundService(IServiceScopeFactory DbContextScopeFactory)
+		{
+			this.DbContextScopeFactory = DbContextScopeFactory;
+		}
+
 
 		public IQueryable<Website.Models.DocumentModel.DbDocument> RecentDocuments { get; private set; }
 
 		protected async override Task ExecuteAsync(CancellationToken ct)
 		{
-			while (ct.IsCancellationRequested)
+			using (WebsiteContext context = this.DbContextScopeFactory
+				.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>())
 			{
-				var NewRecent = context.DbDocuments.OrderBy(d => d.CreatedDateTime);
-				NewRecent.Skip(NewRecent.Count() - 5);
-				this.RecentDocuments = NewRecent;
-				await Task.Delay(this.Interval_msec);
+				while (!ct.IsCancellationRequested)
+				{
+					var NewRecent = context.DbDocuments.OrderBy(d => d.CreatedDateTime);
+					NewRecent.Skip(NewRecent.Count() - 5);
+					this.RecentDocuments = NewRecent;
+					await Task.Delay(this.Interval_msec);
+				}
 			}
 		}
 	}
