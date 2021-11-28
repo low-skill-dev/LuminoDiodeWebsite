@@ -10,22 +10,22 @@
 {
 	@:<a href="@(Model.Link)">
 }
-@if (Model.IsBold ?? false)
+@if (isBold)
 {
 	@:<strong>
 }
-@if (Model.IsItalic ?? false)
+@if (isItalic)
 {
 	@:<i>
 }
 
 	@Model.Text
 
-@if (Model.IsItalic ?? false)
+@if (isItalic)
 {
 	@:</i>
 }
-@if (Model.IsBold ?? false)
+@if (isBold)
 {
 	@:</strong>
 }

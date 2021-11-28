@@ -3,5 +3,5 @@
 
 @foreach(var paragraph in Model.Paragraphs)
 {
-    Html.RenderPartial("~/Views/Shared/PartialViews/Document/_ParagraphTextPartialView.cshtml", paragraph);
+    <partial name="~/Views/Shared/PartialViews/Document/_ParagraphTextPartialView.cshtml" model=paragraph />
 }

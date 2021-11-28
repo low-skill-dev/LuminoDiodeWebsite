@@ -1,8 +1,9 @@
-﻿@model Website.Models.DocumentModel.DocumentParagraph
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Website.Models.DocumentModel.DocumentParagraph
 
 <div>
 @foreach(var webtext in @Model.TextParts)
 {
-    Html.RenderPartial("~/Views/Shared/PartialViews/Document/_WebTextPartialView.cshtml",webtext);
+    <partial name="~/Views/Shared/PartialViews/Document/_WebTextPartialView.cshtml" model=webtext />
 }
 </div>

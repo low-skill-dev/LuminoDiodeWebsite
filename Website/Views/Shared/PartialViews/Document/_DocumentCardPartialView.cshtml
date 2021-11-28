@@ -1,22 +1,36 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @model Website.Models.DocumentWithAuthorStruct
 
-<div class="card w-25" style="max-height:50vh">
-    <div class="card-body overflow-hidden">
-        <h5 class="card-title">
-            <a asp-controller="Document" asp-action="Show" asp-route-id="@Model.Document.Id">
-                @Model.Document.Title
-            </a>
-        </h5>
-        <h6 class="card-subtitle">
-            <a asp-controller="User" asp-action="Show" asp-route-id="@Model.AuthorUser.Id">
-                @Model.AuthorUser.FirstName @Model.AuthorUser.LastName
-            </a>
-        </h6>
-        <div class="card-text">
-            @{
-                Html.RenderPartial("~/Views/Shared/PartialViews/Document/_ParagraphTextPartialView.cshtml", Model.Document.Paragraphs[0]);
-            }
-            </div>
-    </div>
+<div class="card w-100" style="max-height:50vh">
+	<div class="card-body overflow-hidden">
+		<h5 class="card-title">
+			<a class="text-dark" asp-controller="Document" asp-action="Show" asp-route-id="@Model.Document.Id">
+				@Model.Document.Title
+			</a>
+		</h5>
+		<h6 class="card-subtitle">
+			by
+			<a class="text-black-50" asp-controller="User" asp-action="Show" asp-route-id="@Model.AuthorUser.Id">
+				@Model.AuthorUser.FirstName @Model.AuthorUser.LastName
+			</a>
+			
+			<span class="text-black-50">
+				@if (Model.Document.CreatedDateTime.Date == System.DateTime.Today)
+				{
+					@:at
+					@Model.Document.CreatedDateTime.ToShortTimeString()
+				}
+				else
+				{
+					@:on
+					@Model.Document.CreatedDateTime.ToShortDateString()
+				}
+			</span>
+		</h6>
+		<p class="card-text html">
+			@{
+				<partial name="~/Views/Shared/PartialViews/Document/_ParagraphTextPartialView.cshtml" model=Model.Document.Paragraphs[0] />
+			}
+		</p>
+	</div>
 </div>
