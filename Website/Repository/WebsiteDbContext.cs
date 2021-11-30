@@ -8,7 +8,7 @@ namespace Website.Repository
 	{
 		public WebsiteContext(DbContextOptions<WebsiteContext> options) : base(options)
 		{
-			//Database.EnsureDeleted();
+			Database.EnsureDeleted();
 			Database.EnsureCreated();
 			//Database.Migrate();
 
@@ -25,8 +25,7 @@ namespace Website.Repository
 		private void SeedData(bool SaveChanges = true)
 		{
 			SeedData_DbDocuments();
-
-			if (SaveChanges) this.SaveChanges();
+			SeedData_Users();
 		}
 
 		private void SeedData_DbDocuments(bool DoNotSeedIfDataExists=true)
@@ -40,11 +39,18 @@ namespace Website.Repository
 
 			var docsToAdd = new object[10].Select(x => Models.DocumentModel.DbDocument.FromDocument(Website.Models.DocumentModel.Document.GenerateRandom()));
 			this.DbDocuments.AddRange(docsToAdd);
-			this.UpdateRange(docsToAdd);
+			this.SaveChanges();
 		}
 		private  void SeedData_Users()
 		{
-
+			var ToAdd = new Models.UserModel.User
+			{
+				Id = null,
+				FirstName = "Admin",
+				LastName = "Adminovich"
+			};
+			this.Users.Add(ToAdd);
+			this.SaveChanges();
 		}
 		private  void SeedData_Projects()
 		{
