@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Text.Json;
-using Website.Models.ArticleModel;
-using LuminoDiodeRandomDataGenerators;
+using Website.Models.DocumentModel;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using Utf8Json;
+using RandomDataGenerator;
 
 
 namespace FastTestConsoleApp
@@ -17,7 +17,7 @@ namespace FastTestConsoleApp
          */
 		static void Main(string[] args)
 		{
-
+			Console.Write(Website.Models.DocumentModel.Document.GenerateRandom().ToString());
 		}
 	}
 }
