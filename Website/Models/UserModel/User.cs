@@ -9,7 +9,7 @@
 			Admin = 2
 		}
 
-		public int Id { get; set; }
+		public int? Id { get; set; }
 		public USER_TYPE UserType { get; set; }
 		public string FirstName { get; set; }
 		public string? LastName { get; set; }
@@ -18,5 +18,7 @@
 		public string? VkLink { get; set; }
 		public string? City { get; set; }
 		public string? PostalCode { get; set; }
+
+		public string GetFullName() => this.FirstName + this.LastName;
 	}
 }

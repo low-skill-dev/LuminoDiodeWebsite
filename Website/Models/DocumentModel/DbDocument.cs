@@ -14,7 +14,7 @@ namespace Website.Models.DocumentModel
 
 		public static DbDocument FromDocument(Document article) => new DbDocument
 		{
-			Id = article.Id ?? null,
+			Id = article.Id,
 			Title = article.Title,
 			AuthorUserId = article.AuthorUserId,
 			Tags = article.Tags,

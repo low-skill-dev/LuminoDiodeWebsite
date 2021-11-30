@@ -34,7 +34,7 @@ namespace Website.Models.DocumentModel
 			return new Document
 			{
 				Title = new RandomDataGenerator.Randomizers.RandomizerTextWords(new RandomDataGenerator.FieldOptions.FieldOptionsTextWords { }).Generate(),
-				AuthorUserId = 0,
+				AuthorUserId = 1,
 				Tags = new string[rnd.Next(1, 6)]
 					.Select(x => new string(new RandomDataGenerator.Randomizers.RandomizerTextLipsum(new RandomDataGenerator.FieldOptions.FieldOptionsTextLipsum { }).Generate()
 					.Split(' ')[rnd.Next(0,7)].Where(x=> char.IsLetterOrDigit(x)).ToArray())).ToArray(),
