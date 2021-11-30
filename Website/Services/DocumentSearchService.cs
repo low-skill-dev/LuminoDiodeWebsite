@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System;
 using System.Text.RegularExpressions;
 using Website.Models.DocumentModel;
+using FuzzySharp;
 
 namespace Website.Services
 {
@@ -28,17 +29,30 @@ namespace Website.Services
 			this.DbContextScopeFactory = DbContextScopeFactory;
 			this.FreqReqService = FreqReqService;
 		}
+		public DateTime ProceedDateTime;
 
 		public string Request { get; private set; }
-		public IQueryable<DbDocument> Response { get; private set; }
+		public List<DbDocument> Response { get; private set; }
 		
-		public IQueryable<DbDocument> ProceedRequest(string UserRequest)
+
+		// ДОБАВИТЬ ОБНОВЛЕНИЕ ОТВЕТОВ ДЛЯ ЗАПРОСОВ КОТРЫЕ ОСТАЮТСЯ ЧАСТЫМИ ДОЛГОЕ ВРЕМЯ
+		public List<DbDocument> ProceedRequest(string UserRequest)
 		{
+			this.ProceedDateTime= DateTime.UtcNow;
+
+			var TryGetFromFreq = this.FreqReqService.TryGetSimilarRequest(UserRequest);
+			if (TryGetFromFreq != null)
+			{
+				return TryGetFromFreq.Response;
+			}
+
+
 			var UserReqWords = new Regex(@"\w+").Matches(UserRequest).Select(x => x.Value).ToArray();
 			var DocsIQ = this.DbContextScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>().DbDocuments;
 
 			this.Request = UserRequest;
-			this.Response = DocsIQ.OrderByDescending(d => EF.Functions.TrigramsWordSimilarity(d.Title,UserRequest));
+			this.Response = DocsIQ.OrderByDescending(d => EF.Functions.TrigramsWordSimilarity(d.Title,UserRequest))
+				.ToList();
 			
 			this.FreqReqService.AddDocumentSearchServiceScope(this);
 
