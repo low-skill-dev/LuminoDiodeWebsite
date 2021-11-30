@@ -1,19 +1,81 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Collections;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Website.Repository;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Website.Services;
+using static Microsoft.Extensions.DependencyInjection.NpgsqlServiceCollectionExtensions;
 
 namespace Website.Controllers
 {
 	public class DocumentController : Controller
 	{
+		private readonly IServiceScopeFactory ScopeFactory;
+		private readonly Website.Repository.WebsiteContext context;
+		private readonly Website.Services.RecentDocumentsBackgroundService recentDocumentsProvider;
+		public DocumentController(IServiceScopeFactory Services, Website.Services.RecentDocumentsBackgroundService documentsBackgroundService)
+		{
+			this.ScopeFactory = Services;
+			this.context = Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();
+			this.recentDocumentsProvider = documentsBackgroundService;
+		}
+
 		[HttpGet]
 		public ViewResult Summary()
 		{
-			return View();
+			var rd = recentDocumentsProvider.RecentDocuments; 
+
+			Website.Models.DocumentWithAuthorStruct[] documentWithAuthorStructs = new Models.DocumentWithAuthorStruct[3]; int i = 0;
+
+			foreach (var doc in rd)
+			{
+				Website.Models.UserModel.User authorUser = null;
+				try
+				{
+					authorUser = context.Users.Find(doc.AuthorUserId)??
+						new Models.UserModel.User { Id = 0, FirstName = "Admin", LastName = string.Empty };
+				}
+				catch (System.InvalidOperationException)
+				{
+					authorUser = new Models.UserModel.User { Id = 0, FirstName = "Admin", LastName = string.Empty };
+				}
+				documentWithAuthorStructs[i++] = new Website.Models.DocumentWithAuthorStruct { Document = doc.ToDocument(), AuthorUser = authorUser };
+				if (i == 3) break;
+			}
+
+			return View(documentWithAuthorStructs);
 		}
 
 		[HttpGet]
 		public ViewResult Show(int ProjectId)
 		{
 			return View();
+		}
+
+		[HttpPost]
+		public ViewResult Search(string SearchRequest)
+		{
+			ViewBag.SearchRequest = SearchRequest;
+
+			var ServiceProvider = this.ScopeFactory.CreateScope().ServiceProvider;
+			var SearchService = ServiceProvider.GetRequiredService<DocumentSearchService>();
+			var ProceedRes = SearchService.ProceedRequest(SearchRequest);
+			var ResResult = ProceedRes;
+			var Loaded = ResResult.Take(10).ToList().Select(x=> new Models.DocumentWithAuthorStruct { Document=x.ToDocument(), 
+				AuthorUser=this.context.Users.Find(x.AuthorUserId)?? new Models.UserModel.User { Id = 0, FirstName = "Admin", LastName = string.Empty }
+			});
+			return View(Loaded);
 		}
 
 		#region Create
@@ -60,6 +122,8 @@ namespace Website.Controllers
 			return new StatusCodeResult(202);
 		}
 		#endregion
+
+
 
 	}
 }
