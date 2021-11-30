@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System;
 using System.Text.RegularExpressions;
 using Website.Models.DocumentModel;
-using FuzzySharp;
 
 namespace Website.Services
 {
@@ -22,23 +21,28 @@ namespace Website.Services
 	/// </summary>
 	public class DocumentSearchService
 	{
-		private IServiceScopeFactory DbContextScopeFactory;
-		public DocumentSearchService(IServiceScopeFactory DbContextScopeFactory/*,FrequentRequestsSingletonService*/)
+		private readonly IServiceScopeFactory DbContextScopeFactory;
+		private readonly FrequentSearchRequestsService FreqReqService;
+		public DocumentSearchService(IServiceScopeFactory DbContextScopeFactory, FrequentSearchRequestsService FreqReqService)
 		{
 			this.DbContextScopeFactory = DbContextScopeFactory;
+			this.FreqReqService = FreqReqService;
 		}
-		
-		public async Task<IQueryable<DbDocument>> ProceedRequest(string UserRequest)
-		{
 
+		public string Request { get; private set; }
+		public IQueryable<DbDocument> Response { get; private set; }
+		
+		public IQueryable<DbDocument> ProceedRequest(string UserRequest)
+		{
+			var UserReqWords = new Regex(@"\w+").Matches(UserRequest).Select(x => x.Value).ToArray();
 			var DocsIQ = this.DbContextScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>().DbDocuments;
-			return await Task<IQueryable<DbDocument>>.Run(() =>
-			{
-				// В некоторых строках может быть очень много похожих слов, поэтому сначала следует
-				// применить сортировку по токенам, а потом уже непосредственно сравнить названия.
-				// К тому же изначальную сортировку по всему запросу убивает порядок слов.
-				return DocsIQ.OrderBy(d => Fuzz.TokenSetRatio(d.Title, UserRequest)).ThenBy(d=> Fuzz.Ratio(d.Title,UserRequest));
-			});
+
+			this.Request = UserRequest;
+			this.Response = DocsIQ.OrderByDescending(d => EF.Functions.TrigramsWordSimilarity(d.Title,UserRequest));
+			
+			this.FreqReqService.AddDocumentSearchServiceScope(this);
+
+			return this.Response;
 		}
 	}
 }
