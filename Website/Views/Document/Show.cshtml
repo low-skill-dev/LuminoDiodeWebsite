@@ -1,0 +1,9 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Website.Models.DocumentWithAuthorStruct
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+<partial name="~/Views/Shared/PartialViews/Document/_DocumentCommonPartialView.cshtml" model=@Model />
+</div>

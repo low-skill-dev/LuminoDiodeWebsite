@@ -1,0 +1,14 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Website.Models.DocumentWithAuthorStruct
+
+<div>
+    <div class="h1">
+        @(Model.Document.Title?? $"Document title unknown");
+    </div>
+
+    <div class="h4">
+    <partial name="~/Views/Shared/PartialViews/Document/_AuthorAndPublishTimePartialView.cshtml" model=@Model />
+    </div>
+
+    <partial name="~/Views/Shared/PartialViews/Document/_DococumentTextPartialView.cshtml" model=@Model.Document />
+</div>
