@@ -20,7 +20,7 @@ namespace Website.Services
 	class FrequenciedService
 	{
 		public int Frequency { get; private set; }
-		public DocumentSearchService DocumentSearchServiceScope { get; init; }
+		public DocumentSearchService DocumentSearchServiceScope { get; set; }
 		public FrequenciedService(int Frequency, DocumentSearchService DocumentSearchServiceScope)
 		{
 			this.Frequency = Frequency;
@@ -48,12 +48,46 @@ namespace Website.Services
 		public int Interval_updateNeededCheck_msec = 30 * 1000; // 5 sec interval
 		public int NumOfFrequentRequestsStored = 50;
 		public int TokenSetRationNeededToCountAsSimilar = 90;
+		public int ResponseLifetime_msec = 1000 * 60 * 5 / 5 / 60; // 5 min interval
 		private System.DateTime LastUpdateTime;
 
-		public FrequentSearchRequestsService()
+		private readonly IServiceScopeFactory ScopeFactory;
+		public FrequentSearchRequestsService(IServiceScopeFactory ScopeFactory)
 		{
+			this.ScopeFactory = ScopeFactory;
 			this.RecentRequests_DocumentSearchServiceScopes = new List<DocumentSearchService>();
 			this.FrequentRequests = new List<FrequenciedService>();
+		}
+
+		/// <summary>
+		/// Tries to find frequent request which is similar to passed.
+		/// If found, returns it, otherwise returns null.
+		/// </summary>
+		/// <param name="UserReq"></param>
+		/// <returns></returns>
+		public DocumentSearchService? TryGetSimilarRequest(string UserRequest)
+		{
+			try
+			{
+				var tryFind = this.FrequentRequests
+						.First(x => Fuzz.TokenSetRatio(UserRequest, x.DocumentSearchServiceScope.Request)
+						> this.TokenSetRationNeededToCountAsSimilar);
+				tryFind.IncFreq();
+
+				if((tryFind.DocumentSearchServiceScope.ProceedDateTime-DateTime.Now)
+					.Seconds > this.ResponseLifetime_msec)
+				{
+					tryFind.DocumentSearchServiceScope = this.ScopeFactory.CreateScope().ServiceProvider.
+						GetRequiredService<DocumentSearchService>();
+					tryFind.DocumentSearchServiceScope.ProceedRequest(UserRequest);
+				}
+
+				return tryFind.DocumentSearchServiceScope;
+			}
+			catch (System.InvalidOperationException)
+			{
+				return null;
+			}
 		}
 
 
