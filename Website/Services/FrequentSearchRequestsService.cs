@@ -68,8 +68,9 @@ namespace Website.Services
 		/// Tries to find frequent request which is similar to passed.
 		/// If found, returns it, otherwise returns null.
 		/// </summary>
-		public DocumentSearchService? TryGetSimilarRequest(string UserRequest)
+		public DocumentSearchService? GetSimilarRequestOrNull(string UserRequest)
 		{
+			// Пытается найти подходящий ответ на переданный запрос среди частых запросов
 			try
 			{
 				var tryFind = this.FrequentRequests
@@ -77,6 +78,7 @@ namespace Website.Services
 						> this.TokenSetRationNeededToCountAsSimilar);
 				tryFind.IncFreq();
 
+				// Если ответ устарел - обновить сейчас
 				if ((tryFind.DocumentSearchServiceScope.ProceedDateTime - DateTime.Now)
 					.Seconds > this.ResponseLifetime_msec)
 				{
@@ -87,30 +89,30 @@ namespace Website.Services
 
 				return tryFind.DocumentSearchServiceScope;
 			}
+			// Ничего не найдено (следует обработать запрос через БД)
 			catch (System.InvalidOperationException)
 			{
 				return null;
 			}
 		}
 
-
 		public List<DocumentSearchService> GetFrequentSearchesScopes() => this.FrequentRequests.Select(x => x.DocumentSearchServiceScope).ToList();
 
 		public void AddDocumentSearchServiceScope(DocumentSearchService SearchScope)
 			=> this.RecentRequests_DocumentSearchServiceScopes.Add(SearchScope);
 
-
-		private int IndexOfMostCommonByTokenSetRatio(IList<FrequenciedService> SearchServices, string SearchRequest, out int CommonScore)
+		// Наиболее схожая строка среди запросов переданных сервисов
+		private int IndexOfMostCommonByTokenSetRatio(IList<FrequenciedService> SearchServices, string SearchRequest, out int SimilarityScore)
 		{
-			CommonScore = 0;
+			SimilarityScore = 0;
 			int IndexOfMostCommon = 0;
 
 			for (int i = 0; i < SearchServices.Count; i++)
 			{
 				var score = Fuzz.TokenSetRatio(SearchServices[i].DocumentSearchServiceScope.Request, SearchRequest);
-				if (score > CommonScore)
+				if (score > SimilarityScore)
 				{
-					CommonScore = score;
+					SimilarityScore = score;
 					IndexOfMostCommon = i;
 				}
 			}
@@ -193,16 +195,13 @@ namespace Website.Services
 			// Пока сервису не приказано остановиться
 			while (!ct.IsCancellationRequested)
 			{
-				await Task.Run(() =>
-				{
-					// Обновить если накоплено достаточное число недавних запросов
-					if (this.RecentRequests_DocumentSearchServiceScopes.Count() > this.Interval_numOfRecentRequests)
-						this.Update();
-					// Обновить если прошел интервал обновления и получен хотябы один новый запрос для обработки
-					if (((DateTime.UtcNow - this.LastUpdateTime).TotalSeconds > (this.Interval_msec / 1000))
-						&& this.RecentRequests_DocumentSearchServiceScopes.Count > 0)
-						this.Update();
-				});
+				// Обновить если накоплено достаточное число недавних запросов
+				if (this.RecentRequests_DocumentSearchServiceScopes.Count() > this.Interval_numOfRecentRequests)
+					this.Update();
+				// Обновить если прошел интервал обновления и получен хотябы один новый запрос для обработки
+				if (((DateTime.UtcNow - this.LastUpdateTime).TotalSeconds > (this.Interval_msec / 1000))
+					&& this.RecentRequests_DocumentSearchServiceScopes.Count > 0)
+					this.Update();
 
 				// Интервал проверки необходимости обновления
 				await Task.Delay(this.Interval_updateNeededCheck_msec);
