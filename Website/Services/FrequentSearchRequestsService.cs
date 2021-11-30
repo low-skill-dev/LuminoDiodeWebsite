@@ -33,22 +33,27 @@ namespace Website.Services
 	{
 		/* Длинные названия для полей необходимы чтобы человек мог понять смысл
 		 * поля без просмотра исходного кода класса, однако в скрытых методах
-		 * можно прибегнуть к сокращениям с комментарием.
+		 * можно прибегнуть к сокращениям.
 		 */
+
+		// Хранит последние, еще не обработанные запросы
 		private List<DocumentSearchService> RecentRequests_DocumentSearchServiceScopes;
-#if DEBUG
-		public
-#endif
-#if RELEASE
-		private
-#endif
-		List<FrequenciedService> FrequentRequests;
-		public int Interval_msec = 1000 * 60 * 5 / 5 / 60; // 5 min interval
+		// to be private in release
+		// Хранит наиболее частые запросы
+		public List<FrequenciedService> FrequentRequests;
+		// Интервал обработки последних запросов, даже если не набрано нужное количество
+		public int Interval_msec = 1000 * 60 * 5; // 5 min interval
+												  // Количественный интервал обработки последних запросов
 		public int Interval_numOfRecentRequests = 50; // every 50 requests interval
+													  // Интервал проверки необходимости провести обработку
 		public int Interval_updateNeededCheck_msec = 30 * 1000; // 5 sec interval
+																// Количество хранимых частых запросов
 		public int NumOfFrequentRequestsStored = 50;
+		// Очки сходства по методу Fuzz.TokenSetRation для засчитывания строк как одинаковых по токену
 		public int TokenSetRationNeededToCountAsSimilar = 90;
+		// Время жизни сохранненого запроса. Если частый запрос существует более 5 минут, его следует обновить.
 		public int ResponseLifetime_msec = 1000 * 60 * 5 / 5 / 60; // 5 min interval
+																   // Время последнего обновления
 		private System.DateTime LastUpdateTime;
 
 		private readonly IServiceScopeFactory ScopeFactory;
@@ -63,8 +68,6 @@ namespace Website.Services
 		/// Tries to find frequent request which is similar to passed.
 		/// If found, returns it, otherwise returns null.
 		/// </summary>
-		/// <param name="UserReq"></param>
-		/// <returns></returns>
 		public DocumentSearchService? TryGetSimilarRequest(string UserRequest)
 		{
 			try
@@ -74,7 +77,7 @@ namespace Website.Services
 						> this.TokenSetRationNeededToCountAsSimilar);
 				tryFind.IncFreq();
 
-				if((tryFind.DocumentSearchServiceScope.ProceedDateTime-DateTime.Now)
+				if ((tryFind.DocumentSearchServiceScope.ProceedDateTime - DateTime.Now)
 					.Seconds > this.ResponseLifetime_msec)
 				{
 					tryFind.DocumentSearchServiceScope = this.ScopeFactory.CreateScope().ServiceProvider.
@@ -116,58 +119,70 @@ namespace Website.Services
 		}
 		public void Update()
 		{
+			// Установка последнего времени обновления
 			this.LastUpdateTime = System.DateTime.UtcNow;
 
-			lock (this.RecentRequests_DocumentSearchServiceScopes)
-				lock (this.FrequentRequests)
+			/* Теоретически, блокировка доступа не нужна, ибо во всех методах кроме этого используется
+			 * перебор через First, который использует перебор через цикл foreach, а не for, за исключением метода IndexOfMostCommonByTokenSetRatio, но он вызывается единственный раз
+			 * собственно в этом методе.
+			 */
+			// lock (this.RecentRequests_DocumentSearchServiceScopes)
+			//	lock (this.FrequentRequests)
+			{
+				// Присвоение каждому недавнему запросы частоты 0
+				var recent = this.RecentRequests_DocumentSearchServiceScopes
+					.Select(SearchServiceScope => new FrequenciedService(0, SearchServiceScope)).ToList();
+
+				// Вычисление действительной частоты для каждого недавнего запроса и удаление походих
+				for (int i = 0; i < recent.Count - 1; i++)
 				{
-					int Frequency = 0;
-					var RecentRequests_FreqAndService = this.RecentRequests_DocumentSearchServiceScopes
-						.Select(SearchServiceScope => new FrequenciedService(Frequency, SearchServiceScope)).ToList();
-
-					var recent = RecentRequests_FreqAndService; //short name
-					for (int i = 0; i < recent.Count - 1; i++)
+					for (int r = i + 1; r < recent.Count; r++)
 					{
-						for (int r = i + 1; r < recent.Count; r++)
-						{
-							/* Если найдены две похожие строки, то одной добавить частоты, а вторую удалить.
-							 * В идеале данный алгоритм должен быть улучшен, и сначала из двух похожих
-							 * строк выводить наиболее популярную, далее оставлять её, а не просто первую
-							 * из двух, однако сайт не про поиск, поэтому это может быть реализовано только в будущем.
-							 */
-							var DebugVar1 = Fuzz.TokenSetRatio(recent[i].DocumentSearchServiceScope.Request, recent[r].DocumentSearchServiceScope.Request);
-							if (Fuzz.TokenSetRatio(recent[i].DocumentSearchServiceScope.Request, recent[r].DocumentSearchServiceScope.Request)
-								> this.TokenSetRationNeededToCountAsSimilar)
-							{
-								recent[i].IncFreq(recent[r].Frequency + 1);
-								recent.RemoveAt(r--);
-							}
-						}
-					}
-					for (int i = 0; i < recent.Count; i++)
-					{
-						/* Если похожая строка существует, то инкрементировать её
+						/* Если найдены две похожие строки, то одной добавить частоты, а вторую удалить.
+						 * В идеале данный алгоритм должен быть улучшен, и сначала из двух похожих
+						 * строк выводить наиболее популярную, далее оставлять её, а не просто первую
+						 * из двух, однако сайт не про поиск, поэтому это может быть реализовано только в будущем.
 						 */
-						int score;
-						int index = IndexOfMostCommonByTokenSetRatio(this.FrequentRequests, recent[i].DocumentSearchServiceScope.Request, out score);
-						if (score > this.TokenSetRationNeededToCountAsSimilar)
+						var DebugVar1 = Fuzz.TokenSetRatio(recent[i].DocumentSearchServiceScope.Request, recent[r].DocumentSearchServiceScope.Request);
+						if (Fuzz.TokenSetRatio(recent[i].DocumentSearchServiceScope.Request, recent[r].DocumentSearchServiceScope.Request)
+							> this.TokenSetRationNeededToCountAsSimilar)
 						{
-							this.FrequentRequests[index].IncFreq(recent[i].Frequency + 1);
-							recent.RemoveAt(i--);
-							continue;
+							recent[i].IncFreq(recent[r].Frequency + 1);
+							recent.RemoveAt(r--);
 						}
 					}
-					this.FrequentRequests.AddRange(recent);
-
-					this.FrequentRequests = this.FrequentRequests.OrderByDescending(x => x.Frequency).Take(NumOfFrequentRequestsStored).ToList();
-					for (int i = 0; i < this.FrequentRequests.Count; i++)
-					{
-						this.FrequentRequests[i].DecFreq();
-					}
-
-
-					this.RecentRequests_DocumentSearchServiceScopes = new List<DocumentSearchService>();
 				}
+
+
+				// Учет обработанных недавних запросов в общей статистике частых запросов
+				for (int i = 0; i < recent.Count; i++)
+				{
+					/* Если похожая строка существует, то инкрементировать её
+					 */
+					int score;
+					int index = this.IndexOfMostCommonByTokenSetRatio(this.FrequentRequests, recent[i].DocumentSearchServiceScope.Request, out score);
+					if (score > this.TokenSetRationNeededToCountAsSimilar)
+					{
+						this.FrequentRequests[index].IncFreq(recent[i].Frequency + 1);
+						recent.RemoveAt(i--);
+						continue;
+					}
+				}
+				// Если строка не совпадает ни с одним из уже существующих частых - добавить её
+				this.FrequentRequests.AddRange(recent);
+
+				// Сортировка запросов по убыванию популярности
+				this.FrequentRequests = this.FrequentRequests.OrderByDescending(x => x.Frequency).Take(this.NumOfFrequentRequestsStored).ToList();
+
+				// Снижение частоты каждого запроса с целью вытеснения устаревших частых запросов
+				for (int i = 0; i < this.FrequentRequests.Count; i++)
+				{
+					this.FrequentRequests[i].DecFreq();
+				}
+
+				// Опустошение коллекции недавних запросов
+				this.RecentRequests_DocumentSearchServiceScopes.Clear();
+			}
 		}
 
 		/// <summary>
@@ -175,14 +190,21 @@ namespace Website.Services
 		/// </summary>
 		protected async override Task ExecuteAsync(CancellationToken ct)
 		{
+			// Пока сервису не приказано остановиться
 			while (!ct.IsCancellationRequested)
 			{
-				if (this.RecentRequests_DocumentSearchServiceScopes.Count() > this.Interval_numOfRecentRequests)
-					this.Update();
-				if (((DateTime.UtcNow - this.LastUpdateTime).TotalSeconds > (this.Interval_msec / 1000))
-					&& this.RecentRequests_DocumentSearchServiceScopes.Count > 2)
-					this.Update();
+				await Task.Run(() =>
+				{
+					// Обновить если накоплено достаточное число недавних запросов
+					if (this.RecentRequests_DocumentSearchServiceScopes.Count() > this.Interval_numOfRecentRequests)
+						this.Update();
+					// Обновить если прошел интервал обновления и получен хотябы один новый запрос для обработки
+					if (((DateTime.UtcNow - this.LastUpdateTime).TotalSeconds > (this.Interval_msec / 1000))
+						&& this.RecentRequests_DocumentSearchServiceScopes.Count > 0)
+						this.Update();
+				});
 
+				// Интервал проверки необходимости обновления
 				await Task.Delay(this.Interval_updateNeededCheck_msec);
 			}
 		}
