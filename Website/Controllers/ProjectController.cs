@@ -4,7 +4,8 @@ namespace Website.Controllers
 {
 	public class ProjectController : Controller
 	{
-		public IActionResult Index()
+		[HttpGet]
+		public ViewResult Summary()
 		{
 			return View();
 		}
