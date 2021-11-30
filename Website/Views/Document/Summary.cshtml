@@ -1,0 +1,46 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<Website.Models.DocumentWithAuthorStruct>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="row">
+    <div class="col-lg">
+
+    </div>
+
+    <div class="col-lg-6" id="SearchPanel">     
+        <div class="p-3">
+            @using (Html.BeginForm("Search","Document", FormMethod.Post))
+            {
+                <!--
+                <div class="display-4 text-center">Search document</div>
+                <div class="input-group input-group-lg">
+                    <input type="text" name ="SearchRequest" class="form-control" aria-label="Large" placeholder="Document title/tags" />
+                </div>
+                -->
+                <partial name="~/Views/Shared/PartialViews/Document/_DocumentSearchFormPartialView.cshtml" model=string.Empty />
+            }
+        </div>
+    </div>
+
+    <div class="col-lg" id="RecentDocuments">
+        <div class="p-1">
+            <div class="border border-primary">
+                <div class="w-100 text-center p-1">
+                    <h5>Recent docs</h5>
+                </div>
+                @{
+                    foreach (var doc in @Model)
+                    {   
+                        @:<div class="p-1">
+                        <partial name="~/Views/Shared/PartialViews/Document/_DocumentCardPartialView.cshtml" model=doc />;
+                        @:</div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

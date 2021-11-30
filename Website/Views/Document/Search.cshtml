@@ -1,0 +1,29 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<Website.Models.DocumentWithAuthorStruct>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string OriginalRequest = ViewBag.SearchRequest;
+}
+<div>
+    <div class="p-1">
+        <partial name="~/Views/Shared/PartialViews/Document/_DocumentSearchFormPartialView.cshtml" model=OriginalRequest />
+    </div>
+    <div>
+        @{
+            if(@Model != null && @Model.Any()){
+                foreach (var doc in @Model)
+                {   
+                    @:<div class="p-1">
+                    <partial name="~/Views/Shared/PartialViews/Document/_DocumentCardPartialView.cshtml" model=doc />;
+                    @:</div>
+                }
+            }
+            else
+            {
+                @:<div class="display-5 p-4">
+                <span>No results</span>
+                @:</div>
+            }
+        }
+    </div>
+</div>

@@ -1,0 +1,13 @@
+﻿@model System.Linq.IQueryable<Website.Models.DocumentModel.DbDocument>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<html>
+    <head>
+        <title>DebugCntrlrPage</title>
+    </head>
+    <body>
+        <div>This is a "summary" page of debug controller</div>
+        <div>@Model.Count()</div>
+    </body>
+</html>

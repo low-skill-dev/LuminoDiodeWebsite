@@ -1,0 +1,11 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model System.String
+
+
+@using (Html.BeginForm("Search","Document", FormMethod.Post))
+{
+	<div class="display-4 text-center">Search document</div>
+	<div class="input-group input-group-lg">
+		<input type="text" name ="SearchRequest" class="form-control" aria-label="Large" placeholder="Document title" value="@(Model?? string.Empty)" />
+	</div>
+}
