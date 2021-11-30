@@ -34,7 +34,7 @@ namespace Website.Controllers
 		[HttpGet]
 		public ViewResult Summary()
 		{
-			var rd = recentDocumentsProvider.RecentDocuments; 
+			var rd = recentDocumentsProvider.RecentDocuments;
 
 			Website.Models.DocumentWithAuthorStruct[] documentWithAuthorStructs = new Models.DocumentWithAuthorStruct[3]; int i = 0;
 
@@ -43,7 +43,7 @@ namespace Website.Controllers
 				Website.Models.UserModel.User authorUser = null;
 				try
 				{
-					authorUser = context.Users.Find(doc.AuthorUserId)??
+					authorUser = context.Users.Find(doc.AuthorUserId) ??
 						new Models.UserModel.User { Id = 0, FirstName = "Admin", LastName = string.Empty };
 				}
 				catch (System.InvalidOperationException)
@@ -58,22 +58,31 @@ namespace Website.Controllers
 		}
 
 		[HttpGet]
-		public ViewResult Show(int ProjectId)
+		public IActionResult Show(int Id)
 		{
-			return View();
+			var loadedDoc = this.context.DbDocuments.First(x=> x.Id==Id);
+			if (loadedDoc == null) return new StatusCodeResult(404);
+
+			return View(new Website.Models.DocumentWithAuthorStruct
+			{
+				Document = loadedDoc.ToDocument(),
+				AuthorUser = this.context.Users.Find(loadedDoc.AuthorUserId)
+			});
 		}
 
 		[HttpPost]
 		public ViewResult Search(string SearchRequest)
 		{
-			ViewBag.SearchRequest = SearchRequest;
+			this.ViewBag.SearchRequest = SearchRequest;
 
 			var ServiceProvider = this.ScopeFactory.CreateScope().ServiceProvider;
 			var SearchService = ServiceProvider.GetRequiredService<DocumentSearchService>();
 			var ProceedRes = SearchService.ProceedRequest(SearchRequest);
 			var ResResult = ProceedRes;
-			var Loaded = ResResult.Take(10).ToList().Select(x=> new Models.DocumentWithAuthorStruct { Document=x.ToDocument(), 
-				AuthorUser=this.context.Users.Find(x.AuthorUserId)?? new Models.UserModel.User { Id = 0, FirstName = "Admin", LastName = string.Empty }
+			var Loaded = ResResult.Take(10).ToList().Select(x => new Models.DocumentWithAuthorStruct
+			{
+				Document = x.ToDocument(),
+				AuthorUser = this.context.Users.Find(x.AuthorUserId) ?? new Models.UserModel.User { Id = 0, FirstName = "Admin", LastName = string.Empty }
 			});
 			return View(Loaded);
 		}
