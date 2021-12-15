@@ -40,17 +40,7 @@ namespace Website.Controllers
 
 			foreach (var doc in rd)
 			{
-				Website.Models.UserModel.User authorUser = null;
-				try
-				{
-					authorUser = context.Users.Find(doc.AuthorUserId) ??
-						new Models.UserModel.User { Id = 0, FirstName = "Admin", LastName = string.Empty };
-				}
-				catch (System.InvalidOperationException)
-				{
-					authorUser = new Models.UserModel.User { Id = 0, FirstName = "Admin", LastName = string.Empty };
-				}
-				documentWithAuthorStructs[i++] = new Website.Models.DocumentWithAuthorStruct { Document = doc.ToDocument(), AuthorUser = authorUser };
+				documentWithAuthorStructs[i++] = new Website.Models.DocumentWithAuthorStruct { Document = doc.ToDocument(), AuthorUser= doc.Author};
 				if (i == 3) break;
 			}
 
@@ -60,13 +50,13 @@ namespace Website.Controllers
 		[HttpGet]
 		public IActionResult Show(int Id)
 		{
-			var loadedDoc = this.context.DbDocuments.First(x=> x.Id==Id);
+			var loadedDoc = this.context.DbDocuments.Where(x=> x.Id==Id).Include("Author").First();
 			if (loadedDoc == null) return new StatusCodeResult(404);
 
 			return View(new Website.Models.DocumentWithAuthorStruct
 			{
 				Document = loadedDoc.ToDocument(),
-				AuthorUser = this.context.Users.Find(loadedDoc.AuthorUserId)
+				AuthorUser = loadedDoc.Author
 			});
 		}
 
@@ -82,7 +72,7 @@ namespace Website.Controllers
 			var Loaded = ResResult.Take(10).ToList().Select(x => new Models.DocumentWithAuthorStruct
 			{
 				Document = x.ToDocument(),
-				AuthorUser = this.context.Users.Find(x.AuthorUserId) ?? new Models.UserModel.User { Id = 0, FirstName = "Admin", LastName = string.Empty }
+				AuthorUser = x.Author
 			});
 			return View(Loaded);
 		}
