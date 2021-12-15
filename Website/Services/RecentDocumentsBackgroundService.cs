@@ -18,7 +18,7 @@ namespace Website.Services
 	public class RecentDocumentsBackgroundService : BackgroundService
 	{
 		private IServiceScopeFactory DbContextScopeFactory;
-		public int Interval_msec = 1000 * 60 * 1; // 1 min interval
+		public int Interval_msec = 1000 * 60 * 5; // 5 min interval
 
 		public RecentDocumentsBackgroundService(IServiceScopeFactory DbContextScopeFactory)
 		{
@@ -34,8 +34,7 @@ namespace Website.Services
 			{
 				while (!ct.IsCancellationRequested)
 				{
-					var NewRecent = context.DbDocuments.OrderByDescending(d => d.CreatedDateTime);
-					NewRecent.Skip(NewRecent.Count() - 5);
+					var NewRecent = context.DbDocuments.OrderByDescending(d => d.CreatedDateTime).Take(5).Include("Author");
 					this.RecentDocuments = NewRecent.ToList();
 					await Task.Delay(this.Interval_msec);
 				}

@@ -40,18 +40,15 @@ namespace Website.Services
 		{
 			this.ProceedDateTime= DateTime.UtcNow;
 
-			var TryGetFromFreq = this.FreqReqService.TryGetSimilarRequest(UserRequest);
+			var TryGetFromFreq = this.FreqReqService.GetSimilarRequestOrNull(UserRequest);
 			if (TryGetFromFreq != null)
 			{
 				return TryGetFromFreq.Response;
 			}
 
-
-			var UserReqWords = new Regex(@"\w+").Matches(UserRequest).Select(x => x.Value).ToArray();
-			var DocsIQ = this.DbContextScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>().DbDocuments;
-
 			this.Request = UserRequest;
-			this.Response = DocsIQ.OrderByDescending(d => EF.Functions.TrigramsWordSimilarity(d.Title,UserRequest))
+			this.Response = this.DbContextScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>().DbDocuments
+				.OrderByDescending(d => d.TitleTsVector.Rank(EF.Functions.WebSearchToTsQuery(UserRequest))).Take(20).Include("Author")
 				.ToList();
 			
 			this.FreqReqService.AddDocumentSearchServiceScope(this);
