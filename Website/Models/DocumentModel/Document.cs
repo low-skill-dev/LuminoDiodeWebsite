@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Update;
+using NpgsqlTypes;
+using Website.Models.UserModel;
 
 namespace Website.Models.DocumentModel
 {
@@ -17,7 +19,7 @@ namespace Website.Models.DocumentModel
 	{
 		public int? Id { get; set; }
 		public string Title { get; set; }
-		public int AuthorUserId { get; set; }
+		public User Author { get; set; }
 		public string[] Tags { get; set; }
 		public DateTime CreatedDateTime { get; set; }
 		public DocumentParagraph[] Paragraphs { get; set; }
@@ -34,7 +36,7 @@ namespace Website.Models.DocumentModel
 			return new Document
 			{
 				Title = new RandomDataGenerator.Randomizers.RandomizerTextWords(new RandomDataGenerator.FieldOptions.FieldOptionsTextWords { }).Generate(),
-				AuthorUserId = 1,
+				Author = new UserModel.User() { Id=null, FirstName="AdminFN", LastName="AdminLN"},
 				Tags = new string[rnd.Next(1, 6)]
 					.Select(x => new string(new RandomDataGenerator.Randomizers.RandomizerTextLipsum(new RandomDataGenerator.FieldOptions.FieldOptionsTextLipsum { }).Generate()
 					.Split(' ')[rnd.Next(0,7)].Where(x=> char.IsLetterOrDigit(x)).ToArray())).ToArray(),

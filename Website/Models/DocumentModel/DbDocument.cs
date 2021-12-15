@@ -1,5 +1,19 @@
 ﻿using System;
 using Utf8Json;
+using RandomDataGenerator;
+using System;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
+using Microsoft.EntityFrameworkCore.Scaffolding;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Update;
+using NpgsqlTypes;
+using Website.Models.UserModel;
 
 namespace Website.Models.DocumentModel
 {
@@ -7,7 +21,8 @@ namespace Website.Models.DocumentModel
 	{
 		public int? Id { get; set; }
 		public string Title { get; set; }
-		public int AuthorUserId { get; set; }
+		public NpgsqlTsVector TitleTsVector { get; set; }
+		public User Author { get; set; }
 		public string[] Tags { get; set; }
 		public long CreatedDateTime { get; set; }
 		public byte[] Utf8JsonSerializedParagraphs { get; set; }
@@ -16,7 +31,7 @@ namespace Website.Models.DocumentModel
 		{
 			Id = article.Id,
 			Title = article.Title,
-			AuthorUserId = article.AuthorUserId,
+			Author = article.Author,
 			Tags = article.Tags,
 			CreatedDateTime = article.CreatedDateTime.ToBinary(),
 			Utf8JsonSerializedParagraphs = JsonSerializer.Serialize(article.Paragraphs)
@@ -25,7 +40,7 @@ namespace Website.Models.DocumentModel
 		{
 			Id = this.Id,
 			Title = this.Title,
-			AuthorUserId = this.AuthorUserId,
+			Author = this.Author,
 			Tags = this.Tags,
 			CreatedDateTime = DateTime.FromBinary(this.CreatedDateTime),
 			Paragraphs = JsonSerializer.Deserialize<DocumentParagraph[]>(this.Utf8JsonSerializedParagraphs)
