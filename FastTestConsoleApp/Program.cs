@@ -17,7 +17,7 @@ namespace FastTestConsoleApp
          */
 		static void Main(string[] args)
 		{
-			Console.Write(Website.Models.DocumentModel.Document.GenerateRandom().ToString());
+			Console.Write(FuzzySharp.Fuzz.TokenSetRatio("купить апельсины москва","апельсины купить адрес"));
 		}
 	}
 }
