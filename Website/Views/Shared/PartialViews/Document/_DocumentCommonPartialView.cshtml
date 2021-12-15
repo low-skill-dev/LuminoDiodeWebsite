@@ -2,13 +2,17 @@
 @model Website.Models.DocumentWithAuthorStruct
 
 <div>
-    <div class="h1">
+    <div class="p-2">
+    <div class="display-6">
         @(Model.Document.Title?? $"Document title unknown");
     </div>
 
-    <div class="h4">
-    <partial name="~/Views/Shared/PartialViews/Document/_AuthorAndPublishTimePartialView.cshtml" model=@Model />
+    <div class="h5">
+        <partial name="~/Views/Shared/PartialViews/Document/_AuthorAndPublishTimePartialView.cshtml" model=@Model />
+    </div>
     </div>
 
-    <partial name="~/Views/Shared/PartialViews/Document/_DococumentTextPartialView.cshtml" model=@Model.Document />
+    <div class="p-2">
+        <partial name="~/Views/Shared/PartialViews/Document/_DococumentTextPartialView.cshtml" model=@Model.Document />
+    </div> 
 </div>

@@ -1,0 +1,12 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<Website.Models.ProjectModel.Project>
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@foreach (var prj in Model)
+{
+	<div class="p-3">
+		<partial name="~/Views/Shared/PartialViews/Project/_ProjectCardPartialView.cshtml" model=prj />
+	</div>
+}

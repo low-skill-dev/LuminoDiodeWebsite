@@ -2,22 +2,21 @@
 @model Website.Models.DocumentWithAuthorStruct
 
 
-<div>
-    by
-    <a class="text-black-50" asp-controller="User" asp-action="Show" asp-route-id="@Model.AuthorUser.Id">
-        @Model.AuthorUser.FirstName @Model.AuthorUser.LastName
-    </a>
+<div class="text-black-50 text-weight-normal">
+	by
+	<a class="text-black-50" asp-controller="User" asp-action="Show" asp-route-id="@Model.AuthorUser.Id">
+		@Model.AuthorUser.FirstName @Model.AuthorUser.LastName</a>
 
-    <span class="text-black-50">
-        @if (Model.Document.CreatedDateTime.Date == System.DateTime.Today)
-        {
-            @:at
-            @Model.Document.CreatedDateTime.ToShortTimeString()
-        }
-        else
-        {
-            @:on
-            @Model.Document.CreatedDateTime.ToShortDateString()
-        }
-    </span>
+	<span class="text-black-50">
+		@if (Model.Document.CreatedDateTime.Date == System.DateTime.Today)
+		{
+			@:at
+			@Model.Document.CreatedDateTime.ToShortTimeString()
+		}
+		else
+		{
+			@:on
+			@Model.Document.CreatedDateTime.ToShortDateString()
+		}
+	</span>
 </div>

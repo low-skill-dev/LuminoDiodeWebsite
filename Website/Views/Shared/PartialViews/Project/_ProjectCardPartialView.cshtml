@@ -1,0 +1,21 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Website.Models.ProjectModel.Project
+
+<div class="card w-100" style="max-height:50vh">
+	<div class="card-body overflow-hidden">
+		<h5 class="card-title">
+			<a class="text-dark" asp-controller="Document" asp-action="Show" asp-route-id="@Model.Id">
+				@Model.Name
+			</a>
+		</h5>
+		<h6 class="card-subtitle">
+			<a class="text-black-50" asp-controller="Project" asp-action="Show" asp-route-id="@Model.Id">
+				@Model.OrderedDocumentsId.Length
+				<span> documents</span>
+			</a>
+		</h6>
+		<p class="card-text html">
+			@Model.ShortDescription
+		</p>
+	</div>
+</div>
