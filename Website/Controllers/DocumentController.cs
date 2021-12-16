@@ -22,7 +22,7 @@ namespace Website.Controllers
 		[HttpGet]
 		public ViewResult Summary()
 		{
-			return this.View(this.recentDocumentsProvider.RecentDocuments);
+			return this.View(this.recentDocumentsProvider.RecentDocuments.Select(x=>x.ToDocument()));
 		}
 
 		[HttpGet]
@@ -31,7 +31,7 @@ namespace Website.Controllers
 			var loadedDoc = this.context.DbDocuments.Include("Author").First();
 			if (loadedDoc == null) return new StatusCodeResult(404);
 
-			return this.View(loadedDoc);
+			return this.View(loadedDoc.ToDocument());
 		}
 
 		[HttpPost]
@@ -44,7 +44,7 @@ namespace Website.Controllers
 			var ProceedRes = SearchService.ProceedRequest(SearchRequest);
 			var ResResult = ProceedRes;
 			var Loaded = ResResult.Take(10);
-			return this.View(Loaded);
+			return this.View(Loaded.Select(x=> x.ToDocument()));
 		}
 
 		#region Create
