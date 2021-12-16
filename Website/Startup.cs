@@ -1,33 +1,42 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Website.Repository;
 using Website.Services;
+using Website.Services.SettingsProviders;
 
 
 namespace Website
 {
 	public class Startup
 	{
-		private IServiceCollection services;
+		private readonly IConfiguration configuration;
+		public Startup(IConfiguration config)
+		{
+			this.configuration = config;
+		}
 
+		private IServiceCollection services;
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllersWithViews();
-			services.AddCors();
+
+			services.AddSingleton<Website.Services.RecentDocumentsBackgroundService>();
+			services.AddSingleton<Website.Services.FrequentSearchRequestsService>();
+			var AppSetProv = new AppSettingsProvider(this.configuration);
+			services.AddSingleton<AppSettingsProvider>(AppSetProv);
+			services.AddScoped<Website.Services.DocumentSearchService>();
 
 			DbContextOptions<WebsiteContext> dbContextOptions = new DbContextOptions<WebsiteContext>();
 
 			services.AddDbContext<WebsiteContext>(opts =>
 			{
-				opts.UseNpgsql("Server=localhost;Database=LuminodiodeWebsiteDb1;Password=qwerty;username=postgres");
+				opts.UseNpgsql(AppSetProv.ConnectionStringsP.DefaultNpgsqlConnection);
 			});
 
-			services.AddSingleton<Website.Services.RecentDocumentsBackgroundService>();
-			services.AddSingleton<Website.Services.FrequentSearchRequestsService>();
-			services.AddScoped<Website.Services.DocumentSearchService>();
 			this.services = services;
 		}
 

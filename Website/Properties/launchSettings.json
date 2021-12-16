@@ -1,7 +1,7 @@
 {
   "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
+    "windowsAuthentication": false, 
+    "anonymousAuthentication": true, 
     "iisExpress": {
       "applicationUrl": "http://localhost:5000",
       "sslPort": 0
@@ -23,8 +23,5 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
-  },
-  "ConnectionStrings": {
-    "DefaultNpgsqlConnection": "Server=localhost;Database=LuminodiodeWebsiteDb1;Password=qwerty;username=postgres"
   }
 }

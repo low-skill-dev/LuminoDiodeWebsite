@@ -9,8 +9,8 @@ using Website.Repository;
 namespace Website.Services
 {
 	/// <summary>
-	/// A scope service which processes user document search requests and passes this request to
-	/// FrequentRequestsService (Singleton)
+	/// Scope service which processes user document search requests and passes this request to
+	/// FrequentRequestsSingletonService (tbd)
 	/// </summary>
 	public class DocumentSearchService
 	{
@@ -21,20 +21,22 @@ namespace Website.Services
 			this.DbContextScopeFactory = DbContextScopeFactory;
 			this.FreqReqService = FreqReqService;
 		}
-
 		public DateTime ProceedDateTime;
 
 		public string Request { get; private set; }
 		public List<DbDocument> Response { get; private set; }
 
+
+		// ДОБАВИТЬ ОБНОВЛЕНИЕ ОТВЕТОВ ДЛЯ ЗАПРОСОВ КОТРЫЕ ОСТАЮТСЯ ЧАСТЫМИ ДОЛГОЕ ВРЕМЯ
 		public List<DbDocument> ProceedRequest(string UserRequest)
 		{
 			this.ProceedDateTime = DateTime.UtcNow;
 
 			var TryGetFromFreq = this.FreqReqService.GetSimilarRequestOrNull(UserRequest);
 			if (TryGetFromFreq != null)
+			{
 				return TryGetFromFreq.Response;
-
+			}
 
 			this.Request = UserRequest;
 			this.Response = this.DbContextScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>().DbDocuments

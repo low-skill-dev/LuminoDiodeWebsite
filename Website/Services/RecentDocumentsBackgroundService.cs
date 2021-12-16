@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Website.Repository;
+using Website.Services.SettingsProviders;
 
 namespace Website.Services
 {
@@ -15,11 +16,16 @@ namespace Website.Services
 	public class RecentDocumentsBackgroundService : BackgroundService
 	{
 		private readonly IServiceScopeFactory DbContextScopeFactory;
-		public int Interval_msec = 1000 * 60 * 5; // 5 min interval
+		private readonly AppSettingsProvider SettingsProvider;
+		public int Interval_msec
+		{
+			get => this.SettingsProvider.RecentDocumentsBackgroundServiceSP.Interval_msec;
+		}
 
-		public RecentDocumentsBackgroundService(IServiceScopeFactory DbContextScopeFactory)
+		public RecentDocumentsBackgroundService(IServiceScopeFactory DbContextScopeFactory, AppSettingsProvider SettingsProvider)
 		{
 			this.DbContextScopeFactory = DbContextScopeFactory;
+			this.SettingsProvider = SettingsProvider;
 		}
 
 		public List<Website.Models.DocumentModel.DbDocument> RecentDocuments { get; private set; }

@@ -1,35 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Website.Repository;
-using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Website.Repository;
-using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+﻿using Microsoft.Extensions.Configuration;
 using System;
-using System.Text.RegularExpressions;
-using Website.Models.DocumentModel;
-using Microsoft.Extensions.Configuration;
-using Website.Services;
 
 namespace Website.Services.SettingsProviders
 {
-	public class RecentDocumentsBackgroundServiceSettingsProvider  
+	public class RecentDocumentsBackgroundServiceSettingsProvider
 	{
 		protected readonly IConfiguration config;
 		public RecentDocumentsBackgroundServiceSettingsProvider(IConfiguration configuration)
