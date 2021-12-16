@@ -18,6 +18,7 @@
 		public string? VkLink { get; set; }
 		public string? City { get; set; }
 		public string? PostalCode { get; set; }
+		public string? String64_ProfileImage { get; set; }
 
 		public string GetFullName() => this.FirstName + this.LastName;
 	}
