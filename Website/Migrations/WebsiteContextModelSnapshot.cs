@@ -37,6 +37,9 @@ namespace Website.Migrations
                     b.Property<long>("CreatedDateTime")
                         .HasColumnType("bigint");
 
+                    b.Property<int?>("ProjectId")
+                        .HasColumnType("integer");
+
                     b.Property<string[]>("Tags")
                         .HasColumnType("text[]");
 
@@ -56,6 +59,8 @@ namespace Website.Migrations
 
                     b.HasIndex("AuthorId");
 
+                    b.HasIndex("ProjectId");
+
                     b.HasIndex("TitleTsVector");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("TitleTsVector"), "GIN");
@@ -71,25 +76,26 @@ namespace Website.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
 
-                    b.Property<int[]>("AdminsId")
-                        .HasColumnType("integer[]");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<int[]>("OrderedDocumentsId")
-                        .HasColumnType("integer[]");
-
-                    b.Property<int>("OwnerId")
+                    b.Property<int?>("OwnerId")
                         .HasColumnType("integer");
 
                     b.Property<int>("ProjectType")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ProjectsGroupId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ShortDescription")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("ProjectsGroupId");
 
                     b.ToTable("Projects");
                 });
@@ -102,19 +108,15 @@ namespace Website.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int[]>("AdminsId")
-                        .HasColumnType("integer[]");
-
-                    b.Property<int[]>("OrderedProjectsId")
-                        .HasColumnType("integer[]");
-
-                    b.Property<int>("OwnerId")
+                    b.Property<int?>("OwnerIdId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ShortDescription")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerIdId");
 
                     b.ToTable("ProjectsGroups");
                 });
@@ -142,6 +144,12 @@ namespace Website.Migrations
                     b.Property<string>("PostalCode")
                         .HasColumnType("text");
 
+                    b.Property<int?>("ProjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ProjectsGroupId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("String64_ProfileImage")
                         .HasColumnType("text");
 
@@ -156,6 +164,10 @@ namespace Website.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("ProjectsGroupId");
+
                     b.ToTable("Users");
                 });
 
@@ -165,7 +177,58 @@ namespace Website.Migrations
                         .WithMany()
                         .HasForeignKey("AuthorId");
 
+                    b.HasOne("Website.Models.ProjectModel.Project", null)
+                        .WithMany("OrderedDocumentsId")
+                        .HasForeignKey("ProjectId");
+
                     b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("Website.Models.ProjectModel.Project", b =>
+                {
+                    b.HasOne("Website.Models.UserModel.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId");
+
+                    b.HasOne("Website.Models.ProjectsGroupModel.ProjectsGroup", null)
+                        .WithMany("OrderedProjectsId")
+                        .HasForeignKey("ProjectsGroupId");
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("Website.Models.ProjectsGroupModel.ProjectsGroup", b =>
+                {
+                    b.HasOne("Website.Models.UserModel.User", "OwnerId")
+                        .WithMany()
+                        .HasForeignKey("OwnerIdId");
+
+                    b.Navigation("OwnerId");
+                });
+
+            modelBuilder.Entity("Website.Models.UserModel.User", b =>
+                {
+                    b.HasOne("Website.Models.ProjectModel.Project", null)
+                        .WithMany("Admins")
+                        .HasForeignKey("ProjectId");
+
+                    b.HasOne("Website.Models.ProjectsGroupModel.ProjectsGroup", null)
+                        .WithMany("AdminsId")
+                        .HasForeignKey("ProjectsGroupId");
+                });
+
+            modelBuilder.Entity("Website.Models.ProjectModel.Project", b =>
+                {
+                    b.Navigation("Admins");
+
+                    b.Navigation("OrderedDocumentsId");
+                });
+
+            modelBuilder.Entity("Website.Models.ProjectsGroupModel.ProjectsGroup", b =>
+                {
+                    b.Navigation("AdminsId");
+
+                    b.Navigation("OrderedProjectsId");
                 });
 #pragma warning restore 612, 618
         }
