@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Website.Models.DocumentModel
 {
@@ -11,7 +11,7 @@ namespace Website.Models.DocumentModel
 
 
 #if DEBUG
-		static System.Random rnd = new System.Random();
+		private static readonly System.Random rnd = new System.Random();
 		public static DocumentParagraph GenerateRandom()
 		{
 			var OutDoc = new DocumentParagraph

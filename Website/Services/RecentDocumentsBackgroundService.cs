@@ -1,14 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Website.Repository;
-using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using Website.Repository;
 
 namespace Website.Services
 {
@@ -17,7 +14,7 @@ namespace Website.Services
 	/// </summary>
 	public class RecentDocumentsBackgroundService : BackgroundService
 	{
-		private IServiceScopeFactory DbContextScopeFactory;
+		private readonly IServiceScopeFactory DbContextScopeFactory;
 		public int Interval_msec = 1000 * 60 * 5; // 5 min interval
 
 		public RecentDocumentsBackgroundService(IServiceScopeFactory DbContextScopeFactory)

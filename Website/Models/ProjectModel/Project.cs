@@ -1,16 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Website.Repository;
-using Microsoft.AspNetCore.Mvc;
+﻿using System;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System;
-using FuzzySharp;
 using Website.Models.UserModel;
 
 namespace Website.Models.ProjectModel
@@ -33,9 +22,9 @@ namespace Website.Models.ProjectModel
 		{
 			Random rnd = new Random();
 
-			var Docs = documentsSourceContext.DbDocuments.Select(x=>x.Id).ToList();
+			var Docs = documentsSourceContext.DbDocuments.Select(x => x.Id).ToList();
 
-			var RandomlyShuffeledIndeces =Enumerable.Range(0,(Docs.Count/rnd.Next(1,5))).OrderBy(x=> rnd.Next());
+			var RandomlyShuffeledIndeces = Enumerable.Range(0, (Docs.Count / rnd.Next(1, 5))).OrderBy(x => rnd.Next());
 
 			return new Project
 			{

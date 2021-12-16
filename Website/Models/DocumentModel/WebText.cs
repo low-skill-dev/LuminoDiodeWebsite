@@ -1,5 +1,4 @@
-﻿using RandomDataGenerator;
-using System;
+﻿using System;
 
 namespace Website.Models.DocumentModel
 {
@@ -11,7 +10,7 @@ namespace Website.Models.DocumentModel
 		public bool? IsItalic;
 
 #if DEBUG
-		static Random rnd = new Random();
+		private static readonly Random rnd = new Random();
 		public static WebText GenerateRandomProps(string OrigString)
 		{
 			return new WebText

@@ -4,10 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Website.Repository;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Website.Services;
 
 
@@ -24,8 +20,10 @@ namespace Website
 
 			DbContextOptions<WebsiteContext> dbContextOptions = new DbContextOptions<WebsiteContext>();
 
-			services.AddDbContext<WebsiteContext>(opts =>{
-				opts.UseNpgsql("Server=localhost;Database=LuminodiodeWebsiteDb1;Password=qwerty;username=postgres");});
+			services.AddDbContext<WebsiteContext>(opts =>
+			{
+				opts.UseNpgsql("Server=localhost;Database=LuminodiodeWebsiteDb1;Password=qwerty;username=postgres");
+			});
 
 			services.AddSingleton<Website.Services.RecentDocumentsBackgroundService>();
 			services.AddSingleton<Website.Services.FrequentSearchRequestsService>();

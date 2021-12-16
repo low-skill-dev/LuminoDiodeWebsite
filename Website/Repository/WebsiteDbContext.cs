@@ -1,22 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using Website.Models;
-using System;
-using Utf8Json;
-using RandomDataGenerator;
-using System;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
-using Microsoft.EntityFrameworkCore.Scaffolding;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.EntityFrameworkCore.Update;
-using NpgsqlTypes;
-using Npgsql.Schema;
 
 namespace Website.Repository
 {
@@ -25,7 +8,7 @@ namespace Website.Repository
 		public WebsiteContext(DbContextOptions<WebsiteContext> options) : base(options)
 		{
 #if DEBUG
-			Database.Migrate();
+			this.Database.Migrate();
 			//SeedData();
 #endif
 		}
@@ -33,7 +16,7 @@ namespace Website.Repository
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Website.Models.DocumentModel.DbDocument>().
-				HasGeneratedTsVectorColumn(p => p.TitleTsVector,"english", p => new { p.Title }) 
+				HasGeneratedTsVectorColumn(p => p.TitleTsVector, "english", p => new { p.Title })
 				.HasIndex(p => p.TitleTsVector)
 				.HasMethod("GIN");
 		}
@@ -46,9 +29,9 @@ namespace Website.Repository
 #if DEBUG
 		private void SeedData(bool SaveChanges = true)
 		{
-			SeedData_DbDocuments();
-			SeedData_Users();
-			SeedData_Projects();
+			this.SeedData_DbDocuments();
+			this.SeedData_Users();
+			this.SeedData_Projects();
 		}
 
 		private void SeedData_DbDocuments(bool DoNotSeedIfDataExists = false)

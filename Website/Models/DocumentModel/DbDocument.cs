@@ -1,18 +1,6 @@
-﻿using System;
-using Utf8Json;
-using RandomDataGenerator;
+﻿using NpgsqlTypes;
 using System;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
-using Microsoft.EntityFrameworkCore.Scaffolding;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.EntityFrameworkCore.Update;
-using NpgsqlTypes;
+using Utf8Json;
 using Website.Models.UserModel;
 
 namespace Website.Models.DocumentModel

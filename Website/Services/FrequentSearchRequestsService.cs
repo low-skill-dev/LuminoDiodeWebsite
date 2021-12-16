@@ -1,16 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+﻿using FuzzySharp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Website.Repository;
-using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System;
-using FuzzySharp;
 
 namespace Website.Services
 {
@@ -35,7 +30,7 @@ namespace Website.Services
 		 */
 
 		// Хранит последние, еще не обработанные запросы
-		private List<DocumentSearchService> RecentRequests_DocumentSearchServiceScopes;
+		private readonly List<DocumentSearchService> RecentRequests_DocumentSearchServiceScopes;
 
 		// to be private in release
 		// Хранит наиболее частые запросы

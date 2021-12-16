@@ -7,7 +7,7 @@ namespace Website.Controllers
 		[HttpGet]
 		public ViewResult Summary()
 		{
-			return View();
+			return this.View();
 		}
 	}
 }

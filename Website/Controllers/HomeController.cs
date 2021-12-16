@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Website.Models.DocumentModel;
 
 namespace Website.Controllers
 {
@@ -8,7 +7,7 @@ namespace Website.Controllers
 		[HttpGet]
 		public ViewResult Summary()
 		{
-			return View(model: new string[] { "Coding alpha" });
+			return this.View(model: new string[] { "Coding alpha" });
 		}
 	}
 }
