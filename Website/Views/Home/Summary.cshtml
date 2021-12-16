@@ -1,11 +1,74 @@
-﻿@model IEnumerable<string>
-
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-    ViewBag.Title = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<html>
-    <body>
-        <h2>This is an index page</h2>
-        <h3>Current dev stage is: @Model.First()</h3>
-    </body>
-</html>
+
+<div>
+	<div class="container-lg">
+		<div class="row">
+			<div class="col-lg-6">
+				<div class="p-3">
+					<div class="align-content-end border border-primary border-2 p-1">
+						<div p-3>
+							<div class="display-5" style="font-size:xx-large">What is pracc?</div>
+							<div class="display-6" style="font-size:larger">
+								Pracc or Projects Accumulator is an open-source
+								website which allows you to create and publish documentation
+								for your project.
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6"></div>
+		</div>
+		<div class="row">
+			<div class="col-lg-6"></div>
+			<div class="col-lg-6">
+				<div class="p-3">
+					<div class="align-content-end border border-primary border-2 p-1">
+						<div p-3>
+							<div class="display-5" style="font-size:xx-large">Is it free?</div>
+							<div class="display-6" style="font-size:larger">
+								Our project is MIT-licensed. You can freely copy any code from
+								github repository of our project and use it any way you want.
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-6">
+				<div class="p-3">
+					<div class="align-content-end border border-primary border-2 p-1">
+						<div p-3>
+							<div class="display-5"  style="font-size:xx-large">What technology stack do we use?</div>
+							<div class="display-6" style="font-size:larger">
+								Backend uses MVC.NET6, NpgSQL, Utf8Json, FuzzySharp, RandomDataGenerator.Net (debugging only). Frontend uses bootstrap.css.
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6"></div>
+		</div>
+		<div class="row">
+			<div class="col-lg-6"></div>
+			<div class="col-lg-6">
+				<div class="p-3">
+					<div class="align-content-end border border-primary border-2 p-1">
+						<div p-3>
+							<div class="display-5" style="font-size:xx-large">How can I contact support?</div>
+							<div class="display-6" style="font-size:larger">
+								You can find developer contacts on project's' github repository page.
+								This site is developed by single person.
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
