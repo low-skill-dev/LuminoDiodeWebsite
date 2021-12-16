@@ -24,10 +24,10 @@ namespace Website
 		{
 			services.AddControllersWithViews();
 
-			services.AddSingleton<Website.Services.RecentDocumentsBackgroundService>();
-			services.AddSingleton<Website.Services.FrequentSearchRequestsService>();
 			var AppSetProv = new AppSettingsProvider(this.configuration);
 			services.AddSingleton<AppSettingsProvider>(AppSetProv);
+			services.AddSingleton<Website.Services.RecentDocumentsBackgroundService>();
+			services.AddSingleton<Website.Services.FrequentSearchRequestsService>();
 			services.AddScoped<Website.Services.DocumentSearchService>();
 
 			DbContextOptions<WebsiteContext> dbContextOptions = new DbContextOptions<WebsiteContext>();
@@ -47,14 +47,11 @@ namespace Website
 			{
 				app.UseDeveloperExceptionPage();
 			}
-			#region StartServices
+
 			app.ApplicationServices.GetService<RecentDocumentsBackgroundService>().StartAsync(new System.Threading.CancellationToken());
 			app.ApplicationServices.GetService<FrequentSearchRequestsService>().StartAsync(new System.Threading.CancellationToken());
-			#endregion
-
 
 			app.UseStaticFiles();
-			//app.UseStatusCodePages();
 			app.UseRouting();
 
 			app.UseEndpoints(endpoints =>

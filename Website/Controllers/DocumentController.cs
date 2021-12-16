@@ -22,17 +22,7 @@ namespace Website.Controllers
 		[HttpGet]
 		public ViewResult Summary()
 		{
-			var rd = this.recentDocumentsProvider.RecentDocuments;
-
-			Website.Models.DocumentWithAuthorStruct[] documentWithAuthorStructs = new Models.DocumentWithAuthorStruct[3]; int i = 0;
-
-			foreach (var doc in rd)
-			{
-				documentWithAuthorStructs[i++] = new Website.Models.DocumentWithAuthorStruct { Document = doc.ToDocument(), AuthorUser = doc.Author };
-				if (i == 3) break;
-			}
-
-			return this.View(documentWithAuthorStructs);
+			return this.View(this.recentDocumentsProvider.RecentDocuments);
 		}
 
 		[HttpGet]
@@ -53,11 +43,7 @@ namespace Website.Controllers
 			var SearchService = ServiceProvider.GetRequiredService<DocumentSearchService>();
 			var ProceedRes = SearchService.ProceedRequest(SearchRequest);
 			var ResResult = ProceedRes;
-			var Loaded = ResResult.Take(10).ToList().Select(x => new Models.DocumentWithAuthorStruct
-			{
-				Document = x.ToDocument(),
-				AuthorUser = x.Author
-			});
+			var Loaded = ResResult.Take(10);
 			return this.View(Loaded);
 		}
 
