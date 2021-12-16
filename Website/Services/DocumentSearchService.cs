@@ -13,12 +13,13 @@ using System;
 using System.Text.RegularExpressions;
 using Website.Models.DocumentModel;
 using FuzzySharp;
+using Website.Services.SettingsProviders;
 
 namespace Website.Services
 {
 	/// <summary>
-	/// Scope service which processes user document search requests and passes this request to
-	/// FrequentRequestsSingletonService (tbd)
+	/// A scope service which processes user document search requests and passes this request to
+	/// FrequentRequestsService (Singleton)
 	/// </summary>
 	public class DocumentSearchService
 	{
@@ -29,22 +30,20 @@ namespace Website.Services
 			this.DbContextScopeFactory = DbContextScopeFactory;
 			this.FreqReqService = FreqReqService;
 		}
+
 		public DateTime ProceedDateTime;
 
 		public string Request { get; private set; }
 		public List<DbDocument> Response { get; private set; }
 		
-
-		// ДОБАВИТЬ ОБНОВЛЕНИЕ ОТВЕТОВ ДЛЯ ЗАПРОСОВ КОТРЫЕ ОСТАЮТСЯ ЧАСТЫМИ ДОЛГОЕ ВРЕМЯ
 		public List<DbDocument> ProceedRequest(string UserRequest)
 		{
 			this.ProceedDateTime= DateTime.UtcNow;
 
 			var TryGetFromFreq = this.FreqReqService.GetSimilarRequestOrNull(UserRequest);
 			if (TryGetFromFreq != null)
-			{
 				return TryGetFromFreq.Response;
-			}
+			
 
 			this.Request = UserRequest;
 			this.Response = this.DbContextScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>().DbDocuments
