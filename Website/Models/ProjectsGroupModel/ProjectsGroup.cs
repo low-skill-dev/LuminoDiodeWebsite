@@ -1,11 +1,14 @@
-﻿namespace Website.Models.ProjectsGroupModel
+﻿using Website.Models.UserModel;
+using Website.Models.ProjectModel;
+
+namespace Website.Models.ProjectsGroupModel
 {
 	public class ProjectsGroup
 	{
 		public int Id { get; set; }
-		public int OwnerId { get; set; }
-		public int[] AdminsId { get; set; }
-		public int[] OrderedProjectsId { get; set; }
+		public User OwnerId { get; set; }
+		public User[] AdminsId { get; set; }
+		public Project[] OrderedProjectsId { get; set; }
 		public string ShortDescription { get; set; }
 	}
 }
