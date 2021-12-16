@@ -1,0 +1,14 @@
+﻿@model IEnumerable<string>
+
+@{
+	if (!(Model?.Any() ?? false))
+	{
+		<p>Nothing to show</p>
+	}
+	else foreach (string s in @Model)
+	{
+		<p>
+			@s
+		</p>
+	}
+}
