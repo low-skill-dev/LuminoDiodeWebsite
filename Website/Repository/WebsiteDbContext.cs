@@ -9,7 +9,7 @@ namespace Website.Repository
 		{
 #if DEBUG
 			this.Database.Migrate();
-			//SeedData();
+			SeedData();
 #endif
 		}
 
@@ -43,26 +43,35 @@ namespace Website.Repository
 			// this checks if there is at least 10 raws in the db
 			//if (this.DbDocuments.Find(10000) != null && DoNotSeedIfDataExists) return;
 
-			var docsToAdd = new object[10000].Select(x => Models.DocumentModel.DbDocument.FromDocument(Website.Models.DocumentModel.Document.GenerateRandom()));
-			this.DbDocuments.AddRange(docsToAdd);
-			this.SaveChanges();
+			while (this.DbDocuments.Find(100000) == null)
+			{
+				var docsToAdd = new object[10000].Select(x => Models.DocumentModel.DbDocument.FromDocument(Website.Models.DocumentModel.Document.GenerateRandom()));
+				this.DbDocuments.AddRange(docsToAdd);
+				this.SaveChanges();
+			}
 		}
 		private void SeedData_Users()
 		{
-			var ToAdd = new Models.UserModel.User
+			while (this.Users.Find(1) == null)
 			{
-				Id = null,
-				FirstName = "Admin",
-				LastName = "Adminovich"
-			};
-			this.Users.Add(ToAdd);
-			this.SaveChanges();
+				var ToAdd = new Models.UserModel.User
+				{
+					Id = null,
+					FirstName = "Admin",
+					LastName = "Adminovich"
+				};
+				this.Users.Add(ToAdd);
+				this.SaveChanges();
+			}
 		}
 		private void SeedData_Projects()
 		{
-			var ToAdd = new object[100].Select(x => Website.Models.ProjectModel.Project.GenerateRandom(this));
-			this.Projects.AddRange(ToAdd);
-			this.SaveChanges();
+			while (this.Projects.Find(100) == null)
+			{
+				var ToAdd = new object[100].Select(x => Website.Models.ProjectModel.Project.GenerateRandom(this));
+				this.Projects.AddRange(ToAdd);
+				this.SaveChanges();
+			}
 		}
 		private void SeedData_ProjectsGroups()
 		{
