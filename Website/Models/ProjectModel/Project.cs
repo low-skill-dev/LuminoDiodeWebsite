@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using FuzzySharp;
+using Website.Models.UserModel;
 
 namespace Website.Models.ProjectModel
 {
@@ -24,9 +25,9 @@ namespace Website.Models.ProjectModel
 		public PROJECT_TYPE ProjectType { get; set; }
 		public string Name { get; set; }
 		public string ShortDescription { get; set; }
-		public int OwnerId { get; set; }
-		public int[] AdminsId { get; set; }
-		public int[] OrderedDocumentsId { get; set; }
+		public User OwnerId { get; set; }
+		public User[] AdminsId { get; set; }
+		public DocumentModel.DbDocument[] OrderedDocuments { get; set; }
 
 		public static Project GenerateRandom(Website.Repository.WebsiteContext documentsSourceContext)
 		{
@@ -41,10 +42,10 @@ namespace Website.Models.ProjectModel
 				ProjectType = PROJECT_TYPE.Common,
 				Name = "I am a test project",
 				ShortDescription = "Test project desciption",
-				OwnerId = 1,
-				AdminsId = new int[0],
+				OwnerId = new User { Id = 0 },
+				AdminsId = new User[0],
 				// Doc ID is never null cause of it has been loaded from DB
-				OrderedDocumentsId = RandomlyShuffeledIndeces.Select(x => Docs[x].Value).ToArray()
+				OrderedDocuments = documentsSourceContext.DbDocuments.Take(20).ToArray()
 			};
 		}
 	}
