@@ -1,10 +1,10 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@model Website.Models.DocumentWithAuthorStruct
+@model Website.Models.DocumentModel.Document
 
 <div>
     <div class="p-2">
     <div class="display-6">
-        @(Model.Document.Title?? $"Document title unknown");
+        @(Model.Title?? $"Document title unknown");
     </div>
 
     <div class="h5">
@@ -13,6 +13,6 @@
     </div>
 
     <div class="p-2">
-        <partial name="~/Views/Shared/PartialViews/Document/_DococumentTextPartialView.cshtml" model=@Model.Document />
+        <partial name="~/Views/Shared/PartialViews/Document/_DococumentTextPartialView.cshtml" model=@Model />
     </div> 
 </div>

@@ -38,14 +38,10 @@ namespace Website.Controllers
 		[HttpGet]
 		public IActionResult Show(int Id)
 		{
-			var loadedDoc = this.context.DbDocuments.Where(x => x.Id == Id).Include("Author").First();
+			var loadedDoc = this.context.DbDocuments.Include("Author").First();
 			if (loadedDoc == null) return new StatusCodeResult(404);
 
-			return this.View(new Website.Models.DocumentWithAuthorStruct
-			{
-				Document = loadedDoc.ToDocument(),
-				AuthorUser = loadedDoc.Author
-			});
+			return this.View(loadedDoc);
 		}
 
 		[HttpPost]

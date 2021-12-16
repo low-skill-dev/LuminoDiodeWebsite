@@ -1,35 +1,35 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@model Website.Models.DocumentWithAuthorStruct
+@model Website.Models.DocumentModel.Document
 
 <div class="card w-100" style="max-height:50vh">
 	<div class="card-body overflow-hidden">
 		<h5 class="card-title">
-			<a class="text-dark" asp-controller="Document" asp-action="Show" asp-route-id="@Model.Document.Id">
-				@Model.Document.Title
+			<a class="text-dark" asp-controller="Document" asp-action="Show" asp-route-id="@Model.Author.Id">
+				@Model.Title
 			</a>
 		</h5>
 		<h6 class="card-subtitle">
 			by
-			<a class="text-black-50" asp-controller="User" asp-action="Show" asp-route-id="@Model.AuthorUser.Id">
-				@Model.AuthorUser.FirstName @Model.AuthorUser.LastName
+			<a class="text-black-50" asp-controller="User" asp-action="Show" asp-route-id="@Model.Author.Id">
+				@Model.Author.FirstName @Model.Author.LastName
 			</a>
 			
 			<span class="text-black-50">
-				@if (Model.Document.CreatedDateTime.Date == System.DateTime.Today)
+				@if (Model.CreatedDateTime.Date == System.DateTime.Today)
 				{
 					@:at
-					@Model.Document.CreatedDateTime.ToShortTimeString()
+					@Model.CreatedDateTime.ToShortTimeString()
 				}
 				else
 				{
 					@:on
-					@Model.Document.CreatedDateTime.ToShortDateString()
+					@Model.CreatedDateTime.ToShortDateString()
 				}
 			</span>
 		</h6>
 		<p class="card-text html">
 			@{
-				<partial name="~/Views/Shared/PartialViews/Document/_ParagraphTextPartialView.cshtml" model=Model.Document.Paragraphs[0] />
+				<partial name="~/Views/Shared/PartialViews/Document/_ParagraphTextPartialView.cshtml" model=Model.Paragraphs[0] />
 			}
 		</p>
 	</div>
