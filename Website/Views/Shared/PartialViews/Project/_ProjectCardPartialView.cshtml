@@ -10,12 +10,12 @@
 		</h5>
 		<h6 class="card-subtitle">
 			<a class="text-black-50" asp-controller="Project" asp-action="Show" asp-route-id="@Model.Id">
-				@Model.OrderedDocumentsId.Count()
+				@(Model.OrderedDocumentsId?.Count() ?? 0)
 				<span> documents</span>
 			</a>
 		</h6>
 		<p class="card-text html">
-			@Model.ShortDescription
+			@(Model.ShortDescription?? string.Empty)
 		</p>
 	</div>
 </div>
