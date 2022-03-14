@@ -12,7 +12,7 @@ namespace Website.Models.UserModel
 		}
 		
 
-		public int? Id { get; set; }= null!;
+		public int Id { get; set; }
 		public USER_TYPE UserType { get; set; } = USER_TYPE.Common;
 		public string FirstName { get; set; }= null!;
 		public string? LastName { get; set; }= null!;
@@ -23,10 +23,10 @@ namespace Website.Models.UserModel
 		public string? PostalCode { get; set; }= null!;
 		public string? String64_ProfileImage { get; set; }= null!;
 
-		public string EmailAdress { get; set; }= null!;
+		public string? EmailAdress { get; set; }= null!;
 		//public string AuthUserName { get; set; }= null!;
-		public byte[] AuthHashedPassword { get; set; }= null!;
-		public byte[] AuthPasswordSalt { get; set; }= null!;
+		public byte[]? AuthHashedPassword { get; set; }= null!;
+		public byte[]? AuthPasswordSalt { get; set; }= null!;
 
 		public string GetFullName()
 		{
