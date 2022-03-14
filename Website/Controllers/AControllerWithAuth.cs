@@ -18,6 +18,7 @@ namespace Website.Controllers
 		{
 			this.DbCtx = ctx;
 			this.SM = SM;
+			ViewBag.AuthedUser = null;
 			/*
 			if (HttpContext.Current.Request.Cookies.ContainsKey(SessionManager.SessionIdCoockieName))
 			{
@@ -38,7 +39,7 @@ namespace Website.Controllers
 #pragma warning disable CS8604
 				SM.ValidateSession(Request.Cookies[SessionManager.SessionIdCoockieName], out Info);
 #pragma warning restore CS8604
-				this.AuthedUser = DbCtx.Users.Find(Info?.UserId) ?? throw new System.AggregateException("Session cotains user id which cannot be found in DB");
+				this.AuthedUser = DbCtx.Users.Find(Info?.UserId) ?? null /* throw new System.AggregateException("Session cotains user id which cannot be found in DB")*/;
 				ViewBag.AuthedUser = this.AuthedUser;
 			}
 		}

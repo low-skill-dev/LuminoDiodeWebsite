@@ -60,6 +60,13 @@ namespace Website.Controllers
 
 			return new StatusCodeResult(401); // 401 not authorized
 		}
+
+		[HttpGet]
+		public ActionResult Logout()
+		{
+			Response.Cookies.Delete(SessionManager.SessionIdCoockieName);
+			return RedirectToAction("Summary", "Home");
+		}
 		
 		[HttpGet]
 		public async Task<IActionResult> Show(int Id)
