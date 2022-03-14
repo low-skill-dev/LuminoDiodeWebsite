@@ -29,6 +29,16 @@
                     <li class="nav-item"><a class="nav-link" asp-controller="Document"asp-action=@string.Empty><b>Documents</b></a></li>
                     <li class="nav-item"><a class="nav-link" asp-controller="User" asp-action=@string.Empty><b>Users</b></a></li>
                     <li class="nav-item"><a class="nav-link" asp-controller="Dbg" asp-action=@string.Empty><b>DebugCtrller</b></a></li>
+                    @{
+                        if(@ViewBag.AuthedUser==null){
+                            <li class="nav-item"><a class="nav-link" asp-controller="User" asp-action="Login">Sign in / Sign up</a></li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="User" asp-action="Show" asp-route-id="@ViewBag.AuthedUser.Id">@ViewBag.AuthedUser.FirstName</a></li>
+                        }
+                    }
+                    <li class="nav-item"><a class="nav-link"></a></li>
                 </ul>
             </div>
         </div>

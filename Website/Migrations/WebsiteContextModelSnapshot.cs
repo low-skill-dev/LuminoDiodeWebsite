@@ -18,41 +18,45 @@ namespace Website.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("ProductVersion", "6.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Website.Models.DocumentModel.DbDocument", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AuthorId")
+                    b.Property<int>("AuthorId")
                         .HasColumnType("integer");
 
-                    b.Property<long>("CreatedDateTime")
-                        .HasColumnType("bigint");
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("ProjectId")
                         .HasColumnType("integer");
 
                     b.Property<string[]>("Tags")
+                        .IsRequired()
                         .HasColumnType("text[]");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<NpgsqlTsVector>("TitleTsVector")
+                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("tsvector")
                         .HasAnnotation("Npgsql:TsVectorConfig", "english")
                         .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Title" });
 
                     b.Property<byte[]>("Utf8JsonSerializedParagraphs")
+                        .IsRequired()
                         .HasColumnType("bytea");
 
                     b.HasKey("Id");
@@ -70,16 +74,17 @@ namespace Website.Migrations
 
             modelBuilder.Entity("Website.Models.ProjectModel.Project", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("OwnerId")
+                    b.Property<int>("OwnerId")
                         .HasColumnType("integer");
 
                     b.Property<int>("ProjectType")
@@ -89,6 +94,7 @@ namespace Website.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("ShortDescription")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -108,10 +114,11 @@ namespace Website.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("OwnerIdId")
+                    b.Property<int>("OwnerIdId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ShortDescription")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -123,19 +130,29 @@ namespace Website.Migrations
 
             modelBuilder.Entity("Website.Models.UserModel.User", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AboutMe")
                         .HasColumnType("text");
 
+                    b.Property<byte[]>("AuthHashedPassword")
+                        .HasColumnType("bytea");
+
+                    b.Property<byte[]>("AuthPasswordSalt")
+                        .HasColumnType("bytea");
+
                     b.Property<string>("City")
                         .HasColumnType("text");
 
+                    b.Property<string>("EmailAdress")
+                        .HasColumnType("text");
+
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("LastName")
@@ -175,7 +192,9 @@ namespace Website.Migrations
                 {
                     b.HasOne("Website.Models.UserModel.User", "Author")
                         .WithMany()
-                        .HasForeignKey("AuthorId");
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Website.Models.ProjectModel.Project", null)
                         .WithMany("OrderedDocumentsId")
@@ -188,7 +207,9 @@ namespace Website.Migrations
                 {
                     b.HasOne("Website.Models.UserModel.User", "Owner")
                         .WithMany()
-                        .HasForeignKey("OwnerId");
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Website.Models.ProjectsGroupModel.ProjectsGroup", null)
                         .WithMany("OrderedProjectsId")
@@ -201,7 +222,9 @@ namespace Website.Migrations
                 {
                     b.HasOne("Website.Models.UserModel.User", "OwnerId")
                         .WithMany()
-                        .HasForeignKey("OwnerIdId");
+                        .HasForeignKey("OwnerIdId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("OwnerId");
                 });

@@ -4,10 +4,14 @@ namespace Website.Models.DocumentModel
 {
 	public class WebText
 	{
+		#pragma warning disable CS8618
+		
 		public string Text;
 		public string? Link;
 		public bool? IsBold;
 		public bool? IsItalic;
+
+		#pragma warning restore CS8618
 
 #if DEBUG
 		private static readonly Random rnd = new Random();

@@ -7,13 +7,14 @@ namespace Website.Models.DocumentModel
 {
 	public class DbDocument
 	{
-		public int? Id { get; set; }
-		public string Title { get; set; }
-		public NpgsqlTsVector TitleTsVector { get; set; }
-		public User Author { get; set; }
-		public string[] Tags { get; set; }
-		public long CreatedDateTime { get; set; }
-		public byte[] Utf8JsonSerializedParagraphs { get; set; }
+		public int Id { get; set; }
+		public string Title { get; set; }= null!;
+		public NpgsqlTsVector TitleTsVector { get; set; }= null!;
+		public User Author { get; set; }= null!;
+		public string[] Tags { get; set; }= null!;
+		public DateTime CreatedDateTime { get; set; } = DateTime.UtcNow;
+		public byte[] Utf8JsonSerializedParagraphs { get; set; }= null!;
+
 
 		public static DbDocument FromDocument(Document article) => new DbDocument
 		{
@@ -21,7 +22,7 @@ namespace Website.Models.DocumentModel
 			Title = article.Title,
 			Author = article.Author,
 			Tags = article.Tags,
-			CreatedDateTime = article.CreatedDateTime.ToBinary(),
+			CreatedDateTime = article.CreatedDateTime,
 			Utf8JsonSerializedParagraphs = JsonSerializer.Serialize(article.Paragraphs)
 		};
 		public Document ToDocument() => new Document
@@ -30,7 +31,7 @@ namespace Website.Models.DocumentModel
 			Title = this.Title,
 			Author = this.Author,
 			Tags = this.Tags,
-			CreatedDateTime = DateTime.FromBinary(this.CreatedDateTime),
+			CreatedDateTime = this.CreatedDateTime,
 			Paragraphs = JsonSerializer.Deserialize<DocumentParagraph[]>(this.Utf8JsonSerializedParagraphs)
 		};
 	}

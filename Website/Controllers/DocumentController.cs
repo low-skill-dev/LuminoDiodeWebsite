@@ -7,16 +7,20 @@ using Website.Services;
 
 namespace Website.Controllers
 {
-	public class DocumentController : Controller
+	public class DocumentController : AControllerWithAuth
 	{
 		private readonly IServiceScopeFactory ScopeFactory;
 		private readonly Website.Repository.WebsiteContext context;
 		private readonly Website.Services.RecentDocumentsBackgroundService recentDocumentsProvider;
-		public DocumentController(IServiceScopeFactory Services, Website.Services.RecentDocumentsBackgroundService documentsBackgroundService)
+		public DocumentController(IServiceScopeFactory Services, Website.Services.RecentDocumentsBackgroundService documentsBackgroundService, SessionManager SM)
+			:base(SM, Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>())
 		{
 			this.ScopeFactory = Services;
 			this.context = Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();
 			this.recentDocumentsProvider = documentsBackgroundService;
+#if DEBUG
+			Services.CreateScope().ServiceProvider.GetService<RandomDataSeederService>().SeedData();
+#endif
 		}
 
 		[HttpGet]

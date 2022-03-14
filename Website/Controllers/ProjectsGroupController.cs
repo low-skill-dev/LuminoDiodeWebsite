@@ -1,9 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
+using Website.Repository;
+using Website.Services;
+
 
 namespace Website.Controllers
 {
-	public class ProjectsGroupController : Controller
+	public class ProjectsGroupController : AControllerWithAuth
 	{
+		private readonly IServiceScopeFactory ScopeFactory;
+		private readonly Website.Repository.WebsiteContext context;
+		private readonly Website.Services.RecentDocumentsBackgroundService recentDocumentsProvider;
+		public ProjectsGroupController(IServiceScopeFactory Services, Website.Services.RecentDocumentsBackgroundService documentsBackgroundService, SessionManager SM)
+			: base(SM, Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>())
+		{
+			this.ScopeFactory = Services;
+			this.context = Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();
+			this.recentDocumentsProvider = documentsBackgroundService;
+		}
 		[HttpGet]
 		public ViewResult Summary()
 		{

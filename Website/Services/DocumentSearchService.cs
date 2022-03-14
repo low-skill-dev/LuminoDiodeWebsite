@@ -23,8 +23,8 @@ namespace Website.Services
 		}
 		public DateTime ProceedDateTime;
 
-		public string Request { get; private set; }
-		public List<DbDocument> Response { get; private set; }
+		public string? Request { get; private set; }
+		public List<DbDocument>? Response { get; private set; }
 
 
 		// ДОБАВИТЬ ОБНОВЛЕНИЕ ОТВЕТОВ ДЛЯ ЗАПРОСОВ КОТРЫЕ ОСТАЮТСЯ ЧАСТЫМИ ДОЛГОЕ ВРЕМЯ

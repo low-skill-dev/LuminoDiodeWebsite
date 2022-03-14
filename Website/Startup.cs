@@ -28,7 +28,10 @@ namespace Website
 			services.AddSingleton<AppSettingsProvider>(AppSetProv);
 			services.AddSingleton<Website.Services.RecentDocumentsBackgroundService>();
 			services.AddSingleton<Website.Services.FrequentSearchRequestsService>();
+			services.AddSingleton<Website.Services.SessionManager>();
 			services.AddScoped<Website.Services.DocumentSearchService>();
+			services.AddScoped<Website.Services.PasswordsService>();
+			services.AddScoped<Website.Services.RandomDataSeederService>();
 
 			DbContextOptions<WebsiteContext> dbContextOptions = new DbContextOptions<WebsiteContext>();
 
@@ -50,6 +53,7 @@ namespace Website
 
 			app.ApplicationServices.GetService<RecentDocumentsBackgroundService>().StartAsync(new System.Threading.CancellationToken());
 			app.ApplicationServices.GetService<FrequentSearchRequestsService>().StartAsync(new System.Threading.CancellationToken());
+			app.ApplicationServices.GetService<SessionManager>().StartAsync(new System.Threading.CancellationToken());
 
 			app.UseStaticFiles();
 			app.UseRouting();
