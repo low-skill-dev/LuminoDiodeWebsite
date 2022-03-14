@@ -12,13 +12,18 @@ namespace Website.Models.ProjectModel
 		{
 			Common = 0
 		}
-		public int? Id { get; set; }
+
+		#pragma warning disable CS8618
+
+		public int Id { get; set; }
 		public PROJECT_TYPE ProjectType { get; set; }
 		public string Name { get; set; }
 		public string ShortDescription { get; set; }
 		public User Owner { get; set; }
 		public User[] Admins { get; set; }
 		public IEnumerable<DbDocument> OrderedDocumentsId { get; set; }
+
+		#pragma warning restore CS8618
 
 		public static Project GenerateRandom(Website.Repository.WebsiteContext documentsSourceContext)
 		{
@@ -28,7 +33,7 @@ namespace Website.Models.ProjectModel
 				ProjectType = PROJECT_TYPE.Common,
 				Name = "I am a test project",
 				ShortDescription = "Test project desciption",
-				Owner = documentsSourceContext.Users.Find(1),
+				Owner = documentsSourceContext.Users.First(),
 				Admins = new User[0],
 				// Doc ID is never null cause of it has been loaded from DB
 				OrderedDocumentsId = documentsSourceContext.DbDocuments.Take(10).ToList()
