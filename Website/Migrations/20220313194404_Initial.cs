@@ -12,17 +12,24 @@ namespace Website.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ProjectsGroups",
+                name: "DbDocuments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    OwnerIdId = table.Column<int>(type: "integer", nullable: true),
-                    ShortDescription = table.Column<string>(type: "text", nullable: true)
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    TitleTsVector = table.Column<NpgsqlTsVector>(type: "tsvector", nullable: false)
+                        .Annotation("Npgsql:TsVectorConfig", "english")
+                        .Annotation("Npgsql:TsVectorProperties", new[] { "Title" }),
+                    AuthorId = table.Column<int>(type: "integer", nullable: false),
+                    Tags = table.Column<string[]>(type: "text[]", nullable: false),
+                    CreatedDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Utf8JsonSerializedParagraphs = table.Column<byte[]>(type: "bytea", nullable: false),
+                    ProjectId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProjectsGroups", x => x.Id);
+                    table.PrimaryKey("PK_DbDocuments", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -32,19 +39,28 @@ namespace Website.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ProjectType = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    ShortDescription = table.Column<string>(type: "text", nullable: true),
-                    OwnerId = table.Column<int>(type: "integer", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    ShortDescription = table.Column<string>(type: "text", nullable: false),
+                    OwnerId = table.Column<int>(type: "integer", nullable: false),
                     ProjectsGroupId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Projects", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Projects_ProjectsGroups_ProjectsGroupId",
-                        column: x => x.ProjectsGroupId,
-                        principalTable: "ProjectsGroups",
-                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProjectsGroups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    OwnerIdId = table.Column<int>(type: "integer", nullable: false),
+                    ShortDescription = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectsGroups", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -54,7 +70,7 @@ namespace Website.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserType = table.Column<int>(type: "integer", nullable: false),
-                    FirstName = table.Column<string>(type: "text", nullable: true),
+                    FirstName = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: true),
                     AboutMe = table.Column<string>(type: "text", nullable: true),
                     TelegramLink = table.Column<string>(type: "text", nullable: true),
@@ -62,6 +78,9 @@ namespace Website.Migrations
                     City = table.Column<string>(type: "text", nullable: true),
                     PostalCode = table.Column<string>(type: "text", nullable: true),
                     String64_ProfileImage = table.Column<string>(type: "text", nullable: true),
+                    EmailAdress = table.Column<string>(type: "text", nullable: false),
+                    AuthHashedPassword = table.Column<byte[]>(type: "bytea", nullable: false),
+                    AuthPasswordSalt = table.Column<byte[]>(type: "bytea", nullable: false),
                     ProjectId = table.Column<int>(type: "integer", nullable: true),
                     ProjectsGroupId = table.Column<int>(type: "integer", nullable: true)
                 },
@@ -77,37 +96,6 @@ namespace Website.Migrations
                         name: "FK_Users_ProjectsGroups_ProjectsGroupId",
                         column: x => x.ProjectsGroupId,
                         principalTable: "ProjectsGroups",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DbDocuments",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "text", nullable: true),
-                    TitleTsVector = table.Column<NpgsqlTsVector>(type: "tsvector", nullable: true)
-                        .Annotation("Npgsql:TsVectorConfig", "english")
-                        .Annotation("Npgsql:TsVectorProperties", new[] { "Title" }),
-                    AuthorId = table.Column<int>(type: "integer", nullable: true),
-                    Tags = table.Column<string[]>(type: "text[]", nullable: true),
-                    CreatedDateTime = table.Column<long>(type: "bigint", nullable: false),
-                    Utf8JsonSerializedParagraphs = table.Column<byte[]>(type: "bytea", nullable: true),
-                    ProjectId = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DbDocuments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DbDocuments_Projects_ProjectId",
-                        column: x => x.ProjectId,
-                        principalTable: "Projects",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_DbDocuments_Users_AuthorId",
-                        column: x => x.AuthorId,
-                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 
@@ -153,10 +141,25 @@ namespace Website.Migrations
                 column: "ProjectsGroupId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_ProjectsGroups_Users_OwnerIdId",
-                table: "ProjectsGroups",
-                column: "OwnerIdId",
+                name: "FK_DbDocuments_Projects_ProjectId",
+                table: "DbDocuments",
+                column: "ProjectId",
+                principalTable: "Projects",
+                principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DbDocuments_Users_AuthorId",
+                table: "DbDocuments",
+                column: "AuthorId",
                 principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Projects_ProjectsGroups_ProjectsGroupId",
+                table: "Projects",
+                column: "ProjectsGroupId",
+                principalTable: "ProjectsGroups",
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
@@ -164,7 +167,16 @@ namespace Website.Migrations
                 table: "Projects",
                 column: "OwnerId",
                 principalTable: "Users",
-                principalColumn: "Id");
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ProjectsGroups_Users_OwnerIdId",
+                table: "ProjectsGroups",
+                column: "OwnerIdId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
