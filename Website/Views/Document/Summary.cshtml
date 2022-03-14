@@ -8,21 +8,12 @@
 
 <div class="row">
     <div class="col-lg">
-
+        <img style="height: 100%; width: 100%; object-fit: contain"  src="~/StaticFiles/Images/ForFun/jvoIVk8HTwg.png"/>
     </div>
 
     <div class="col-lg-6" id="SearchPanel">     
         <div class="p-3">
-            @using (Html.BeginForm("Search","Document", FormMethod.Post))
-            {
-                <!--
-                <div class="display-4 text-center">Search document</div>
-                <div class="input-group input-group-lg">
-                    <input type="text" name ="SearchRequest" class="form-control" aria-label="Large" placeholder="Document title/tags" />
-                </div>
-                -->
                 <partial name="~/Views/Shared/PartialViews/Document/_DocumentSearchFormPartialView.cshtml" model=string.Empty />
-            }
         </div>
     </div>
 
