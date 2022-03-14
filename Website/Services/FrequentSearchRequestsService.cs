@@ -108,7 +108,7 @@ namespace Website.Services
 				tryFind.IncFreq();
 
 				// Если ответ устарел - обновить сейчас
-				if ((tryFind.DocumentSearchServiceScope.ProceedDateTime - DateTime.Now)
+				if ((tryFind.DocumentSearchServiceScope.ProceedDateTime - DateTime.UtcNow)
 					.Seconds > this.ResponseLifetime_msec)
 				{
 					tryFind.DocumentSearchServiceScope = this.ScopeFactory.CreateScope().ServiceProvider.
