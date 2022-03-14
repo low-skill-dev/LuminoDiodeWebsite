@@ -1,0 +1,32 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Website.Models.Auth.LoginInfo
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+
+		if(Model!=null){
+			if (Model.EmailPlainText == null) Model.EmailPlainText = string.Empty;
+			if (Model.PasswordPlainText == null) Model.EmailPlainText = string.Empty;
+		}
+}
+
+<div class="col-lg-4"></div>
+<div class="col-lg-4">
+	@using (Html.BeginForm("Login", "User", FormMethod.Post))
+	{
+		<div class="input-group input-group-lg">
+			<ul>
+				<li>
+					<p class="display-5">email</p>
+					<input class="form-control" type="text" name="EmailPlainText" placeholder="Your email" value="@((Model?.EmailPlainText)?? string.Empty)" />
+				</li>
+				<li>
+					<p class="display-5">pass</p>
+					<input class="form-control" type="text" name="PasswordPlainText" placeholder="Your password" value="@((Model?.PasswordPlainText) ?? string.Empty)" />
+				</li>
+				<li><input type="submit" value="Submit"/></li>
+			</ul>
+		</div>
+	}
+</div>
+<div class="col-lg-4">
+</div>
