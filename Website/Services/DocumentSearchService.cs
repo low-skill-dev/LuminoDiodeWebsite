@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Website.Models.DocumentModel;
 using Website.Repository;
+using System.Threading.Tasks;
 
 namespace Website.Services
 {
@@ -28,7 +29,7 @@ namespace Website.Services
 
 
 		// ДОБАВИТЬ ОБНОВЛЕНИЕ ОТВЕТОВ ДЛЯ ЗАПРОСОВ КОТРЫЕ ОСТАЮТСЯ ЧАСТЫМИ ДОЛГОЕ ВРЕМЯ
-		public List<DbDocument> ProceedRequest(string UserRequest)
+		public async Task<List<DbDocument>> ProceedRequest(string UserRequest)
 		{
 			this.ProceedDateTime = DateTime.UtcNow;
 
@@ -39,9 +40,9 @@ namespace Website.Services
 			}
 
 			this.Request = UserRequest;
-			this.Response = this.DbContextScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>().DbDocuments
+			this.Response = await this.DbContextScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>().DbDocuments
 				.OrderByDescending(d => d.TitleTsVector.Rank(EF.Functions.WebSearchToTsQuery(UserRequest))).Take(20).Include("Author")
-				.ToList();
+				.ToListAsync();
 
 			this.FreqReqService.AddDocumentSearchServiceScope(this);
 
