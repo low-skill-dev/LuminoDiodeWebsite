@@ -20,6 +20,7 @@ namespace Website.Services.SettingsProviders
 			this.PasswordsCryptographyServiceSP = new(configuration);
 			this.SessionManagerServiceSP=new(configuration);
 			this.RandomDataSeederSP = new(configuration);
+			this.RequestsFromIpCounterServiceSP = new(configuration);
 		}
 
 		public ConnectionStringsProvider ConnectionStringsP
@@ -33,6 +34,8 @@ namespace Website.Services.SettingsProviders
 		public SessionManagerServiceSettingsProvider SessionManagerServiceSP
 		{ get; private set; }
 		public RandomDataSeederSettingsProvider RandomDataSeederSP
+		{ get; private set; }
+		public RequestsFromIpCounterServiceSettingsProvider RequestsFromIpCounterServiceSP
 		{ get; private set; }
 	}
 }
