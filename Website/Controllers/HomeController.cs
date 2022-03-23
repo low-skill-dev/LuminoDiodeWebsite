@@ -14,12 +14,12 @@ using Website.Services;
 
 namespace Website.Controllers
 {
-	public class HomeController : AControllerWithAuth
+	public class HomeController : AMyController
 	{
 		private readonly IServiceScopeFactory ScopeFactory;
 		private readonly WebsiteContext context;
 		public HomeController(IServiceScopeFactory Services, SessionManager SM)
-			: base(SM, Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>())
+			: base(Services)
 		{
 			this.ScopeFactory = Services;
 			this.context = Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();

@@ -8,25 +8,47 @@
 			if (Model.PasswordPlainText == null) Model.EmailPlainText = string.Empty;
 		}
 }
-
-<div class="col-lg-4"></div>
-<div class="col-lg-4">
-	@using (Html.BeginForm("Login", "User", FormMethod.Post))
-	{
-		<div class="input-group input-group-lg">
-			<ul>
+<div class="raw">
+	<div class="col-lg-6">
+		<div class="display-4">Sign in</div>
+		@using (Html.BeginForm("Login", "User", FormMethod.Post))
+		{
+			<div class="input-group input-group-lg">
+				<ul>
+					<li>
+						<p class="display-5">email</p>
+						<input class="form-control" type="text" name="EmailPlainText" placeholder="Your email" value="@((Model?.EmailPlainText)?? string.Empty)" />
+					</li>
+					<li>
+						<p class="display-5">pass</p>
+						<input class="form-control" type="text" name="PasswordPlainText" placeholder="Your password" value="@((Model?.PasswordPlainText) ?? string.Empty)" />
+					</li>
+					<li><input type="submit" value="Log in"/></li>
+				</ul>
+			</div>
+		}
+	</div>
+	<div class="col-lg-6">
+		<div class="display-4">Sign up</div>
+		@using (Html.BeginForm("Register", "User", FormMethod.Post))
+		{
+			<div class="input-group input-group-lg">
+				<ul>
 				<li>
-					<p class="display-5">email</p>
-					<input class="form-control" type="text" name="EmailPlainText" placeholder="Your email" value="@((Model?.EmailPlainText)?? string.Empty)" />
-				</li>
-				<li>
-					<p class="display-5">pass</p>
-					<input class="form-control" type="text" name="PasswordPlainText" placeholder="Your password" value="@((Model?.PasswordPlainText) ?? string.Empty)" />
-				</li>
-				<li><input type="submit" value="Submit"/></li>
-			</ul>
-		</div>
-	}
-</div>
-<div class="col-lg-4">
+						<p class="display-5">Name</p>
+						<input class="form-control" type="text" name="UserName" placeholder="Your name" value="@((Model?.UserName)?? string.Empty)" />
+					</li>
+					<li>
+						<p class="display-5">email</p>
+						<input class="form-control" type="text" name="EmailPlainText" placeholder="Your email" value="@((Model?.EmailPlainText)?? string.Empty)" />
+					</li>
+					<li>
+						<p class="display-5">pass</p>
+						<input class="form-control" type="text" name="PasswordPlainText" placeholder="Your password" value="@((Model?.PasswordPlainText) ?? string.Empty)" />
+					</li>
+					<li><input type="submit" value="Register"/></li>
+				</ul>
+			</div>
+		}
+	</div>
 </div>

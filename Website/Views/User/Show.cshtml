@@ -2,10 +2,45 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+	For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
-    <div>
-        @Utf8Json.JsonSerializer.Serialize(@Model);
-    </div>
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+.sqrimg{
+  width:200px;height:200px;overflow:hidden
+}
+</style>
+
+<div>
+	<div class="row">
+		<div class="col-lg-2"></div>
+		<div class=col-lg>
+			<div name="PhotoAndName">
+				<div class="row p-3">
+					@{
+						<div class="col-lg-6">
+							@{
+								if (Model.String64_ProfileImage is not null)
+								{
+									<img class="sqrimg img-thumbnail" src="@("data:image/png;base64,"+@Model.String64_ProfileImage)" />
+								}
+								else
+								{
+									<div class="display-5">Фото нет! Держитесь!</div>
+								}
+							}
+						</div>
+					}
+					@{
+						<div class="col-lg-6">
+							<p class="display-5">@Model.GetFullName()</p>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+		<div class=col-lg-2></div>
+	</div>
+</div>
