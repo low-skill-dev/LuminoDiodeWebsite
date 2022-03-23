@@ -4,23 +4,23 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using Website.Repository;
 using Website.Services;
+using System.Threading.Tasks;
 
 namespace Website.Controllers
 {
-	public class DocumentController : AControllerWithAuth
+	public class DocumentController : AMyController
 	{
 		private readonly IServiceScopeFactory ScopeFactory;
 		private readonly Website.Repository.WebsiteContext context;
 		private readonly Website.Services.RecentDocumentsBackgroundService recentDocumentsProvider;
-		public DocumentController(IServiceScopeFactory Services, Website.Services.RecentDocumentsBackgroundService documentsBackgroundService, SessionManager SM)
-			:base(SM, Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>())
+		public DocumentController(IServiceScopeFactory ScopeFactory)
+			:base(ScopeFactory)
 		{
-			this.ScopeFactory = Services;
-			this.context = Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();
-			this.recentDocumentsProvider = documentsBackgroundService;
-#if DEBUG
-			Services.CreateScope().ServiceProvider.GetService<RandomDataSeederService>().SeedData();
-#endif
+			var sp = ScopeFactory.CreateScope().ServiceProvider;
+			this.ScopeFactory = ScopeFactory;
+			this.context = sp.GetRequiredService<WebsiteContext>();
+			this.recentDocumentsProvider = sp.GetRequiredService<RecentDocumentsBackgroundService>();
+			sp.GetRequiredService<RandomDataSeederService>().SeedData();
 		}
 
 		[HttpGet]
@@ -39,13 +39,13 @@ namespace Website.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult Search(string SearchRequest)
+		public async Task<ViewResult> Search(string SearchRequest)
 		{
 			this.ViewBag.SearchRequest = SearchRequest;
 
 			var ServiceProvider = this.ScopeFactory.CreateScope().ServiceProvider;
 			var SearchService = ServiceProvider.GetRequiredService<DocumentSearchService>();
-			var ProceedRes = SearchService.ProceedRequest(SearchRequest);
+			var ProceedRes = await SearchService.ProceedRequest(SearchRequest);
 			var ResResult = ProceedRes;
 			var Loaded = ResResult.Take(10);
 			return this.View(Loaded.Select(x=> x.ToDocument()));

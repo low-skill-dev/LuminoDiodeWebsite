@@ -16,16 +16,15 @@ using Website.Services;
 
 namespace Website.Controllers
 {
-	public class DbgController : AControllerWithAuth
+	public class DbgController : AMyController
 	{
 		private readonly Website.Repository.WebsiteContext context;
 		private readonly Website.Services.FrequentSearchRequestsService freqServ;
-		public DbgController(Website.Repository.WebsiteContext ctx, Website.Services.FrequentSearchRequestsService freqServ, SessionManager SM) : base(SM, ctx)
+		public DbgController(IServiceScopeFactory ScopeFactory) : base(ScopeFactory)
 		{
-			this.context = ctx;
-			this.freqServ = freqServ;
-			//if(Request.Cookies.ContainsKey("SessionId"));
-			ViewBag["UserName"] = 123;
+			var sp = ScopeFactory.CreateScope().ServiceProvider;
+			this.context = sp.GetRequiredService<WebsiteContext>();
+			this.freqServ = sp.GetRequiredService<FrequentSearchRequestsService>();
 		}
 
 		public ViewResult Summary()
