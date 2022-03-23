@@ -47,7 +47,12 @@
         </div>
     </nav>
 
-    <div class="">
+    <div class="container-fluid">
+        @if(ViewBag.ErrorMessage!=null){
+             <div class="alert alert-danger" role="alert">
+                 @ViewBag.ErrorMessage
+            </div>
+        }
         <main role="main" class="container">
             @RenderBody()
         </main>
