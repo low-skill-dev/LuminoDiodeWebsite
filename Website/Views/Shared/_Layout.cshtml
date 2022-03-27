@@ -48,11 +48,7 @@
     </nav>
 
     <div class="container-fluid">
-        @if(ViewBag.ErrorMessage!=null){
-             <div class="alert alert-danger" role="alert">
-                 @ViewBag.ErrorMessage
-            </div>
-        }
+        <partial name="~/Views/Shared/PartialViews/_AlertsListPartialView.cshtml" model=@TempData["PageTopAlerts"]/>
         <main role="main" class="container">
             @RenderBody()
         </main>

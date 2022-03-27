@@ -1,0 +1,11 @@
+﻿@model IEnumerable<Website.Models.ViewModels.Alert>
+
+
+@if(Model is not null) foreach (var alrt in Model)
+{
+	<div class="p-1">
+		<div class="@Html.Encode(alrt.HtmlClass)" role="alert">
+			@alrt.Message
+		</div>
+	</div>
+}
