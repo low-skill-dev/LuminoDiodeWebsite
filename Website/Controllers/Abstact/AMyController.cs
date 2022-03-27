@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using Website.Repository;
 using Website.Services;
+using System.Collections.Generic;
 
 namespace Website.Controllers
 {
@@ -17,6 +18,7 @@ namespace Website.Controllers
 		protected readonly SessionManager SM;
 		protected readonly RequestsFromIpCounterService RC;
 		protected Website.Models.UserModel.User? AuthedUser { get; set; } = null;
+		protected readonly List<Website.Models.ViewModels.Alert> PageTopAlerts = new();
 		public AMyController(IServiceScopeFactory ScopeFactory)
 		{
 			var sp = ScopeFactory.CreateScope().ServiceProvider;
@@ -25,6 +27,7 @@ namespace Website.Controllers
 			this.RC = sp.GetRequiredService<RequestsFromIpCounterService>();
 			ViewBag.AuthedUser = new Website.Models.UserModel.User { };
 			ViewBag.AuthedUser = null;
+			ViewBag.PageTopAlerts = this.PageTopAlerts;
 		}
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{
