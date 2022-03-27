@@ -7,6 +7,8 @@ using Website.Repository;
 using Website.Services;
 using System.Threading;
 using System.Threading.Tasks;
+using Website.Models.ViewModels;
+using System.Collections.Generic;
 
 
 namespace Website.Controllers
@@ -83,8 +85,6 @@ namespace Website.Controllers
 		{
 			var EmailPlainText = LI.EmailPlainText;
 			var PasswordPlainText = LI.PasswordPlainText;
-			var Name = !string.IsNullOrEmpty(LI.UserName) ? LI.UserName : "Unknown";
-
 
 			Website.Models.UserModel.User? found;
 			try { found = await this.context.Users.FirstAsync(x => x.EmailAdress.Equals(EmailPlainText)); }
@@ -92,7 +92,8 @@ namespace Website.Controllers
 
 			if (found != null)
 			{
-				ViewBag.ErrorMessage = "This email is already occupied";
+				base.PageTopAlerts.Add(new Alert("This email is already occupied", Alert.ALERT_TYPE.Danger));
+				TempData["PageTopAlerts"] = new List<Alert> { new Alert("Account created. Log in.", Alert.ALERT_TYPE.Info) };
 				return View("Login");
 			}
 
@@ -105,10 +106,12 @@ namespace Website.Controllers
 					EmailAdress = EmailPlainText,
 					AuthHashedPassword = hashedpass,
 					AuthPasswordSalt = Salt,
-					FirstName = Name
+					FirstName = "New User"
 				});
 				context.SaveChanges();
-				ViewBag.ErrorMessage = "Account created. Log in.";
+
+				base.PageTopAlerts.Add(new Alert("Account created. Log in.",Alert.ALERT_TYPE.Info));
+				TempData["PageTopAlerts"] = new List<Alert> { new Alert("Account created. Log in.", Alert.ALERT_TYPE.Info) };
 				return View("Login");
 			}
 		}
