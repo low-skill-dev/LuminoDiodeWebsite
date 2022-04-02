@@ -27,8 +27,8 @@ namespace Website.Services
 			/* Be aware!
 			 * Seeding projects must be launched only if at least 1 user exists in DB.
 			 */
-			this.SeedData_DbDocuments();
 			this.SeedData_Users();
+			this.SeedData_DbDocuments();
 			this.SeedData_Projects();
 			this.context.SaveChanges();
 		}
@@ -42,7 +42,6 @@ namespace Website.Services
 			// this checks if there is at least 10 raws in the db
 			// if (this.DbDocuments.Find(10000) != null && DoNotSeedIfDataExists) return;
 
-
 			int NumToAdd = this.SettingsProvider.RandomDataSeederSP.SeedUntilAmountOfDocumentsLeesThen - this.context.DbDocuments.Count();
 			if (NumToAdd < 0) NumToAdd = 0;
 			var ToAddUsers = new Website.Models.DocumentModel.DbDocument[NumToAdd];
@@ -51,6 +50,7 @@ namespace Website.Services
 			for (int i = 0; i < ToAddUsers.Length; i++)
 			{
 				var docToAdd = Models.DocumentModel.DbDocument.FromDocument(Website.Models.DocumentModel.Document.GenerateRandom());
+				docToAdd.Author = context.Users.First();
 				this.context.DbDocuments.Add(docToAdd);
 				if (CurrCt++ > 10*1000)
 				{
@@ -71,9 +71,8 @@ namespace Website.Services
 				var ToAdd = new Models.UserModel.User
 				{
 					//Id = null,
-					EmailAdress = "testemail@gmail.com",
-					FirstName = "Admin",
-					LastName = "Adminovich"
+					EmailAdress = $"testemail{i}@gmail.com",
+					DisplayedName = "Admin",
 				};
 				this.context.Users.Add(ToAdd);
 			}
