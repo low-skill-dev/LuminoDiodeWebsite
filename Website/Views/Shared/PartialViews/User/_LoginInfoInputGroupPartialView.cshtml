@@ -1,0 +1,30 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Website.Models.Auth.LoginInfo
+
+<div class="input-group input-group-xxl">
+	<div class="container-fluid p-2">
+		<div class="d-xl-flex justify-content-between">
+			<div class="w-100">
+				@Html.LabelFor(Model=>Model.EmailPlainText)
+			</div>
+			<div class="w-100">
+				@Html.EditorFor(Model=>Model.EmailPlainText)
+			</div>
+		</div>
+		@Html.ValidationMessageFor(Model=>Model.EmailPlainText,"",new {@class="text-danger"})
+	</div>
+	<div class="container-fluid p-2">
+		<div class="d-xl-flex justify-content-between">
+			<div class="w-100">
+				@Html.LabelFor(Model=>Model.PasswordPlainText)
+			</div>
+			<div class="w-100">
+				@Html.EditorFor(Model=>Model.PasswordPlainText)
+			</div>
+		</div>
+		@Html.ValidationMessageFor(Model=>Model.PasswordPlainText,"",new {@class="text-danger"})
+	</div>
+	<div class="container-fluid p-2">
+		<input class="btn btn-sm btn-outline-dark col-12 p-2" type="submit" value="Log in" />
+	</div>
+</div>

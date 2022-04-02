@@ -3,48 +3,19 @@
 @{
 	Layout = "~/Views/Shared/_Layout.cshtml";
 
-		if(Model!=null){
-			if (Model.EmailPlainText == null) Model.EmailPlainText = string.Empty;
-			if (Model.PasswordPlainText == null) Model.EmailPlainText = string.Empty;
-		}
+	if (Model != null)
+	{
+		if (Model.EmailPlainText == null) Model.EmailPlainText = string.Empty;
+		if (Model.PasswordPlainText == null) Model.EmailPlainText = string.Empty;
+	}
 }
-<div class="raw">
-	<div class="col-lg-6">
-		<div class="display-4">Sign in</div>
-		@using (Html.BeginForm("Login", "User", FormMethod.Post))
-		{
-			<div class="input-group input-group-lg">
-				<ul>
-					<li>
-						<p class="display-5">email</p>
-						<input class="form-control" type="text" name="EmailPlainText" placeholder="Your email" value="@((Model?.EmailPlainText)?? string.Empty)" />
-					</li>
-					<li>
-						<p class="display-5">pass</p>
-						<input class="form-control" type="text" name="PasswordPlainText" placeholder="Your password" value="@((Model?.PasswordPlainText) ?? string.Empty)" />
-					</li>
-					<li><input type="submit" value="Log in"/></li>
-				</ul>
-			</div>
-		}
+<div class="container row">
+	<div class="col col-md-4"></div>
+	<div class="col col-md-4">
+		<div class="display-4 text-center p-1">Log in</div>
+
+	<partial name="~/Views/Shared/PartialViews/User/_LoginFormPartialView.cshtml" model=Model />
+
 	</div>
-	<div class="col-lg-6">
-		<div class="display-4">Sign up</div>
-		@using (Html.BeginForm("Register", "User", FormMethod.Post))
-		{
-			<div class="input-group input-group-lg">
-				<ul>
-					<li>
-						<p class="display-5">email</p>
-						<input class="form-control" type="text" name="EmailPlainText" placeholder="Your email" value="@((Model?.EmailPlainText)?? string.Empty)" />
-					</li>
-					<li>
-						<p class="display-5">pass</p>
-						<input class="form-control" type="text" name="PasswordPlainText" placeholder="Your password" value="@((Model?.PasswordPlainText) ?? string.Empty)" />
-					</li>
-					<li><input type="submit" value="Register"/></li>
-				</ul>
-			</div>
-		}
-	</div>
+	<div class="col col-md-4"></div>
 </div>

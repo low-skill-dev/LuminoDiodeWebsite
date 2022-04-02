@@ -4,7 +4,7 @@
 @if(Model is not null) foreach (var alrt in Model)
 {
 	<div class="p-1">
-		<div class="@Html.Encode(alrt.HtmlClass)" role="alert">
+		<div class="@Html.Encode(alrt.GetHtmlClass())" role="alert">
 			@alrt.Message
 		</div>
 	</div>

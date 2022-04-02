@@ -1,67 +1,84 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @*
-    For mo
-    re information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+	For mo
+	re information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
 }
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
-    <title>@ViewBag.Title</title>
+	<meta charset="utf-8" />
+	<link href="~/css/bootstrap.min.css" rel="stylesheet" />
+	<title>@ViewBag.Title</title>
 </head>
+
 <body>
 
-    <nav class="navbar navbar-expand-sm navbar-light bg-info ">
-        <div class="container px-lg-5">
-            <a class="navbar-brand" asp-controller="Home">
-                <b>PRACC</b>
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav" style="font-family:'Century Gothic'">
-                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action=@string.Empty><b>Home</b></a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Project" asp-action=@string.Empty><b>Projects</b></a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Document"asp-action=@string.Empty><b>Documents</b></a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="User" asp-action=@string.Empty><b>Users</b></a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Dbg" asp-action=@string.Empty><b>DebugCtrller</b></a></li>
-                    @{
-                        if(@ViewBag.AuthedUser==null){
-                            <li class="nav-item"><a class="nav-link" asp-controller="User" asp-action="Login">Sign in / Sign up</a></li>
-                        }
-                        else
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-controller="User" asp-action="Show" asp-route-id="@ViewBag.AuthedUser.Id">@ViewBag.AuthedUser.FirstName</a></li>
-                            <li class="nav-item">
-                                <button onclick="location.href='@Url.Action("Logout", "User")'" type="button" class="btn btn-secondary">Log out</button>
-                            </li>
-                        }
-                    }
-                    <li class="nav-item"><a class="nav-link"></a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+	<nav class="navbar navbar-expand-sm navbar-light bg-info ">
+		<div class="container px-lg-5">
+			<a class="navbar-brand" asp-controller="Home">
+				<b>PRACC</b>
+			</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse">
+				<ul class="nav navbar-nav" style="font-family:'Century Gothic'">
+					<li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action=@string.Empty><b>Home</b></a></li>
+					<li class="nav-item"><a class="nav-link" asp-controller="Project" asp-action=@string.Empty><b>Projects</b></a></li>
+					<li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action=@string.Empty><b>Documents</b></a></li>
+					<li class="nav-item"><a class="nav-link" asp-controller="User" asp-action=@string.Empty><b>Users</b></a></li>
+					<li class="nav-item"><a class="nav-link" asp-controller="Dbg" asp-action=@string.Empty><b>DebugCtrller</b></a></li>
+					@{
+						if (@ViewBag.AuthedUser == null)
+						{
+							<li class="nav-item">
+							<div class="p-1">
+								<button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("Login","User")'">
+									Log in
+								</button>
+								</div>
+							</li>
+							<li class="nav-item">
+							<div class="p-1">
+								<button class="btn btn-warning" type="button" onclick="location.href='@Url.Action("Register","User")'">
+									Join PRACC
+								</button>
+								</div>
+							</li>
+						}
+						else
+						{
+							<li class="nav-item">
+								<a class="nav-link" asp-controller="User" asp-action="Show" asp-route-id="@ViewBag.AuthedUser.Id">@ViewBag.AuthedUser.FirstName</a>
+							</li>
+							<li class="nav-item">
+								<button onclick="location.href='@Url.Action("Logout", "User")'" type="button" class="btn btn-secondary">Log out</button>
+							</li>
+						}
+					}
+					<li class="nav-item"><a class="nav-link"></a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
 
-    <div class="container-fluid">
-        <partial name="~/Views/Shared/PartialViews/_AlertsListPartialView.cshtml" model=@TempData["PageTopAlerts"]/>
-        <main role="main" class="container">
-            @RenderBody()
-        </main>
-    </div>
+	<div class="container-fluid">
+		<partial name="~/Views/Shared/PartialViews/_AlertsListPartialView.cshtml" model=@TempData["PageTopAlerts"] />
+		<main role="main" class="container">
+			@RenderBody()
+		</main>
+	</div>
 
-    <footer class="border-top footer">
-        <div class="container flex-lg-row">
-            <img style="align-self:center; height:40px; margin-top:5px" src="~/StaticFiles/Images/Logo/PRACC_ProjectsAccumulator_small_long.png" />
-        </div>
-    </footer>
+	<footer class="border-top footer">
+		<div class="container flex-lg-row">
+			<img style="align-self:center; height:40px; margin-top:5px" src="~/StaticFiles/Images/Logo/PRACC_ProjectsAccumulator_small_long.png" />
+		</div>
+	</footer>
 
-    <script src="~/js/bootstrap.bundle.min.js"></script>
-    @RenderSection("Scripts", required: false)
+	<script src="~/js/bootstrap.bundle.min.js"></script>
+	@RenderSection("Scripts", required: false)
 
 </body>
 </html>
