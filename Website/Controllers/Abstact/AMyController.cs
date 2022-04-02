@@ -6,6 +6,7 @@ using System.Linq;
 using Website.Repository;
 using Website.Services;
 using System.Collections.Generic;
+using System;
 
 namespace Website.Controllers
 {
@@ -18,7 +19,7 @@ namespace Website.Controllers
 		protected readonly SessionManager SM;
 		protected readonly RequestsFromIpCounterService RC;
 		protected Website.Models.UserModel.User? AuthedUser { get; set; } = null;
-		protected readonly List<Website.Models.ViewModels.Alert> PageTopAlerts = new();
+		protected readonly List<Website.Models.ViewModels.Alert> PageTopAlerts = new(1);
 		public AMyController(IServiceScopeFactory ScopeFactory)
 		{
 			var sp = ScopeFactory.CreateScope().ServiceProvider;
@@ -27,18 +28,17 @@ namespace Website.Controllers
 			this.RC = sp.GetRequiredService<RequestsFromIpCounterService>();
 			ViewBag.AuthedUser = new Website.Models.UserModel.User { };
 			ViewBag.AuthedUser = null;
-			ViewBag.PageTopAlerts = this.PageTopAlerts;
+
 		}
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{
 			RC.CountRequest(context);
 			if (RC.IPAddressIsBanned(context)) context.Result = new StatusCodeResult(429); // Return Http429 if too many requests
 			base.OnActionExecuting(context);
-			LoadSessionAndAuthedUser(); // Auth
+			LoadSessionAndAuthedUser();
 		}
 		protected void LoadSessionAndAuthedUser()
 		{
-			ViewBag.AuthedUser = null;
 			if (Request.Cookies.ContainsKey(SessionManager.SessionIdCoockieName))
 			{
 				SessionInfo? Info;
@@ -48,6 +48,13 @@ namespace Website.Controllers
 				this.AuthedUser = DbCtx.Users.Find(Info?.UserId) ?? null /* throw new System.AggregateException("Session cotains user id which cannot be found in DB")*/;
 				ViewBag.AuthedUser = this.AuthedUser;
 			}
+		}
+		protected void AddAlertToPageTop(Website.Models.ViewModels.Alert alert)
+		{
+			if (this.TempData["PageTopAlerts"] == null)
+				this.TempData["PageTopAlerts"] = this.PageTopAlerts;
+
+			this.PageTopAlerts.Add(alert);
 		}
 	}
 }

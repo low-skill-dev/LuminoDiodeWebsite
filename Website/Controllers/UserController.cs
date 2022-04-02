@@ -9,21 +9,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Website.Models.ViewModels;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 
 namespace Website.Controllers
 {
 	public class UserController : AMyController
 	{
-		private readonly IServiceScopeFactory ScopeFactory;
-		private readonly Website.Repository.WebsiteContext context;
-		private readonly Website.Services.RecentDocumentsBackgroundService recentDocumentsProvider;
+		protected readonly IServiceScopeFactory ScopeFactory;
+		protected readonly Website.Repository.WebsiteContext context;
+		protected readonly Website.Services.RecentDocumentsBackgroundService recentDocumentsProvider;
+		protected readonly Website.Services.PasswordsService passwordsService;
 		public UserController(IServiceScopeFactory Services, Website.Services.RecentDocumentsBackgroundService documentsBackgroundService, SessionManager SM)
 			: base(Services)
 		{
 			this.ScopeFactory = Services;
-			this.context = Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();
-			this.recentDocumentsProvider = documentsBackgroundService;
+			var sp = Services.CreateScope().ServiceProvider;
+			this.context = sp.GetRequiredService<WebsiteContext>();
+			this.recentDocumentsProvider = sp.GetRequiredService<RecentDocumentsBackgroundService>();
+			this.passwordsService = sp.GetRequiredService<PasswordsService>();
 		}
 
 		[HttpGet]
@@ -38,29 +42,48 @@ namespace Website.Controllers
 			if (base.AuthedUser != null) return new StatusCodeResult(409); // 409 "Conflict", already signed in
 			else return View();
 		}
-		[HttpPost]
-		public async Task<ActionResult> Login(Website.Models.Auth.LoginInfo LI)
+		[HttpGet]
+		public ActionResult Register()
 		{
-#if DEBUG
-			//this.ScopeFactory.CreateScope().ServiceProvider.GetRequiredService<PasswordsService>().SetPassAndSaltForUser(1, "qwerty");
-#endif
+			if (base.AuthedUser != null) return new StatusCodeResult(409); // 409 "Conflict", already signed in
+			else return View();
+		}
+		[HttpPost]
+		public async Task<ActionResult> Login([Bind]Website.Models.Auth.LoginInfo LI)
+		{
+			if (!ModelState.IsValid)
+				return View(LI);
 
-			var EmailPlainText = LI.EmailPlainText;
-			var PasswordPlainText = LI.PasswordPlainText;
-			Website.Models.UserModel.User? found;
-			try { found = await this.context.Users.FirstAsync(x => x.EmailAdress.Equals(EmailPlainText) && x.AuthHashedPassword != null); }
-			catch (System.InvalidOperationException) { found = null; }
+			var found = await this.context.Users.FirstOrDefaultAsync(x => x.EmailAdress==LI.EmailPlainText);
 
-			if (found == null) return new StatusCodeResult(500); // user not found
-			if (this.ScopeFactory.CreateScope().ServiceProvider.GetRequiredService<PasswordsService>()
-				.ConfirmPassword(PasswordPlainText, found.AuthHashedPassword, found.AuthPasswordSalt))
+			if (found == null)
+			{
+				base.AddAlertToPageTop(new Alert("User not found", Alert.ALERT_TYPE.Danger));
+				return View(LI);
+			}
+			if(found.AuthHashedPassword is null || found.AuthPasswordSalt is null)
+			{
+				return new StatusCodeResult(500); // should never be returned in prod
+			}
+
+			if (passwordsService.ConfirmPassword(LI.PasswordPlainText, found.AuthHashedPassword, found.AuthPasswordSalt))
 			{
 				base.SM.CreateSession(found.Id, out var CreatedSessId);
 				Response.Cookies.Append(SessionManager.SessionIdCoockieName, CreatedSessId);
+				/* Блядина ASP не умеет в сериализацию пустых списков.
+				 * Так что если вдруг вам пришло в голову не отображать никаких алертов вверху страницы,
+				 * то вы обязательно должны обНУЛЛить массив с ними, ни в коем случае не передавать пустые списки!
+				 */
+				//TempData["PageTopAlerts"] = null; // пофикшено нахуй
 				return RedirectToAction("Show", "User", new { id = found.Id });
 			}
+			else
+			{
+				base.AddAlertToPageTop(new Alert("Wrong email or password" ,Alert.ALERT_TYPE.Danger));
+				return View();
+			}
 
-			return new StatusCodeResult(401); // 401 not authorized
+			return new StatusCodeResult(500); // unknown error
 		}
 
 		[HttpGet]
@@ -83,17 +106,21 @@ namespace Website.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Register(Website.Models.Auth.LoginInfo LI)
 		{
+			if (!ModelState.IsValid)
+			{
+				return View(LI);
+			}
+
 			var EmailPlainText = LI.EmailPlainText;
 			var PasswordPlainText = LI.PasswordPlainText;
 
 			Website.Models.UserModel.User? found;
-			try { found = await this.context.Users.FirstAsync(x => x.EmailAdress.Equals(EmailPlainText)); }
+			try { found = await this.context.Users.FirstAsync(x =>  x.EmailAdress.Equals(EmailPlainText)); }
 			catch (System.InvalidOperationException) { found = null; }
 
 			if (found != null)
 			{
-				base.PageTopAlerts.Add(new Alert("This email is already occupied", Alert.ALERT_TYPE.Danger));
-				TempData["PageTopAlerts"] = new List<Alert> { new Alert("Account created. Log in.", Alert.ALERT_TYPE.Info) };
+				base.AddAlertToPageTop(new Alert("This email is already occupied", Alert.ALERT_TYPE.Danger));
 				return View("Login");
 			}
 
@@ -106,12 +133,11 @@ namespace Website.Controllers
 					EmailAdress = EmailPlainText,
 					AuthHashedPassword = hashedpass,
 					AuthPasswordSalt = Salt,
-					FirstName = "New User"
+					DisplayedName = "New User",
 				});
 				context.SaveChanges();
 
-				base.PageTopAlerts.Add(new Alert("Account created. Log in.",Alert.ALERT_TYPE.Info));
-				TempData["PageTopAlerts"] = new List<Alert> { new Alert("Account created. Log in.", Alert.ALERT_TYPE.Info) };
+				base.AddAlertToPageTop(new Alert("Account created. Log in.",Alert.ALERT_TYPE.Info));
 				return View("Login");
 			}
 		}
