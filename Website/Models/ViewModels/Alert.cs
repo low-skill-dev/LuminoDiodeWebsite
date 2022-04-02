@@ -25,10 +25,8 @@
 			DarkGray= ALERT_TYPE.Dark
 		}
 
-		public string HtmlClass
+		public string GetHtmlClass()
 		{
-			get
-			{
 				if (this.AlertType == ALERT_TYPE.Primary)
 					return "alert alert-primary";
 				if(this.AlertType == ALERT_TYPE.Secondary)
@@ -47,11 +45,10 @@
 					return "alert alert-dark";
 
 				return "alert alert-primary";
-			}
 		}
 
 		public ALERT_TYPE AlertType { get; }
-		public string Message { get;} = string.Empty;
+		public string Message { get; }
 
 		public Alert(string Message, ALERT_TYPE AlertType)
 		{

@@ -9,7 +9,7 @@ namespace Website.Models.DocumentModel
 
 		public int Id { get; set; }
 		public string Title { get; set; }=null!;
-		public User Author { get; set; }=null!;
+		public User? Author { get; set; }=null!;
 		public string[] Tags { get; set; }=null!;
 		public DateTime CreatedDateTime { get; set; }=DateTime.UtcNow;
 		public DocumentParagraph[] Paragraphs { get; set; }=null!;
@@ -27,7 +27,7 @@ namespace Website.Models.DocumentModel
 			return new Document
 			{
 				Title = new RandomDataGenerator.Randomizers.RandomizerTextWords(new RandomDataGenerator.FieldOptions.FieldOptionsTextWords { }).Generate(),
-				Author = new UserModel.User() { /*Id = null,*/ FirstName = "AdminFN", LastName = "AdminLN", EmailAdress="123@gmaiil.com" },
+				//Author = new UserModel.User() { Id=0 },
 				Tags = new string[rnd.Next(1, 6)]
 					.Select(x => new string(new RandomDataGenerator.Randomizers.RandomizerTextLipsum(new RandomDataGenerator.FieldOptions.FieldOptionsTextLipsum { }).Generate()
 					.Split(' ')[rnd.Next(0, 7)].Where(x => char.IsLetterOrDigit(x)).ToArray())).ToArray(),
