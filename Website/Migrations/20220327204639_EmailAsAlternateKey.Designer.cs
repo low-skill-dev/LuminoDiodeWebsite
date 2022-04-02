@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
@@ -12,9 +13,10 @@ using Website.Repository;
 namespace Website.Migrations
 {
     [DbContext(typeof(WebsiteContext))]
-    partial class WebsiteContextModelSnapshot : ModelSnapshot
+    [Migration("20220327204639_EmailAsAlternateKey")]
+    partial class EmailAsAlternateKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -137,8 +139,7 @@ namespace Website.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AboutMe")
-                        .HasMaxLength(3000)
-                        .HasColumnType("character varying(3000)");
+                        .HasColumnType("text");
 
                     b.Property<byte[]>("AuthHashedPassword")
                         .HasColumnType("bytea");
@@ -147,22 +148,21 @@ namespace Website.Migrations
                         .HasColumnType("bytea");
 
                     b.Property<string>("City")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("DisplayedName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("EmailAdress")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text");
 
                     b.Property<string>("PostalCode")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+                        .HasColumnType("text");
 
                     b.Property<int?>("ProjectId")
                         .HasColumnType("integer");
@@ -170,28 +170,17 @@ namespace Website.Migrations
                     b.Property<int?>("ProjectsGroupId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime?>("RegistrationCompleteDateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("RegistrationStage")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("RegistrationStartedDateTime")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("String64_ProfileImage")
                         .HasColumnType("text");
 
                     b.Property<string>("TelegramLink")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<int>("UserType")
                         .HasColumnType("integer");
 
                     b.Property<string>("VkLink")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
