@@ -12,10 +12,13 @@ namespace Website.Repository
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<Website.Models.DocumentModel.DbDocument>().
-				HasGeneratedTsVectorColumn(p => p.TitleTsVector, "english", p => new { p.Title })
+			modelBuilder.Entity<Website.Models.DocumentModel.DbDocument>()
+				.HasGeneratedTsVectorColumn(p => p.TitleTsVector, "english", p => new { p.Title })
 				.HasIndex(p => p.TitleTsVector)
 				.HasMethod("GIN");
+
+			modelBuilder.Entity<Website.Models.UserModel.User>()
+				.HasAlternateKey(u => u.EmailAdress);
 		}
 
 		public DbSet<Website.Models.DocumentModel.DbDocument> DbDocuments { get; set; } = null!;
