@@ -17,7 +17,6 @@ namespace Website.Controllers
 	public class UserController : AMyController
 	{
 		protected readonly IServiceScopeFactory ScopeFactory;
-		protected readonly Website.Repository.WebsiteContext context;
 		protected readonly Website.Services.RecentDocumentsBackgroundService recentDocumentsProvider;
 		protected readonly Website.Services.PasswordsService passwordsService;
 		public UserController(IServiceScopeFactory Services, Website.Services.RecentDocumentsBackgroundService documentsBackgroundService, SessionManager SM)
@@ -25,7 +24,6 @@ namespace Website.Controllers
 		{
 			this.ScopeFactory = Services;
 			var sp = Services.CreateScope().ServiceProvider;
-			this.context = sp.GetRequiredService<WebsiteContext>();
 			this.recentDocumentsProvider = sp.GetRequiredService<RecentDocumentsBackgroundService>();
 			this.passwordsService = sp.GetRequiredService<PasswordsService>();
 		}
@@ -37,13 +35,17 @@ namespace Website.Controllers
 		}
 
 		[HttpGet]
-		public ActionResult Login()
+		public async Task<IActionResult> Show(int Id)
 		{
-			if (base.AuthedUser != null) return new StatusCodeResult(409); // 409 "Conflict", already signed in
-			else return View();
+			Website.Models.UserModel.User? found;
+			found = await this.context.Users.FindAsync(Id);
+
+			if (found == null) return new StatusCodeResult(404); // user not found
+			else return View(found);
 		}
+
 		[HttpGet]
-		public ActionResult Register()
+		public IActionResult Login()
 		{
 			if (base.AuthedUser != null) return new StatusCodeResult(409); // 409 "Conflict", already signed in
 			else return View();
@@ -94,15 +96,11 @@ namespace Website.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Show(int Id)
+		public ActionResult Register()
 		{
-			Website.Models.UserModel.User? found;
-			found = await this.context.Users.FindAsync(Id);
-
-			if (found == null) return new StatusCodeResult(404); // user not found
-			else return View(found);
+			if (base.AuthedUser != null) return new StatusCodeResult(409); // 409 "Conflict", already signed in
+			else return View();
 		}
-
 		[HttpPost]
 		public async Task<IActionResult> Register(Website.Models.Auth.LoginInfo LI)
 		{
@@ -115,8 +113,7 @@ namespace Website.Controllers
 			var PasswordPlainText = LI.PasswordPlainText;
 
 			Website.Models.UserModel.User? found;
-			try { found = await this.context.Users.FirstAsync(x =>  x.EmailAdress.Equals(EmailPlainText)); }
-			catch (System.InvalidOperationException) { found = null; }
+			found = await this.context.Users.FirstOrDefaultAsync(x =>  x.EmailAdress.Equals(EmailPlainText));
 
 			if (found != null)
 			{
@@ -126,20 +123,81 @@ namespace Website.Controllers
 
 			else
 			{
-				var PassServ = this.ScopeFactory.CreateScope().ServiceProvider.GetRequiredService<PasswordsService>();
-				var hashedpass = PassServ.HashPassword(PasswordPlainText, out var Salt);
-				context.Users.Add(new Models.UserModel.User
+				var hashedpass = passwordsService.HashPassword(PasswordPlainText, out var Salt);
+
+				var UserToAdd= new Models.UserModel.User
 				{
 					EmailAdress = EmailPlainText,
 					AuthHashedPassword = hashedpass,
 					AuthPasswordSalt = Salt,
 					DisplayedName = "New User",
-				});
-				context.SaveChanges();
-
+				};
+				context.Users.Add(UserToAdd);
+				await context.SaveChangesAsync();
+				UserToAdd.DisplayedName = "user" + UserToAdd.Id;
+				await context.SaveChangesAsync();
 				base.AddAlertToPageTop(new Alert("Account created. Log in.",Alert.ALERT_TYPE.Info));
 				return View("Login");
 			}
+		}
+
+		[HttpGet]
+		public IActionResult RegistrationStageEnteringName()
+		{
+			if (this.AuthedUser == null)
+				return new StatusCodeResult(401); // 401 Unauthorized
+			if (this.AuthedUser.RegistrationStage != Models.UserModel.User.REGISTRATION_STAGE.EnteringName)
+				return new StatusCodeResult(422); // 422 Unprocessable Entity
+
+			return View();
+		}
+		[HttpPost]
+		public async Task<IActionResult> RegistrationStageEnteringName(Website.Models.UserModel.NameModel NM)
+		{
+			if (this.AuthedUser == null)
+				return new StatusCodeResult(401); // 401 Unauthorized
+			if (this.AuthedUser.RegistrationStage != Models.UserModel.User.REGISTRATION_STAGE.EnteringName)
+				return new StatusCodeResult(422); // 422 Unprocessable Entity
+
+
+			if (!ModelState.IsValid)
+				return View(NM);
+
+			this.AuthedUser.UpdateFromNameModel(NM);
+			this.AuthedUser.RegistrationStage = Models.UserModel.User.REGISTRATION_STAGE.EnteringMetadata;
+			await context.SaveChangesAsync();
+
+			return RedirectToAction("RegistrationStageEnteringMetadata", "User");
+		}
+		[HttpGet]
+		public IActionResult RegistrationStageEnteringMetadata()
+		{
+			if (this.AuthedUser == null)
+				return new StatusCodeResult(401); // 401 Unauthorized
+			if (this.AuthedUser.RegistrationStage != Models.UserModel.User.REGISTRATION_STAGE.EnteringMetadata)
+				return new StatusCodeResult(422); // 422 Unprocessable Entity
+
+			return View();
+		}
+		[HttpPost]
+		public async Task<IActionResult> RegistrationStageEnteringMetadata(Website.Models.UserModel.MetadataModel MM)
+		{
+			if (this.AuthedUser == null)
+				return new StatusCodeResult(401); // 401 Unauthorized
+			if (this.AuthedUser.RegistrationStage != Models.UserModel.User.REGISTRATION_STAGE.EnteringMetadata)
+				return new StatusCodeResult(422); // 422 Unprocessable Entity
+
+			MM.TrimAllFields();
+			if (!ModelState.IsValid)
+				return View(MM);
+
+			this.AuthedUser.UpdateFromMetadataModel(MM);
+			this.AuthedUser.RegistrationStage = Models.UserModel.User.REGISTRATION_STAGE.RegistrationCompleted;
+			this.AuthedUser.RegistrationCompleteDateTime = System.DateTime.UtcNow;
+
+			await this.context.SaveChangesAsync();
+
+			return RedirectToAction("Show", "User", new { Id = AuthedUser.Id });
 		}
 	}
 }
