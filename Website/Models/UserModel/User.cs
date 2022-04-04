@@ -14,8 +14,8 @@ namespace Website.Models.UserModel
 		// this enum shows page where user should be redirected while entering the site
 		public enum REGISTRATION_STAGE
 		{
-			NameEnterece, // user needs to enter a name
-			OtherMetadataEnterence, // City, aboutme, telegram link e.t.c
+			EnteringName, // user needs to enter a name
+			EnteringMetadata, // City, aboutme, telegram link e.t.c
 			RegistrationCompleted
 		}
 		
@@ -63,7 +63,7 @@ namespace Website.Models.UserModel
 		public DateTime? RegistrationCompleteDateTime { get; set; } = null!;
 
 		[EnumDataType(typeof(REGISTRATION_STAGE))]
-		public REGISTRATION_STAGE RegistrationStage { get; set; } = REGISTRATION_STAGE.NameEnterece;
+		public REGISTRATION_STAGE RegistrationStage { get; set; } = REGISTRATION_STAGE.EnteringName;
 
 		public string GetFullName()
 		{
@@ -72,5 +72,33 @@ namespace Website.Models.UserModel
 		}
 		public string FirstName => this.DisplayedName;
 		public string LastName => null;
+
+		public void UpdateFromNameModel(NameModel NM)
+		{
+			this.DisplayedName = NM.FirstName + ' ' + NM.LastName;
+		}
+		public void UpdateFromMetadataModel(MetadataModel MM)
+		{
+			if (MM.AboutMe is not null)
+			{
+				this.AboutMe = MM.AboutMe;
+			}
+			if (MM.City is not null)
+			{
+				this.City = MM.City;
+			}
+			if (MM.TelegramLink is not null)
+			{
+				this.TelegramLink = MM.TelegramLink;
+			}
+			if (MM.PostalCode is not null)
+			{
+				this.PostalCode=MM.PostalCode;
+			}
+			if(MM.VkLink is not null)
+			{
+				this.VkLink = MM.VkLink;
+			}
+		}
 	}
 }
