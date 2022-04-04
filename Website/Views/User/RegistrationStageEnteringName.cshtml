@@ -1,0 +1,48 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Website.Models.UserModel.NameModel
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container row">
+	<div class="col col-md-4"></div>
+	<div class="col col-md-4">
+		<div class="display-4 text-center p-1">Continue registration</div>
+
+		@using (Html.BeginForm("RegistrationStageEnteringName", "User", FormMethod.Post))
+		{
+			<div class="input-group input-group-xxl">
+
+				<div class="container-fluid p-2">
+					<div class="d-xl-flex justify-content-between">
+						<div class="w-100">
+							@Html.LabelFor(Model=>Model.FirstName)
+						</div>
+						<div class="w-100">
+							@Html.EditorFor(Model=>Model.FirstName)
+						</div>
+					</div>
+					@Html.ValidationMessageFor(Model=>Model.FirstName,"",new {@class="text-danger"})
+				</div>
+
+				<div class="container-fluid p-2">
+					<div class="d-xl-flex justify-content-between">
+						<div class="w-100">
+							@Html.LabelFor(Model=>Model.LastName)
+						</div>
+						<div class="w-100">
+							@Html.EditorFor(Model=>Model.LastName)
+						</div>
+					</div>
+					@Html.ValidationMessageFor(Model=>Model.LastName,"",new {@class="text-danger"})
+				</div>
+
+				<div class="container-fluid p-2">
+					<input class="btn btn-sm btn-outline-dark col-12 p-2" type="submit" value="Submit" />
+				</div>
+			</div>
+		}
+	</div>
+
+</div>
+<div class="col col-md-4"></div>
+</div>
