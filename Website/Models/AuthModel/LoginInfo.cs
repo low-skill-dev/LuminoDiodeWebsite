@@ -6,6 +6,7 @@ namespace Website.Models.Auth
 	{
 		[DataType(DataType.EmailAddress)]
 		[MinLength(5), MaxLength(50)]
+		[RegularExpression(@".*[\S]{5}.*")] // at least 5 non-space chars
 		[Required(ErrorMessage = "Please enter a correct email address")]
 		[Display(Name = "Email")]
 		public string EmailPlainText { get; set; }
