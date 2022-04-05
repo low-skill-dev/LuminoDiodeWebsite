@@ -69,7 +69,6 @@ namespace Website.Controllers
 			EnteringMetadataPage,
 			OtherPages
 		}
-		private static string UserCtrName = nameof(Website.Controllers.UserController).Replace("Controller", string.Empty);
 		protected void RedirectToRegistrationStepIfNeeded(ActionExecutingContext context)
 		{
 			if (AuthedUser == null) return; // RETURN; if no user authed
