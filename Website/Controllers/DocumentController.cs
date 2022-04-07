@@ -53,19 +53,36 @@ namespace Website.Controllers
 
 		#region Create
 		[HttpGet]
-		public ViewResult Create()
+		public async Task<IActionResult> Create()
 		{
+			if (this.AuthedUser is null)
+				return new StatusCodeResult(401); // 401 Unauthorized
+
 			return this.View();
 		}
 
 		[HttpPost]
-		public StatusCodeResult Create(object DocumentPassedForCreation/*tobedefinied*/)
+		public async Task<IActionResult> Create(Website.Models.DocumentModel.DocumentCreation Doc/*tobedefinied*/)
 		{
-			/* HTTP Status 202 indicates that the request 
-			 * has been accepted for processing, 
-			 * but the processing has not been completed.
-			 */
-			return new StatusCodeResult(202);
+			if (this.AuthedUser is null)
+				return new StatusCodeResult(401); // 401 Unauthorized
+
+			if (!ModelState.IsValid)
+				View(Doc);
+
+			var DocForAddingToDb = new Website.Models.DocumentModel.Document
+			{
+				Title = Doc.Title,
+				Author = context.Users.Find(this.AuthedUser.Id),
+				CreatedDateTime = System.DateTime.UtcNow,
+				Paragraphs = new Models.DocumentModel.DocumentParagraph[] { new Models.DocumentModel.DocumentParagraph {
+						TextParts= new Website.Models.DocumentModel.WebText[] {new Models.DocumentModel.WebText { Text=Doc.Text} } } }
+			};
+
+			context.DbDocuments.Add(Website.Models.DocumentModel.DbDocument.FromDocument(DocForAddingToDb));
+			await context.SaveChangesAsync();
+
+			return RedirectToAction("Show", new { Id = DocForAddingToDb.Id });
 		}
 		#endregion
 
