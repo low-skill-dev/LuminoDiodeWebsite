@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
@@ -12,9 +13,10 @@ using Website.Repository;
 namespace Website.Migrations
 {
     [DbContext(typeof(WebsiteContext))]
-    partial class WebsiteContextModelSnapshot : ModelSnapshot
+    [Migration("20220406145817_TagsNullable")]
+    partial class TagsNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,7 +33,7 @@ namespace Website.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AuthorId")
+                    b.Property<int>("AuthorId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDateTime")
@@ -41,6 +43,7 @@ namespace Website.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string[]>("Tags")
+                        .IsRequired()
                         .HasColumnType("text[]");
 
                     b.Property<string>("Title")
@@ -207,7 +210,9 @@ namespace Website.Migrations
                 {
                     b.HasOne("Website.Models.UserModel.User", "Author")
                         .WithMany()
-                        .HasForeignKey("AuthorId");
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Website.Models.ProjectModel.Project", null)
                         .WithMany("OrderedDocumentsId")
