@@ -15,6 +15,7 @@ namespace Website.Controllers
 	/// </summary>
 	public abstract class AMyController : Controller
 	{
+		protected readonly IServiceProvider ServiceProvider;
 		protected readonly WebsiteContext context;
 		protected readonly SessionManager SM;
 		protected readonly RequestsFromIpCounterService RC;
@@ -24,6 +25,7 @@ namespace Website.Controllers
 		public AMyController(IServiceScopeFactory ScopeFactory)
 		{
 			var sp = ScopeFactory.CreateScope().ServiceProvider;
+			this.ServiceProvider = sp;
 			this.context = sp.GetRequiredService<WebsiteContext>();
 			this.SM = sp.GetRequiredService<SessionManager>();
 			this.RC = sp.GetRequiredService<RequestsFromIpCounterService>();
@@ -50,7 +52,8 @@ namespace Website.Controllers
 #pragma warning disable CS8604
 				SM.ValidateSession(Request.Cookies[SessionManager.SessionIdCoockieName], out Info);
 #pragma warning restore CS8604
-				this.AuthedUser = context.Users.Find(Info?.UserId) ?? null /* throw new System.AggregateException("Session cotains user id which cannot be found in DB")*/;
+				if (Info == null) return;
+				this.AuthedUser = context.Users.AsTracking(QueryTrackingBehavior.TrackAll).First(u => u.Id == Info.UserId); /* throw new System.AggregateException("Session cotains user id which cannot be found in DB")*/;
 				ViewBag.AuthedUser = this.AuthedUser;
 			}
 		}

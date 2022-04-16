@@ -5,37 +5,36 @@ using System.Linq;
 using Website.Repository;
 using Website.Services;
 using System.Threading.Tasks;
+using System;
 
 namespace Website.Controllers
 {
-	public class DocumentController : AMyController
+	public sealed class DocumentController : AMyController
 	{
-		private readonly IServiceScopeFactory ScopeFactory;
-		private readonly Website.Repository.WebsiteContext context;
 		private readonly Website.Services.RecentDocumentsBackgroundService recentDocumentsProvider;
 		public DocumentController(IServiceScopeFactory ScopeFactory)
-			:base(ScopeFactory)
+			: base(ScopeFactory)
 		{
-			var sp = ScopeFactory.CreateScope().ServiceProvider;
-			this.ScopeFactory = ScopeFactory;
-			this.context = sp.GetRequiredService<WebsiteContext>();
-			this.recentDocumentsProvider = sp.GetRequiredService<RecentDocumentsBackgroundService>();
-			sp.GetRequiredService<RandomDataSeederService>().SeedData();
+			this.recentDocumentsProvider = base.ServiceProvider.GetRequiredService<RecentDocumentsBackgroundService>();
+			base.ServiceProvider.GetRequiredService<RandomDataSeederService>().SeedData();
 		}
 
 		[HttpGet]
 		public ViewResult Summary()
 		{
-			return this.View(this.recentDocumentsProvider.RecentDocuments.Select(x=>x.ToDocument()));
+			return this.View(this.recentDocumentsProvider.RecentDocuments.Select(x => x.ToDocument()));
 		}
 
 		[HttpGet]
-		public IActionResult Show(int Id)
+		public async Task<IActionResult> Show(int Id)
 		{
-			var loadedDoc = this.context.DbDocuments.Include("Author").First();
+			var loadedDoc = await this.context.DbDocuments.Include("Author").SingleOrDefaultAsync(d => d.Id == Id);
 			if (loadedDoc == null) return new StatusCodeResult(404);
 
-			return this.View(loadedDoc.ToDocument());
+			ViewBag.AutherUserIsOwner = this.AuthedUser?.Id.Equals(loadedDoc.Author?.Id) ?? false;
+
+			var v = loadedDoc.ToDocument();
+			return this.View(v);
 		}
 
 		[HttpPost]
@@ -43,17 +42,17 @@ namespace Website.Controllers
 		{
 			this.ViewBag.SearchRequest = SearchRequest;
 
-			var ServiceProvider = this.ScopeFactory.CreateScope().ServiceProvider;
+			var ServiceProvider = base.ServiceProvider;
 			var SearchService = ServiceProvider.GetRequiredService<DocumentSearchService>();
 			var ProceedRes = await SearchService.ProceedRequest(SearchRequest);
 			var ResResult = ProceedRes;
 			var Loaded = ResResult.Take(10);
-			return this.View(Loaded.Select(x=> x.ToDocument()));
+			return this.View(Loaded.Select(x => x.ToDocument()));
 		}
 
 		#region Create
 		[HttpGet]
-		public async Task<IActionResult> Create()
+		public IActionResult Create()
 		{
 			if (this.AuthedUser is null)
 				return new StatusCodeResult(401); // 401 Unauthorized
@@ -68,12 +67,12 @@ namespace Website.Controllers
 				return new StatusCodeResult(401); // 401 Unauthorized
 
 			if (!ModelState.IsValid)
-				View(Doc);
+				return View(Doc);
 
 			var DocForAddingToDb = new Website.Models.DocumentModel.Document
 			{
 				Title = Doc.Title,
-				Author = context.Users.Find(this.AuthedUser.Id),
+				Author = this.context.Users.Find(this.AuthedUser.Id),
 				CreatedDateTime = System.DateTime.UtcNow,
 				Paragraphs = new Models.DocumentModel.DocumentParagraph[] { new Models.DocumentModel.DocumentParagraph {
 						TextParts= new Website.Models.DocumentModel.WebText[] {new Models.DocumentModel.WebText { Text=Doc.Text} } } }
@@ -88,15 +87,62 @@ namespace Website.Controllers
 
 		#region Edit
 		[HttpGet]
-		public ViewResult Edit(int ProjectId)
+		public async Task<IActionResult> Edit(int Id)
 		{
-			return this.View();
+			if (this.AuthedUser is null)
+				return new StatusCodeResult(401);
+
+			var FoundDoc = await this.context.DbDocuments.Include("Author").SingleOrDefaultAsync(d => d.Id == Id);
+
+			if (FoundDoc is null)
+				return new StatusCodeResult(404);
+
+			if ((!FoundDoc.Author?.Id.Equals(AuthedUser.Id)) ?? true)
+				return new StatusCodeResult(401);
+
+			return this.View("Edit", Website.Models.DocumentModel.DocumentEdition.FromDocument(FoundDoc.ToDocument()));
 		}
 
-		[HttpPut]
-		public StatusCodeResult Edit(int ProjectId, object DocumentToBePosted)
+		[HttpPost]
+		public async Task<IActionResult> Edit(Website.Models.DocumentModel.DocumentCreation Doc)
 		{
-			return new StatusCodeResult(202);
+			if (this.AuthedUser is null)
+				return new StatusCodeResult(401); // 401 Unauthorized
+
+
+			Website.Models.DocumentModel.DbDocument? FoundDoc = null;
+			if (RouteData.Values["Id"] is not null)
+			{
+				try
+				{
+					FoundDoc = await this.context.DbDocuments.FindAsync(int.Parse(RouteData.Values["Id"] as string));
+				}
+				catch (ArgumentException)
+				{
+
+				}
+			}
+
+			if (FoundDoc is null)
+				return new StatusCodeResult(404);
+
+			if (!ModelState.IsValid)
+				return View(Doc);
+
+			var DocForAddingToDb = new Website.Models.DocumentModel.Document
+			{
+				Title = Doc.Title,
+				Author = FoundDoc.Author,
+				CreatedDateTime = FoundDoc.CreatedDateTime,
+				Paragraphs = new Models.DocumentModel.DocumentParagraph[] { new Models.DocumentModel.DocumentParagraph {
+						TextParts= new Website.Models.DocumentModel.WebText[] {new Models.DocumentModel.WebText { Text=Doc.Text} } } }
+			};
+
+			FoundDoc = Website.Models.DocumentModel.DbDocument.FromDocument(DocForAddingToDb);
+
+			await this.context.SaveChangesAsync();
+
+			return View("Show", FoundDoc.ToDocument());
 		}
 		#endregion
 
