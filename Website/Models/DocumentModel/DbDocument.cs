@@ -8,12 +8,12 @@ namespace Website.Models.DocumentModel
 	public class DbDocument
 	{
 		public int Id { get; set; }
-		public string Title { get; set; }= null!;
-		public NpgsqlTsVector TitleTsVector { get; set; }= null!;
+		public string Title { get; set; } = null!;
+		public NpgsqlTsVector TitleTsVector { get; set; } = null!;
 		public User? Author { get; set; }
 		public string[]? Tags { get; set; }
 		public DateTime CreatedDateTime { get; set; } = DateTime.UtcNow;
-		public byte[] Utf8JsonSerializedParagraphs { get; set; }= null!;
+		public byte[] Utf8JsonSerializedParagraphs { get; set; } = null!;
 
 
 		public static DbDocument FromDocument(Document article) => new DbDocument

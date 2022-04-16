@@ -8,11 +8,11 @@ namespace Website.Models.DocumentModel
 	{
 
 		public int Id { get; set; }
-		public string Title { get; set; }=null!;
-		public User? Author { get; set; }=null!;
-		public string[]? Tags { get; set; }=null!;
-		public DateTime CreatedDateTime { get; set; }=DateTime.UtcNow;
-		public DocumentParagraph[] Paragraphs { get; set; }=null!;
+		public string Title { get; set; } = null!;
+		public User? Author { get; set; } = null!;
+		public string[]? Tags { get; set; } = null!;
+		public DateTime CreatedDateTime { get; set; } = DateTime.UtcNow;
+		public DocumentParagraph[] Paragraphs { get; set; } = null!;
 
 
 		public override string ToString()

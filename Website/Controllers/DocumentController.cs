@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
-using Website.Repository;
-using Website.Services;
-using System.Threading.Tasks;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Website.Services;
 
 namespace Website.Controllers
 {
@@ -31,7 +30,7 @@ namespace Website.Controllers
 			var loadedDoc = await this.context.DbDocuments.Include("Author").SingleOrDefaultAsync(d => d.Id == Id);
 			if (loadedDoc == null) return new StatusCodeResult(404);
 
-			ViewBag.AutherUserIsOwner = this.AuthedUser?.Id.Equals(loadedDoc.Author?.Id) ?? false;
+			this.ViewBag.AutherUserIsOwner = this.AuthedUser?.Id.Equals(loadedDoc.Author?.Id) ?? false;
 
 			var v = loadedDoc.ToDocument();
 			return this.View(v);
@@ -66,8 +65,8 @@ namespace Website.Controllers
 			if (this.AuthedUser is null)
 				return new StatusCodeResult(401); // 401 Unauthorized
 
-			if (!ModelState.IsValid)
-				return View(Doc);
+			if (!this.ModelState.IsValid)
+				return this.View(Doc);
 
 			var DocForAddingToDb = new Website.Models.DocumentModel.Document
 			{
@@ -78,10 +77,10 @@ namespace Website.Controllers
 						TextParts= new Website.Models.DocumentModel.WebText[] {new Models.DocumentModel.WebText { Text=Doc.Text} } } }
 			};
 
-			context.DbDocuments.Add(Website.Models.DocumentModel.DbDocument.FromDocument(DocForAddingToDb));
-			await context.SaveChangesAsync();
+			this.context.DbDocuments.Add(Website.Models.DocumentModel.DbDocument.FromDocument(DocForAddingToDb));
+			await this.context.SaveChangesAsync();
 
-			return RedirectToAction("Show", new { Id = DocForAddingToDb.Id });
+			return this.RedirectToAction("Show", new { Id = DocForAddingToDb.Id });
 		}
 		#endregion
 
@@ -97,7 +96,7 @@ namespace Website.Controllers
 			if (FoundDoc is null)
 				return new StatusCodeResult(404);
 
-			if ((!FoundDoc.Author?.Id.Equals(AuthedUser.Id)) ?? true)
+			if ((!FoundDoc.Author?.Id.Equals(this.AuthedUser.Id)) ?? true)
 				return new StatusCodeResult(401);
 
 			return this.View("Edit", Website.Models.DocumentModel.DocumentEdition.FromDocument(FoundDoc.ToDocument()));
@@ -111,11 +110,11 @@ namespace Website.Controllers
 
 
 			Website.Models.DocumentModel.DbDocument? FoundDoc = null;
-			if (RouteData.Values["Id"] is not null)
+			if (this.RouteData.Values["Id"] is not null)
 			{
 				try
 				{
-					FoundDoc = await this.context.DbDocuments.FindAsync(int.Parse(RouteData.Values["Id"] as string));
+					FoundDoc = await this.context.DbDocuments.FindAsync(int.Parse(this.RouteData.Values["Id"] as string));
 				}
 				catch (ArgumentException)
 				{
@@ -126,8 +125,8 @@ namespace Website.Controllers
 			if (FoundDoc is null)
 				return new StatusCodeResult(404);
 
-			if (!ModelState.IsValid)
-				return View(Doc);
+			if (!this.ModelState.IsValid)
+				return this.View(Doc);
 
 			var DocForAddingToDb = new Website.Models.DocumentModel.Document
 			{
@@ -142,7 +141,7 @@ namespace Website.Controllers
 
 			await this.context.SaveChangesAsync();
 
-			return View("Show", FoundDoc.ToDocument());
+			return this.View("Show", FoundDoc.ToDocument());
 		}
 		#endregion
 

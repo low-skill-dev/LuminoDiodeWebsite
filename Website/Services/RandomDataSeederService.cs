@@ -1,14 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Website.Repository;
 using Website.Services.SettingsProviders;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Website.Services
 {
@@ -50,9 +42,9 @@ namespace Website.Services
 			for (int i = 0; i < ToAddUsers.Length; i++)
 			{
 				var docToAdd = Models.DocumentModel.DbDocument.FromDocument(Website.Models.DocumentModel.Document.GenerateRandom());
-				docToAdd.Author = context.Users.First();
+				docToAdd.Author = this.context.Users.First();
 				this.context.DbDocuments.Add(docToAdd);
-				if (CurrCt++ > 10*1000)
+				if (CurrCt++ > 10 * 1000)
 				{
 					CurrCt = 0;
 					this.context.SaveChanges();

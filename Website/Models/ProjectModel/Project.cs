@@ -1,8 +1,7 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Website.Models.UserModel;
 using Website.Models.DocumentModel;
-using System.Collections.Generic;
+using Website.Models.UserModel;
 
 namespace Website.Models.ProjectModel
 {
@@ -13,7 +12,7 @@ namespace Website.Models.ProjectModel
 			Common = 0
 		}
 
-		#pragma warning disable CS8618
+#pragma warning disable CS8618
 
 		public int Id { get; set; }
 		public PROJECT_TYPE ProjectType { get; set; }
@@ -23,11 +22,11 @@ namespace Website.Models.ProjectModel
 		public User[] Admins { get; set; }
 		public IEnumerable<DbDocument> OrderedDocumentsId { get; set; }
 
-		#pragma warning restore CS8618
+#pragma warning restore CS8618
 
 		public static Project GenerateRandom(Website.Repository.WebsiteContext documentsSourceContext)
 		{
-			
+
 			return new Project
 			{
 				ProjectType = PROJECT_TYPE.Common,

@@ -25,6 +25,6 @@ namespace Website.Models.DocumentModel
 		public string Text { get; set; } = null!;
 
 		public static DocumentEdition FromDocument(Website.Models.DocumentModel.Document Doc) =>
-			new DocumentEdition { Id=Doc.Id, Title = Doc.Title, Text = string.Concat(Doc.Paragraphs.Select(x => string.Concat(x.TextParts?.Select(y => y.Text) ?? new string[0]))) };
+			new DocumentEdition { Id = Doc.Id, Title = Doc.Title, Text = string.Concat(Doc.Paragraphs.Select(x => string.Concat(x.TextParts?.Select(y => y.Text) ?? new string[0]))) };
 	}
 }

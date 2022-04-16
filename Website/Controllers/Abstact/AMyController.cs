@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Website.Repository;
 using Website.Services;
-using System.Collections.Generic;
-using System;
 
 namespace Website.Controllers
 {
@@ -29,32 +29,32 @@ namespace Website.Controllers
 			this.context = sp.GetRequiredService<WebsiteContext>();
 			this.SM = sp.GetRequiredService<SessionManager>();
 			this.RC = sp.GetRequiredService<RequestsFromIpCounterService>();
-			ViewBag.AuthedUser = new Website.Models.UserModel.User { };
-			ViewBag.AuthedUser = null;
+			this.ViewBag.AuthedUser = new Website.Models.UserModel.User { };
+			this.ViewBag.AuthedUser = null;
 
 		}
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{
 			// Returns Http 429 if too many requests
-			RC.CountRequest(context);
-			if (RC.IPAddressIsBanned(context)) context.Result = new StatusCodeResult(429);
+			this.RC.CountRequest(context);
+			if (this.RC.IPAddressIsBanned(context)) context.Result = new StatusCodeResult(429);
 
 			base.OnActionExecuting(context);
 
-			LoadSessionAndAuthedUser();
-			RedirectToRegistrationStepIfNeeded(context);
+			this.LoadSessionAndAuthedUser();
+			this.RedirectToRegistrationStepIfNeeded(context);
 		}
 		protected void LoadSessionAndAuthedUser()
 		{
-			if (Request.Cookies.ContainsKey(SessionManager.SessionIdCoockieName))
+			if (this.Request.Cookies.ContainsKey(SessionManager.SessionIdCoockieName))
 			{
 				SessionInfo? Info;
 #pragma warning disable CS8604
-				SM.ValidateSession(Request.Cookies[SessionManager.SessionIdCoockieName], out Info);
+				this.SM.ValidateSession(this.Request.Cookies[SessionManager.SessionIdCoockieName], out Info);
 #pragma warning restore CS8604
 				if (Info == null) return;
-				this.AuthedUser = context.Users.AsTracking(QueryTrackingBehavior.TrackAll).First(u => u.Id == Info.UserId); /* throw new System.AggregateException("Session cotains user id which cannot be found in DB")*/;
-				ViewBag.AuthedUser = this.AuthedUser;
+				this.AuthedUser = this.context.Users.AsTracking(QueryTrackingBehavior.TrackAll).First(u => u.Id == Info.UserId); /* throw new System.AggregateException("Session cotains user id which cannot be found in DB")*/;
+				this.ViewBag.AuthedUser = this.AuthedUser;
 			}
 		}
 		protected void AddAlertToPageTop(Website.Models.ViewModels.Alert alert)
@@ -74,12 +74,12 @@ namespace Website.Controllers
 		}
 		protected void RedirectToRegistrationStepIfNeeded(ActionExecutingContext context)
 		{
-			if (AuthedUser == null) return; // RETURN; if no user authed
+			if (this.AuthedUser == null) return; // RETURN; if no user authed
 
 			var act = context.RouteData.Values["Action"] ?? string.Empty;
 			var ctr = context.RouteData.Values["controller"] ?? string.Empty;
 
-			ForwardingTo CurrentDist=ForwardingTo.OtherPages;
+			ForwardingTo CurrentDist = ForwardingTo.OtherPages;
 
 			var UserCtrName = nameof(Website.Controllers.UserController).Replace("Controller", string.Empty);
 			var LogoutActName = nameof(Website.Controllers.UserController.Logout);
@@ -89,7 +89,7 @@ namespace Website.Controllers
 			if (ctr.Equals(UserCtrName))
 			{
 				if (act.Equals(LogoutActName))
-					CurrentDist=ForwardingTo.LogoutPage; // could return here, but returning just anywhere is not good
+					CurrentDist = ForwardingTo.LogoutPage; // could return here, but returning just anywhere is not good
 				else if (act.Equals(EntNameActName))
 					CurrentDist = ForwardingTo.EnteringNamePage;
 				else if (act.Equals(EntMetaActName))
@@ -98,19 +98,19 @@ namespace Website.Controllers
 
 			if (CurrentDist == ForwardingTo.LogoutPage) return; // RETURN; If trying to logout, let him
 
-			ForwardingTo NeededDist=ForwardingTo.OtherPages;
+			ForwardingTo NeededDist = ForwardingTo.OtherPages;
 
-			if (AuthedUser.RegistrationStage == Models.UserModel.User.REGISTRATION_STAGE.EnteringName)
+			if (this.AuthedUser.RegistrationStage == Models.UserModel.User.REGISTRATION_STAGE.EnteringName)
 				NeededDist = ForwardingTo.EnteringNamePage;
-			else if (AuthedUser.RegistrationStage == Models.UserModel.User.REGISTRATION_STAGE.EnteringMetadata)
+			else if (this.AuthedUser.RegistrationStage == Models.UserModel.User.REGISTRATION_STAGE.EnteringMetadata)
 				NeededDist = ForwardingTo.EnteringMetadataPage;
 
-			if(NeededDist == CurrentDist) return; // RETURN; already heading needed page
+			if (NeededDist == CurrentDist) return; // RETURN; already heading needed page
 
-			if(NeededDist == ForwardingTo.EnteringNamePage)
-				context.Result = RedirectToAction(EntNameActName, UserCtrName);
-			else if (NeededDist==ForwardingTo.EnteringMetadataPage)
-				context.Result= RedirectToAction(EntMetaActName, UserCtrName);
+			if (NeededDist == ForwardingTo.EnteringNamePage)
+				context.Result = this.RedirectToAction(EntNameActName, UserCtrName);
+			else if (NeededDist == ForwardingTo.EnteringMetadataPage)
+				context.Result = this.RedirectToAction(EntMetaActName, UserCtrName);
 		}
 	}
 }

@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Website.Models.UserModel
 {
@@ -18,46 +18,46 @@ namespace Website.Models.UserModel
 			EnteringMetadata, // City, aboutme, telegram link e.t.c
 			RegistrationCompleted
 		}
-		
+
 		public int Id { get; set; }
 
 		[EnumDataType(typeof(USER_TYPE))]
 		public USER_TYPE UserType { get; set; } = USER_TYPE.Common;
 
 		[DataType(DataType.Text)]
-		[MinLength(1),MaxLength(50)]
+		[MinLength(1), MaxLength(50)]
 		[Required(ErrorMessage = "Please enter a correct user name")]
-		public string DisplayedName { get; set; }= "New User";
+		public string DisplayedName { get; set; } = "New User";
 
 		[DataType(DataType.Text)]
 		[MinLength(1), MaxLength(3000)]
-		public string? AboutMe { get; set; }= null!;
+		public string? AboutMe { get; set; } = null!;
 
 		[DataType(DataType.Url)]
 		[MinLength(1), MaxLength(50)]
-		public string? TelegramLink { get; set; }= null!;
+		public string? TelegramLink { get; set; } = null!;
 
 		[DataType(DataType.Url)]
 		[MinLength(1), MaxLength(50)]
-		public string? VkLink { get; set; }= null!;
+		public string? VkLink { get; set; } = null!;
 
 		[DataType(DataType.Text)]
 		[MinLength(1), MaxLength(50)]
-		public string? City { get; set; }= null!;
+		public string? City { get; set; } = null!;
 
 		[DataType(DataType.PostalCode)]
 		[MinLength(1), MaxLength(10)]
-		public string? PostalCode { get; set; }= null!;
+		public string? PostalCode { get; set; } = null!;
 
-		public string? String64_ProfileImage { get; set; }= null!;
+		public string? String64_ProfileImage { get; set; } = null!;
 
 		[DataType(DataType.EmailAddress)]
-		[MinLength(4),MaxLength(50)]
-		[Required(ErrorMessage ="Please enter correct email address")]
-		public string? EmailAdress { get; set; }= null!;
+		[MinLength(4), MaxLength(50)]
+		[Required(ErrorMessage = "Please enter correct email address")]
+		public string? EmailAdress { get; set; } = null!;
 
-		public byte[]? AuthHashedPassword { get; set; }= null!;
-		public byte[]? AuthPasswordSalt { get; set; }= null!;
+		public byte[]? AuthHashedPassword { get; set; } = null!;
+		public byte[]? AuthPasswordSalt { get; set; } = null!;
 
 		public DateTime RegistrationStartedDateTime { get; set; } = DateTime.UtcNow;
 		public DateTime? RegistrationCompleteDateTime { get; set; } = null!;
@@ -93,9 +93,9 @@ namespace Website.Models.UserModel
 			}
 			if (MM.PostalCode is not null)
 			{
-				this.PostalCode=MM.PostalCode;
+				this.PostalCode = MM.PostalCode;
 			}
-			if(MM.VkLink is not null)
+			if (MM.VkLink is not null)
 			{
 				this.VkLink = MM.VkLink;
 			}

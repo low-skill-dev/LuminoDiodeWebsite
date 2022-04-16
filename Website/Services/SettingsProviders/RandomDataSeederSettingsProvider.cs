@@ -58,7 +58,7 @@ namespace Website.Services.SettingsProviders
 				catch (Exception)
 				{
 					// default
-					return 100*1000;
+					return 100 * 1000;
 				}
 			}
 		}
@@ -75,7 +75,7 @@ namespace Website.Services.SettingsProviders
 				catch (Exception)
 				{
 					// default
-					return 10*1000;
+					return 10 * 1000;
 				}
 			}
 		}
