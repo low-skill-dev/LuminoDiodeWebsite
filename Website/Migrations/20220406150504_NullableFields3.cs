@@ -4,7 +4,7 @@
 
 namespace Website.Migrations
 {
-	public partial class EmailAsAlternateKey2 : Migration
+	public partial class NullableFields3 : Migration
 	{
 		protected override void Up(MigrationBuilder migrationBuilder)
 		{

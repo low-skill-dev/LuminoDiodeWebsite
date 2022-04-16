@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Website.Repository
 {
@@ -22,8 +21,8 @@ namespace Website.Repository
 		}
 
 		public DbSet<Website.Models.DocumentModel.DbDocument> DbDocuments { get; set; } = null!;
-		public DbSet<Website.Models.UserModel.User> Users { get; set; }= null!;
-		public DbSet<Website.Models.ProjectModel.Project> Projects { get; set; }= null!;
-		public DbSet<Website.Models.ProjectsGroupModel.ProjectsGroup> ProjectsGroups { get; set; }= null!;
+		public DbSet<Website.Models.UserModel.User> Users { get; set; } = null!;
+		public DbSet<Website.Models.ProjectModel.Project> Projects { get; set; } = null!;
+		public DbSet<Website.Models.ProjectsGroupModel.ProjectsGroup> ProjectsGroups { get; set; } = null!;
 	}
 }

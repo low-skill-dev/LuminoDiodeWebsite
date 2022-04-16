@@ -1,0 +1,27 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Website.Models.DocumentModel.DocumentEdition
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class=container-fluid>
+	@using (Html.BeginForm("Edit", "Document",new {@Id=Model.Id},FormMethod.Post))
+	{
+		<div>
+			<div class="p-3 w-100">
+				<div class="w-25">
+					@Html.LabelFor(Model=>Model.Title)
+				</div>
+				<div class="w-75">
+					@Html.EditorFor(Model=>Model.Title)
+				</div>
+			</div>
+		</div>
+		<div class="p-3">
+			@Html.LabelFor(Model=>Model.Text)
+			@Html.TextAreaFor(Model=>Model.Text,new {@rows="10", @class="form-control"})
+		</div>
+		<div class="p-3">
+			<button class="btn btn-outline-dark" type="submit">Submit</button>
+		</div>
+	}
+</div>

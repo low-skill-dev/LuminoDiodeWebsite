@@ -1,11 +1,11 @@
-﻿using Website.Models.UserModel;
-using Website.Models.ProjectModel;
+﻿using Website.Models.ProjectModel;
+using Website.Models.UserModel;
 
 namespace Website.Models.ProjectsGroupModel
 {
 	public class ProjectsGroup
 	{
-		#pragma warning disable CS8618
+#pragma warning disable CS8618
 
 		public int Id { get; set; }
 		public User OwnerId { get; set; }
@@ -13,6 +13,6 @@ namespace Website.Models.ProjectsGroupModel
 		public Project[] OrderedProjectsId { get; set; }
 		public string ShortDescription { get; set; }
 
-		#pragma warning restore CS8618
+#pragma warning restore CS8618
 	}
 }

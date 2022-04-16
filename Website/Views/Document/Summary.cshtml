@@ -1,37 +1,55 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @model IEnumerable<Website.Models.DocumentModel.Document>
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 
 
 <div class="row">
-    <div class="col-lg">
-        <img style="height: 100%; width: 100%; object-fit: contain"  src="~/StaticFiles/Images/ForFun/jvoIVk8HTwg.png"/>
-    </div>
+	<div class="col-lg-3">
+		<div class="p-3">
+			<span class="p-1">
+				<button onclick="location.href='@Url.Action("Create","Document")'" class="btn btn-outline-dark">
+					Create new
+				</button>
+			</span>
 
-    <div class="col-lg-6" id="SearchPanel">     
-        <div class="p-3">
-                <partial name="~/Views/Shared/PartialViews/Document/_DocumentSearchFormPartialView.cshtml" model=string.Empty />
-        </div>
-    </div>
+			<span class="p-1">
+				<button onclick="location.href='@Url.Action("Create","Document")'" class="btn btn-outline-dark">
+					My documents
+				</button>
+			</span>
 
-    <div class="col-lg" id="RecentDocuments">
-        <div class="p-1">
-            <div class="border border-primary">
-                <div class="w-100 text-center p-1">
-                    <h5>Recent docs</h5>
-                </div>
-                @{
-                    foreach (var doc in @Model)
-                    {   
-                        @:<div class="p-1">
-                        <partial name="~/Views/Shared/PartialViews/Document/_DocumentCardPartialView.cshtml" model=doc />;
-                        @:</div>
-                    }
-                }
-            </div>
-        </div>
-    </div>
+		</div>
+	</div>
+	<div
+
+    <div class="col-lg-6" id="SearchPanel">
+		<div class="p-3">
+				<partial name="~/Views/Shared/PartialViews/Document/_DocumentSearchFormPartialView.cshtml" model=string.Empty />
+		</div>
+	</div>
+
+	<div class="col-lg-3" id="RecentDocuments">
+		<div class="p-1">
+			<div class="border border-primary">
+				<div class="w-100 text-center p-1">
+					<h5>Recent docs</h5>
+				</div>
+					@{
+						foreach (var doc in @Model)
+						{
+							@:<div class="p-1">
+								<partial name="~/Views/Shared/PartialViews/Document/_DocumentCardPartialView.cshtml" model=doc />
+							;
+							@:</div>
+						}
+					}
+			</div>
+		</div>
+	</div>
+	 <div class="col-lg-3">
+
+	</div>
 </div>

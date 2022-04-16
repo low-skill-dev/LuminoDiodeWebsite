@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Website.Services.SettingsProviders;
-using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
+using Website.Services.SettingsProviders;
 
 namespace Website.Services
 {
@@ -48,7 +46,7 @@ namespace Website.Services
 
 		public bool ValidateSession(string SessionId, out SessionInfo? FoundSession)
 		{
-			FoundSession=null;
+			FoundSession = null;
 
 			// if session does not exist
 			if (!this.Sessions.TryGetValue(SessionId, out FoundSession)) return false;
@@ -57,13 +55,13 @@ namespace Website.Services
 			if ((FoundSession.ValidThrough.Ticks - DateTime.UtcNow.Ticks) < 0) return false;
 
 			// if session is valid, validate it for the next 24 hours (by default)
-			FoundSession.ValidThrough = DateTime.UtcNow.AddSeconds(SessionLifeTimeSecs);
+			FoundSession.ValidThrough = DateTime.UtcNow.AddSeconds(this.SessionLifeTimeSecs);
 			return true;
 		}
 
 		public void CreateSession(int UsedId, out string CreatedSessionId)
 		{
-			var SessionId = new string(System.Security.Cryptography.RandomNumberGenerator.GetBytes(SessionIdStringLength).Select(x => (char)x).ToArray());
+			var SessionId = new string(System.Security.Cryptography.RandomNumberGenerator.GetBytes(this.SessionIdStringLength).Select(x => (char)x).ToArray());
 			var ValidThrough = DateTime.UtcNow.AddSeconds(this.SessionLifeTimeSecs);
 
 			CreatedSessionId = SessionId;
@@ -74,7 +72,7 @@ namespace Website.Services
 		{
 			while (!ct.IsCancellationRequested)
 			{
-				await Task.Delay(SessionsCleanUpIntervalSecs * 1000);
+				await Task.Delay(this.SessionsCleanUpIntervalSecs * 1000);
 				this.Sessions = this.Sessions.Where(s => s.Value.IsValidNow).ToDictionary(key => key.Key, value => value.Value);
 			}
 		}

@@ -1,19 +1,10 @@
-﻿using Microsoft.Extensions.Hosting;
-using System;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
-using System.Linq;
-using Website.Services.SettingsProviders;
-using System.Security.Cryptography;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
-using Website.Repository;
-using Website.Services;
+using Website.Services.SettingsProviders;
 
 namespace Website.Services
 {
@@ -33,9 +24,9 @@ namespace Website.Services
 		private const int UpdateDelay_mins = 1;
 
 		private int MaxRequestsPerPeriod
-			=> SettingsProvider.RequestsFromIpCounterServiceSP.AllowedNumOfRequestsPerMinute * SettingsProvider.RequestsFromIpCounterServiceSP.ControlledTime_mins;
+			=> this.SettingsProvider.RequestsFromIpCounterServiceSP.AllowedNumOfRequestsPerMinute * this.SettingsProvider.RequestsFromIpCounterServiceSP.ControlledTime_mins;
 		private int Period_mins
-			=> SettingsProvider.RequestsFromIpCounterServiceSP.ControlledTime_mins;
+			=> this.SettingsProvider.RequestsFromIpCounterServiceSP.ControlledTime_mins;
 
 
 
@@ -53,11 +44,11 @@ namespace Website.Services
 				 * Вычисляется как (допустимое число запросов за период) * (период обновления/длинна периода).
 				 * Таким образом, максимальное число запросов за период будет сниматься за один, собственно, период.
 				 */
-				float DecreaseRateInDelay = (float)this.MaxRequestsPerPeriod * ((float)UpdateDelay_mins / (float)Period_mins);
+				float DecreaseRateInDelay = (float)this.MaxRequestsPerPeriod * ((float)UpdateDelay_mins / (float)this.Period_mins);
 				foreach (var k in this.RequestsByIpLastTime.Keys)
 				{
-					RequestsByIpLastTime[k] = RequestsByIpLastTime[k] - DecreaseRateInDelay;
-					if (RequestsByIpLastTime[k] < 0) RequestsByIpLastTime[k] = 0;
+					this.RequestsByIpLastTime[k] = this.RequestsByIpLastTime[k] - DecreaseRateInDelay;
+					if (this.RequestsByIpLastTime[k] < 0) this.RequestsByIpLastTime[k] = 0;
 				}
 			}
 		}
@@ -78,7 +69,7 @@ namespace Website.Services
 		public bool IPAddressIsBanned(IPAddress RequesterIp)
 		{
 			if (this.RequestsByIpLastTime.ContainsKey(RequesterIp))
-				if (this.RequestsByIpLastTime[RequesterIp] > MaxRequestsPerPeriod) return true;
+				if (this.RequestsByIpLastTime[RequesterIp] > this.MaxRequestsPerPeriod) return true;
 
 			return false;
 		}
