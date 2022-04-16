@@ -6,6 +6,8 @@
 	bool isItalic = Model.IsItalic ?? false;
 }
 
+<div>
+
 @if (hasLink)
 {
 	@:<a href="@(Model.Link)">
@@ -33,3 +35,6 @@
 {
 	@:</a>
 }
+
+</div>
+
