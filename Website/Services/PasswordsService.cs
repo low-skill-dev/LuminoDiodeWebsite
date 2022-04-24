@@ -1,12 +1,7 @@
-﻿using System.Security.Cryptography;
-using FuzzySharp;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 using Website.Services.SettingsProviders;
 
 namespace Website.Services
@@ -22,7 +17,7 @@ namespace Website.Services
 		}
 
 		private const int KeySizeBytes = 64; // 512 bits
-		private Func<byte[], byte[]> HashAlg = SHA512.HashData;
+		private readonly Func<byte[], byte[]> HashAlg = SHA512.HashData;
 		private static byte[] GenerateSalt()
 		{
 			var Bits = new byte[KeySizeBytes];
@@ -38,7 +33,7 @@ namespace Website.Services
 			for (int i = 0; i < Salt.Length; i++) { SaltedPassword[PlainTextPassword.Length + i] = Salt[i]; }
 
 			GeneratedSalt = Salt;
-			return HashAlg(SaltedPassword); // should better use PBKDF2 ?
+			return this.HashAlg(SaltedPassword); // should better use PBKDF2 ?
 		}
 		public bool ConfirmPassword(string PlainTextPassword, byte[] HashedPassword, byte[] Salt)
 		{
@@ -46,7 +41,7 @@ namespace Website.Services
 			for (int i = 0; i < PlainTextPassword.Length; i++) { SaltedPossiblePassword[i] = (byte)(PlainTextPassword[i]); }
 			for (int i = 0; i < Salt.Length; i++) { SaltedPossiblePassword[PlainTextPassword.Length + i] = Salt[i]; }
 
-			return HashAlg(SaltedPossiblePassword).SequenceEqual(HashedPassword);
+			return this.HashAlg(SaltedPossiblePassword).SequenceEqual(HashedPassword);
 		}
 		public async void SetPassAndSaltForUser(int SelectedUserId, string PasswordPlaintText)
 		{
@@ -54,9 +49,9 @@ namespace Website.Services
 				.GetRequiredService<Website.Repository.WebsiteContext>();
 			var User = (await ctx.Users.FindAsync(SelectedUserId));
 			//var Salt = GenerateSalt();
-			var Hashed = HashPassword(PasswordPlaintText, out var Salt);
-			User.AuthHashedPassword= Hashed;
-			User.AuthPasswordSalt= Salt;
+			var Hashed = this.HashPassword(PasswordPlaintText, out var Salt);
+			User.AuthHashedPassword = Hashed;
+			User.AuthPasswordSalt = Salt;
 			ctx.Update(User);
 			ctx.SaveChanges();
 		}

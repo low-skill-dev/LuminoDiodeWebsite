@@ -18,7 +18,7 @@ namespace Website.Services.SettingsProviders
 			this.RecentDocumentsBackgroundServiceSP = new(configuration);
 			this.ConnectionStringsP = new(configuration);
 			this.PasswordsCryptographyServiceSP = new(configuration);
-			this.SessionManagerServiceSP=new(configuration);
+			this.SessionManagerServiceSP = new(configuration);
 			this.RandomDataSeederSP = new(configuration);
 			this.RequestsFromIpCounterServiceSP = new(configuration);
 			this.AuthTockenServiceSP = new(configuration);

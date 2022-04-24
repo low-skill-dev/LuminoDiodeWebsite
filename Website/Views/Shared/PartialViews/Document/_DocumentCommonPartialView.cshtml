@@ -2,17 +2,30 @@
 @model Website.Models.DocumentModel.Document
 
 <div>
-    <div class="p-2">
-    <div class="display-6">
-        @(Model.Title?? $"Document title unknown");
-    </div>
+	<div class="p-2">
 
-    <div class="h5">
-        <partial name="~/Views/Shared/PartialViews/Document/_AuthorAndPublishTimePartialView.cshtml" model=@Model />
-    </div>
-    </div>
 
-    <div class="p-2">
-        <partial name="~/Views/Shared/PartialViews/Document/_DococumentTextPartialView.cshtml" model=@Model />
-    </div> 
+		<div>
+			<div class="display-6">
+				@(Model.Title?? $"Document title unknown");
+			</div>
+		</div>
+
+		<div class="h5">
+			<partial name="~/Views/Shared/PartialViews/Document/_AuthorAndPublishTimePartialView.cshtml" model=@Model />
+		</div>
+
+		@if (ViewBag.AutherUserIsOwner == true)
+		{
+			<div class="mt-2 mb-2">
+				<button class="btn btn-sm btn-outline-dark" onclick="location.href='@Url.Action("Edit","Document",new {@Id=Model.Id})'">Edit</button>
+			</div>
+		}
+
+		<div class="p-2">
+			<partial name="~/Views/Shared/PartialViews/Document/_DococumentTextPartialView.cshtml" model=@Model />
+		</div>
+
+
+	</div>
 </div>
