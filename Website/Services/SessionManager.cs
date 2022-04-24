@@ -35,7 +35,7 @@ namespace Website.Services
 			=> this.SettingsProvider.SessionManagerServiceSP.SessionLifetime_secs;
 		private int SessionIdStringLength
 			=> this.SettingsProvider.SessionManagerServiceSP.SessionIdStringLength_chars;
-		public int SessionsCleanUpIntervalSecs
+		private int SessionsCleanUpIntervalSecs
 			=> this.SettingsProvider.SessionManagerServiceSP.SessionsCleanUpInterval_secs;
 
 		public SessionInfo this[string SessionId] => this.Sessions[SessionId];

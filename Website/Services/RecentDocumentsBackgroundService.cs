@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Website.Repository;
 using Website.Services.SettingsProviders;
+using Website.Services.SettingsProviders;
 
 namespace Website.Services
 {
@@ -15,32 +16,32 @@ namespace Website.Services
 	/// </summary>
 	public class RecentDocumentsBackgroundService : BackgroundService
 	{
-		private readonly IServiceScopeFactory DbContextScopeFactory;
-		private readonly AppSettingsProvider SettingsProvider;
+		private readonly WebsiteContext context;
+		private readonly RecentDocumentsBackgroundServiceSettingsProvider SettingsProvider;
 		public int Interval_msec
 		{
-			get => this.SettingsProvider.RecentDocumentsBackgroundServiceSP.Interval_msec;
+			get => this.SettingsProvider.Interval_msec;
 		}
 
 		public RecentDocumentsBackgroundService(IServiceScopeFactory DbContextScopeFactory, AppSettingsProvider SettingsProvider)
 		{
-			this.DbContextScopeFactory = DbContextScopeFactory;
-			this.SettingsProvider = SettingsProvider;
+			this.context = DbContextScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();
+			this.SettingsProvider = SettingsProvider.RecentDocumentsBackgroundServiceSP;
 		}
 
-		public List<Website.Models.DocumentModel.DbDocument> RecentDocuments { get; private set; }
-
+		public List<Website.Models.DocumentModel.Document> RecentDocuments { get; private set; } = new List<Models.DocumentModel.Document>();
 		protected async override Task ExecuteAsync(CancellationToken ct)
 		{
-			using (WebsiteContext context = this.DbContextScopeFactory
-				.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>())
+			while (!ct.IsCancellationRequested)
 			{
-				while (!ct.IsCancellationRequested)
-				{
-					var NewRecent = context.DbDocuments.OrderByDescending(d => d.CreatedDateTime).Take(5).Include("Author");
-					this.RecentDocuments = NewRecent.ToList();
-					await Task.Delay(this.Interval_msec);
-				}
+				var NewRecent = this.context.DbDocuments.TakeLast(5).Include("Author").Reverse(); // newest as first
+				await NewRecent.LoadAsync();
+
+				if (NewRecent.First().CreatedDateTime.Equals(this.RecentDocuments.First().CreatedDateTime))
+					return; // no new docs added
+
+				this.RecentDocuments = NewRecent.Select(x => x.ToDocument()).ToList();
+				await Task.Delay(this.Interval_msec);
 			}
 		}
 	}
