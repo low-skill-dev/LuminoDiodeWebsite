@@ -35,7 +35,16 @@
 					}
 					@{
 						<div class="col-lg-6">
-							<p class="display-5">@Model.GetFullName()</p>
+							<p class="display-4">@Model.GetFullName()</p>
+							<p class="h3">@Model.City</p>
+							@if (!string.IsNullOrWhiteSpace(Model.AboutMe))
+							{
+								<p class="h4">About: @Model.AboutMe</p>
+							}
+							@if (Model.RegistrationCompleteDateTime is not null)
+							{
+								<p class="h4">Reg date: @Model.RegistrationCompleteDateTime.Value.ToShortDateString()</p>
+							}
 						</div>
 					}
 				</div>
