@@ -2,7 +2,7 @@
 
 namespace Website.Models.Auth
 {
-	public class LoginInfo
+	public class LoginOnly
 	{
 		[DataType(DataType.EmailAddress)]
 		[MinLength(5), MaxLength(50)]
@@ -11,18 +11,10 @@ namespace Website.Models.Auth
 		[Display(Name = "Email")]
 		public string EmailPlainText { get; set; }
 
-		[DataType(DataType.Password)]
-		[MinLength(8, ErrorMessage = "Please use a password that is at least 8 characters long")]
-		[MaxLength(128, ErrorMessage = "Your password is too long")]
-		[Required(ErrorMessage = "Please enter a correct password")]
-		[Display(Name = "Password")]
-
-		public string PasswordPlainText { get; set; }
 
 		public void TrimSelf()
 		{
 			this.EmailPlainText = this.EmailPlainText.Trim();
-			this.PasswordPlainText = this.PasswordPlainText.Trim();
 		}
 	}
 }

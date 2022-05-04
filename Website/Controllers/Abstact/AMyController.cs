@@ -21,7 +21,27 @@ namespace Website.Controllers
 		protected readonly RequestsFromIpCounterService RC;
 
 		protected Website.Models.UserModel.User? AuthedUser { get; set; } = null;
-		protected readonly List<Website.Models.ViewModels.Alert> PageTopAlerts = new(1);
+
+		protected const string PageTopAlertsTempDataName = "PageTopAlerts";
+		//protected readonly List<Website.Models.ViewModels.Alert> PageTopAlerts = new(1);
+
+		protected Dictionary<string, string>? RouteAdditionalParams
+		{
+			get
+			{
+				if (Request.Path.Value is null) return null;
+				if (this._RouteAdditionalParams is null)
+				{
+					var startIndex = Request.Path.Value.LastIndexOf('?');
+					if (startIndex < 0) return null;
+					this._RouteAdditionalParams = Request.Path.Value.Substring(startIndex)
+						.Split('&').Select(x => x.Split("=", 2)).ToDictionary(x => x[0], x => x[1]);
+				}
+				return this._RouteAdditionalParams;
+			}
+		}
+		protected Dictionary<string, string>? _RouteAdditionalParams;
+
 		public AMyController(IServiceScopeFactory ScopeFactory)
 		{
 			var sp = ScopeFactory.CreateScope().ServiceProvider;
@@ -31,7 +51,6 @@ namespace Website.Controllers
 			this.RC = sp.GetRequiredService<RequestsFromIpCounterService>();
 			this.ViewBag.AuthedUser = new Website.Models.UserModel.User { };
 			this.ViewBag.AuthedUser = null;
-
 		}
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{
@@ -57,12 +76,24 @@ namespace Website.Controllers
 				this.ViewBag.AuthedUser = this.AuthedUser;
 			}
 		}
+
 		protected void AddAlertToPageTop(Website.Models.ViewModels.Alert alert)
 		{
-			if (this.TempData["PageTopAlerts"] == null)
-				this.TempData["PageTopAlerts"] = this.PageTopAlerts;
+			if (!this.TempData.ContainsKey(PageTopAlertsTempDataName))
+			{
+				this.TempData.Add(PageTopAlertsTempDataName, string.Empty);
+			}
+			if (this.TempData.Peek(PageTopAlertsTempDataName) is not string)
+			{
+				this.TempData.Remove(PageTopAlertsTempDataName);
+				this.TempData.Add(PageTopAlertsTempDataName, string.Empty);
+			}
 
-			this.PageTopAlerts.Add(alert);
+			var peekedStr = (string)this.TempData.Peek(PageTopAlertsTempDataName)!;
+			var StringWithNewAlert = peekedStr + (string.IsNullOrEmpty(peekedStr) ? string.Empty : "\n") + alert.ToHtmlString();
+
+			this.TempData.Remove(PageTopAlertsTempDataName);
+			this.TempData.Add(PageTopAlertsTempDataName, StringWithNewAlert);
 		}
 
 		private enum ForwardingTo

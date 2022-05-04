@@ -11,7 +11,7 @@ namespace Website.Services.SettingsProviders
 			this.config = configuration;
 		}
 
-		public string? DefaultNpgsqlConnection
+		public string DefaultNpgsqlConnection
 		{
 			get
 			{
@@ -21,9 +21,9 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("ConnectionStrings:DefaultNpgsqlConnection")
 						.Get<string>();
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
-					return null;
+					throw new ArgumentException("Cannot find database connection string in appsettings.json", ex);
 				}
 			}
 		}

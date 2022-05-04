@@ -63,8 +63,8 @@ namespace Website.Services
 		{
 			string SessionId = null;
 			do {
-				SessionId = new string(System.Security.Cryptography.RandomNumberGenerator
-					.GetBytes(this.SessionIdStringLength).Select(x => (char)x).ToArray());
+				SessionId = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator
+					.GetBytes(this.SessionIdStringLength));
 			} while(this.Sessions.ContainsKey(SessionId));
 			var ValidThrough = DateTime.UtcNow.AddSeconds(this.SessionLifeTimeSecs);
 

@@ -1,4 +1,8 @@
-﻿namespace Website.Models.ViewModels
+﻿using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+
+namespace Website.Models.ViewModels
 {
 	public class Alert
 	{
@@ -47,19 +51,30 @@
 			return "alert alert-primary";
 		}
 
-		public ALERT_TYPE AlertType { get; }
-		public string Message { get; }
+		public ALERT_TYPE AlertType { get;}
+		public string Message { get;}
 
 		public Alert(string Message, ALERT_TYPE AlertType)
 		{
-			this.Message = Message;
+			this.Message = Message.Replace('\n', ' ');
 			this.AlertType = AlertType;
 		}
 		public Alert(string Message, ALERT_COLOR AlertColor)
 		{
-			this.Message = Message;
+			this.Message = Message.Replace('\n', ' ');
 			this.AlertType = (ALERT_TYPE)AlertColor;
 		}
 
+		public string ToHtmlString()
+		{
+			return "<div class='p-1'>"
+			+ $"<div class='{this.GetHtmlClass()}' role='alert'>"
+			+ this.Message
+			+ @"</div></div>";
+		}
+		public string ToHtmlStringMany(IEnumerable<Alert> alerts)
+		{
+			return string.Join('\n', alerts.Select(x => x.ToHtmlString()));
+		}
 	}
 }

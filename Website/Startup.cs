@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Website.Repository;
 using Website.Services;
 using Website.Services.SettingsProviders;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace Website
@@ -23,6 +24,7 @@ namespace Website
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllersWithViews();
+			services.AddSession();
 
 			var AppSetProv = new AppSettingsProvider(this.configuration);
 			services.AddSingleton<AppSettingsProvider>(AppSetProv);
@@ -30,6 +32,7 @@ namespace Website
 			services.AddSingleton<Website.Services.FrequentSearchRequestsService>();
 			services.AddSingleton<Website.Services.SessionManager>();
 			services.AddSingleton<Website.Services.RequestsFromIpCounterService>();
+			services.AddSingleton<Website.Services.AuthTockenService>();
 			services.AddScoped<Website.Services.DocumentSearchService>();
 			services.AddScoped<Website.Services.PasswordsService>();
 			services.AddScoped<Website.Services.RandomDataSeederService>();
@@ -58,12 +61,14 @@ namespace Website
 
 			app.UseStaticFiles();
 			app.UseRouting();
+			app.UseSession();
 
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllerRoute(
 					name: "default", pattern: "{controller=Home}/{Action=Summary}/{Id?}");
 			});
+
 		}
 	}
 }
