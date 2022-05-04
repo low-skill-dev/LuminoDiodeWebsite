@@ -56,8 +56,8 @@ namespace Website.Models.UserModel
 		[Required(ErrorMessage = "Please enter correct email address")]
 		public string? EmailAdress { get; set; } = null!;
 
-		public byte[]? AuthHashedPassword { get; set; } = null!;
-		public byte[]? AuthPasswordSalt { get; set; } = null!;
+		public string AuthHashedPasswordString64 { get; set; } = null!;
+		public string AuthPasswordSaltString64 { get; set; } = null!;
 
 		public DateTime RegistrationStartedDateTime { get; set; } = DateTime.UtcNow;
 		public DateTime? RegistrationCompleteDateTime { get; set; } = null!;

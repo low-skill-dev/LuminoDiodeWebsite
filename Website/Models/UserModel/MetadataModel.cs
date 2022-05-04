@@ -8,7 +8,7 @@ namespace Website.Models.UserModel
 
 		[DataType(DataType.Text)]
 		[MinLength(5), MaxLength(3000)]
-		[RegularExpression(@".*\S{5}.*", ErrorMessage = PleaseCorrectStr)] // at least 5 non-space chars
+		//[RegularExpression(@".*\S{5}.*", ErrorMessage = PleaseCorrectStr)] // at least 5 non-space chars
 		[Display(Name = "About me")]
 		public string? AboutMe { get; set; } = null!;
 

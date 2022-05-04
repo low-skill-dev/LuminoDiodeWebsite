@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Security.Cryptography;
 using Website.Services.SettingsProviders;
+using System.Text;
 
 namespace Website.Services
 {
@@ -20,7 +21,7 @@ namespace Website.Services
 		public const string HashAlgUsed = "SHA512";
 		public Func<byte[], byte[]> HashAlg = SHA512.HashData;
 
-		public Dictionary<string, (byte[] HashKey, DateTime ValidThrough, int UserId)> AuthTockens { get; private set; } = new();
+		public Dictionary<string, (string HashKeyString64, DateTime ValidThrough, int UserId)> AuthTockens { get; private set; } = new();
 
 		private readonly AuthTockenServiceSettingsProvider SettingsProvider;
 		private int TockenLifeTimeSecs
@@ -36,33 +37,37 @@ namespace Website.Services
 		{
 			this.SettingsProvider = SettingsProvider.AuthTockenServiceSP;
 		}
-	
-		public void CreateTocken(int UserId, out string CreatedAuthTockenId, out byte[] CreatedKey)
+
+		public void CreateTocken(int UserId, out string CreatedAuthTockenId, out string CreatedKeyString64)
 		{
-			string TockenId = null;
+			string TockenId = null!;
 			do
 			{
 				TockenId = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator
 					.GetBytes(this.TockenIdStringLength));
 			} while (this.AuthTockens.ContainsKey(TockenId));
 
-			var Key = System.Security.Cryptography.RandomNumberGenerator
-				.GetBytes(this.TokenKeyLengthBytes);
+			var Key = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator
+				.GetBytes(this.TokenKeyLengthBytes));
 			var ValidThrough = DateTime.UtcNow.AddSeconds(this.TockenLifeTimeSecs);
 
 			CreatedAuthTockenId = TockenId;
-			CreatedKey = Key;
+			CreatedKeyString64 = Key;
 
-			this.AuthTockens.Add(TockenId, new(Key, ValidThrough,UserId));
+			this.AuthTockens.Add(TockenId, new(Key, ValidThrough, UserId));
 		}
 
-		public bool ConfirmPassword(string TockenId, byte[] PasswordHashedByClient, byte[] PasswordFromDb, out int? UserId)
+		public bool ConfirmPassword
+			(string TockenId, string PasswordHashedByClientString64,
+			string PasswordFromDbString64, out int? UserId)
 		{
-			return this.ConfirmPasswordPrivate(TockenId, true, PasswordHashedByClient, PasswordFromDb, out UserId);
+			return this.ConfirmPasswordPrivate(TockenId, true, PasswordHashedByClientString64, PasswordFromDbString64, out UserId);
 		}
-		public bool ConfirmPasswordWithoutTockenInvalidation(string TockenId, byte[] PasswordHashedByClient, byte[] PasswordFromDb, out int? UserId)
+		public bool ConfirmPasswordWithoutTockenInvalidation(
+			string TockenId, string PasswordHashedByClientString64,
+			string PasswordFromDbString64, out int? UserId)
 		{
-			return this.ConfirmPasswordPrivate(TockenId, false, PasswordHashedByClient, PasswordFromDb, out UserId);
+			return this.ConfirmPasswordPrivate(TockenId, false, PasswordHashedByClientString64, PasswordFromDbString64, out UserId);
 		}
 		public void InvalidateTocken(string TockenId)
 		{
@@ -70,7 +75,11 @@ namespace Website.Services
 				this.AuthTockens.Remove(TockenId);
 		}
 
-		private bool ConfirmPasswordPrivate(string TockenId,bool InvalidateTocken, byte[] PasswordHashedByClient, byte[] PasswordFromDb, out int? UserId)
+		private bool ConfirmPasswordPrivate(
+			string TockenId,
+			bool InvalidateTocken,
+			string PasswordHashedByClientString64,
+			string PasswordFromDbString64, out int? UserId)
 		{
 			UserId = null;
 			if (!this.AuthTockens.TryGetValue(TockenId, out var GotTockenData))
@@ -85,13 +94,12 @@ namespace Website.Services
 				return false;
 			}
 
-			var MyTockenKey = GotTockenData.HashKey;
+			var MyTockenKey = GotTockenData.HashKeyString64;
 
-			var HashedPasswordFromDb = SHA512.HashData(PasswordFromDb.Concat(MyTockenKey).ToArray());
-
-			if (HashedPasswordFromDb.SequenceEqual(PasswordHashedByClient))
+			var HashedPasswordFromDb = SHA512.HashData(Encoding.UTF8.GetBytes(PasswordFromDbString64 + MyTockenKey));
+			if (HashedPasswordFromDb.SequenceEqual(Encoding.UTF8.GetBytes(PasswordHashedByClientString64)))
 			{
-				if(InvalidateTocken) this.AuthTockens.Remove(TockenId);
+				if (InvalidateTocken) this.AuthTockens.Remove(TockenId);
 				return true;
 			}
 
@@ -103,7 +111,7 @@ namespace Website.Services
 			while (!ct.IsCancellationRequested)
 			{
 				await Task.Delay(this.TockensCleanUpIntervalSecs * 1000);
-				this.AuthTockens = this.AuthTockens.Where(s => s.Value.ValidThrough>DateTime.UtcNow)
+				this.AuthTockens = this.AuthTockens.Where(s => s.Value.ValidThrough > DateTime.UtcNow)
 					.ToDictionary(key => key.Key, value => value.Value);
 			}
 		}

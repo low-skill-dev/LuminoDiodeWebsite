@@ -61,7 +61,7 @@ namespace Website.Services
 
 		public void CreateSession(int UsedId, out string CreatedSessionId)
 		{
-			string SessionId = null;
+			string SessionId = null!;
 			do {
 				SessionId = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator
 					.GetBytes(this.SessionIdStringLength));
