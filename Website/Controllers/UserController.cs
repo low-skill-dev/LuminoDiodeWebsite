@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Website.Models.ViewModels;
 using Website.Services;
 using System.Linq;
+using System;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace Website.Controllers
@@ -206,9 +209,9 @@ namespace Website.Controllers
 			return View();
 		}
 
-		protected const string PasswordSaltCoockieName = "PasswordSalt";
+		protected const string PasswordSaltCoockieName = "PasswordSaltString64";
 		protected const string AuthTockenCoockieName = "AuthTocken";
-		protected const string AuthHashKeyCoockieName = "AuthHashKey";
+		protected const string AuthHashKeyCoockieName = "AuthHashKeyString64";
 		protected const string LoginRouteValueName = "Login";
 		[HttpPost]
 		public async Task<IActionResult> NewAuthLogin(Website.Models.Auth.LoginOnly LO)
@@ -250,16 +253,20 @@ namespace Website.Controllers
 
 			this.authTockenService.CreateTocken(found.Id, out var AuthTocken, out var AuthHashKey);
 
+			var t1 = Convert.ToBase64String(found.AuthPasswordSalt);
+			var t2 = Convert.ToBase64String(AuthHashKey);
+
 			this.Response.Cookies.Append(
 				PasswordSaltCoockieName, new string(found.AuthPasswordSaltString64.Select(x => (char)x).ToArray()));
 			this.Response.Cookies.Append(
 				AuthTockenCoockieName, AuthTocken);
 			this.Response.Cookies.Append(
-				AuthHashKeyCoockieName, new string(AuthHashKey.Select(x => (char)x).ToArray()));
+				AuthHashKeyCoockieName, ASCIIEncoding.UTF8.GetString(AuthHashKey));
 
 			return View();
 		}
 
+		//private static string Base64ToUrl(string s)=> s.Replace()
 		[HttpPost]
 		public async Task<IActionResult> NewAuthPassword(string PasswordHashByClientString64)
 		{
