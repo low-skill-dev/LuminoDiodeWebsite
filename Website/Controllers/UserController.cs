@@ -64,12 +64,12 @@ namespace Website.Controllers
 				base.AddAlertToPageTop(new Alert("User not found", Alert.ALERT_TYPE.Danger));
 				return this.View(LI);
 			}
-			if (found.AuthHashedPassword is null || found.AuthPasswordSalt is null)
+			if (found.AuthHashedPasswordString64 is null || found.AuthPasswordSaltString64 is null)
 			{
 				return new StatusCodeResult(500); // should never be returned in prod
 			}
 
-			if (this.passwordsService.ConfirmPassword(LI.PasswordPlainText, found.AuthHashedPassword, found.AuthPasswordSalt))
+			if (this.passwordsService.ConfirmPassword(LI.PasswordPlainText, found.AuthHashedPasswordString64, found.AuthPasswordSaltString64))
 			{
 				base.SM.CreateSession(found.Id, out var CreatedSessId);
 				this.Response.Cookies.Append(SessionManager.SessionIdCoockieName, CreatedSessId);
@@ -126,8 +126,8 @@ namespace Website.Controllers
 				var UserToAdd = new Models.UserModel.User
 				{
 					EmailAdress = EmailPlainText,
-					AuthHashedPassword = hashedpass,
-					AuthPasswordSalt = Salt,
+					AuthHashedPasswordString64 = hashedpass,
+					AuthPasswordSaltString64 = Salt,
 					DisplayedName = "New User",
 					String64_ProfileImage = DefaultProfileImage_230x230
 				};
@@ -243,7 +243,7 @@ namespace Website.Controllers
 				base.AddAlertToPageTop(new Alert("User not found", Alert.ALERT_TYPE.Danger));
 				return this.RedirectToAction(nameof(NewAuthLogin));
 			}
-			if (found.AuthHashedPassword is null || found.AuthPasswordSalt is null)
+			if (found.AuthHashedPasswordString64 is null || found.AuthPasswordSaltString64 is null)
 			{
 				return new StatusCodeResult(500); // should never be returned in prod
 			}
@@ -251,7 +251,7 @@ namespace Website.Controllers
 			this.authTockenService.CreateTocken(found.Id, out var AuthTocken, out var AuthHashKey);
 
 			this.Response.Cookies.Append(
-				PasswordSaltCoockieName, new string(found.AuthPasswordSalt.Select(x => (char)x).ToArray()));
+				PasswordSaltCoockieName, new string(found.AuthPasswordSaltString64.Select(x => (char)x).ToArray()));
 			this.Response.Cookies.Append(
 				AuthTockenCoockieName, AuthTocken);
 			this.Response.Cookies.Append(
@@ -261,7 +261,7 @@ namespace Website.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> NewAuthPassword(byte[] PasswordHashByClient)
+		public async Task<IActionResult> NewAuthPassword(string PasswordHashByClientString64)
 		{
 			var ReqBody = this.Request.BodyReader.ReadAsync().Result;
 			
@@ -286,12 +286,12 @@ namespace Website.Controllers
 				base.AddAlertToPageTop(new Alert("User not found", Alert.ALERT_TYPE.Danger));
 				return this.RedirectToAction(nameof(NewAuthLogin));
 			}
-			if (FoundUser.AuthHashedPassword is null || FoundUser.AuthPasswordSalt is null)
+			if (FoundUser.AuthHashedPasswordString64 is null || FoundUser.AuthPasswordSaltString64 is null)
 			{
 				return new StatusCodeResult(500); // should never be returned in prod
 			}
 
-			if (this.authTockenService.ConfirmPassword(AuthLogin, PasswordHashByClient, FoundUser.AuthHashedPassword, out var dummy))
+			if (this.authTockenService.ConfirmPassword(AuthLogin, PasswordHashByClientString64, FoundUser.AuthHashedPasswordString64, out var dummy))
 			{
 				AddAlertToPageTop(new("Wrong password", Alert.ALERT_COLOR.Red));
 				return RedirectToAction(nameof(NewAuthPassword), new { Login = FoundUser.EmailAdress });

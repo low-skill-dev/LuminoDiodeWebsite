@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using Website.Services.SettingsProviders;
 
 namespace Website.Services
@@ -18,40 +19,36 @@ namespace Website.Services
 
 		private const int KeySizeBytes = 64; // 512 bits
 		private readonly Func<byte[], byte[]> HashAlg = SHA512.HashData;
-		private static byte[] GenerateSalt()
+		private static string GenerateSalt()
 		{
 			var Bits = new byte[KeySizeBytes];
+
 			System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(Bits);
-			return Bits;
+			return Convert.ToBase64String(Bits);
 		}
-		public byte[] HashPassword(string PlainTextPassword, out byte[] GeneratedSalt)
+		public string HashPassword(string PlainTextPassword, out string GeneratedSalt)
 		{
 			var Salt = GenerateSalt();
 
-			var SaltedPassword = new byte[PlainTextPassword.Length + Salt.Length];
-			for (int i = 0; i < PlainTextPassword.Length; i++) { SaltedPassword[i] = (byte)(PlainTextPassword[i]); }
-			for (int i = 0; i < Salt.Length; i++) { SaltedPassword[PlainTextPassword.Length + i] = Salt[i]; }
+			var SaltedPassword = PlainTextPassword + Salt;
 
 			GeneratedSalt = Salt;
-			return this.HashAlg(SaltedPassword); // should better use PBKDF2 ?
+			return Convert.ToBase64String(this.HashAlg(Encoding.UTF8.GetBytes(SaltedPassword))); // should better use PBKDF2 ?
 		}
-		public bool ConfirmPassword(string PlainTextPassword, byte[] HashedPassword, byte[] Salt)
+		public bool ConfirmPassword(string PlainTextPassword, string HashedPassword, string Salt)
 		{
-			var SaltedPossiblePassword = new byte[PlainTextPassword.Length + Salt.Length];
-			for (int i = 0; i < PlainTextPassword.Length; i++) { SaltedPossiblePassword[i] = (byte)(PlainTextPassword[i]); }
-			for (int i = 0; i < Salt.Length; i++) { SaltedPossiblePassword[PlainTextPassword.Length + i] = Salt[i]; }
+			var SaltedPossiblePassword = PlainTextPassword + Salt;
 
-			return this.HashAlg(SaltedPossiblePassword).SequenceEqual(HashedPassword);
+			return this.HashAlg(Encoding.UTF8.GetBytes(SaltedPossiblePassword)).SequenceEqual(Convert.FromBase64String(HashedPassword));
 		}
 		public async void SetPassAndSaltForUser(int SelectedUserId, string PasswordPlaintText)
 		{
 			var ctx = this.DbContextScopeFactory.CreateScope().ServiceProvider
 				.GetRequiredService<Website.Repository.WebsiteContext>();
 			var User = (await ctx.Users.FindAsync(SelectedUserId));
-			//var Salt = GenerateSalt();
 			var Hashed = this.HashPassword(PasswordPlaintText, out var Salt);
-			User.AuthHashedPassword = Hashed;
-			User.AuthPasswordSalt = Salt;
+			User.AuthHashedPasswordString64 = Hashed;
+			User.AuthPasswordSaltString64 = Salt;
 			ctx.Update(User);
 			ctx.SaveChanges();
 		}
