@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿#if DEBUG
+
+using Microsoft.Extensions.Configuration;
 using System;
 
 namespace Website.Services.SettingsProviders
 {
+	[Obsolete]
 	public class AuthTockenServiceSettingsProvider
 	{
 		protected readonly IConfiguration config;
@@ -82,3 +85,5 @@ namespace Website.Services.SettingsProviders
 
 	}
 }
+
+#endif

@@ -32,7 +32,6 @@ namespace Website
 			services.AddSingleton<Website.Services.FrequentSearchRequestsService>();
 			services.AddSingleton<Website.Services.SessionManager>();
 			services.AddSingleton<Website.Services.RequestsFromIpCounterService>();
-			//services.AddSingleton<Website.Services.AuthTockenService>();
 			services.AddScoped<Website.Services.DocumentSearchService>();
 			services.AddScoped<Website.Services.PasswordsService>();
 			services.AddScoped<Website.Services.RandomDataSeederService>();
