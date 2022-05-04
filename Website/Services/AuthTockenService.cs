@@ -8,10 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Website.Services.SettingsProviders;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
 using System.Security.Cryptography;
-using Website.Services.SettingsProviders;
 using System.Text;
 
 namespace Website.Services

@@ -37,7 +37,5 @@ namespace Website.Services.SettingsProviders
 		{ get; private set; }
 		public RequestsFromIpCounterServiceSettingsProvider RequestsFromIpCounterServiceSP
 		{ get; private set; }
-		public AuthTockenServiceSettingsProvider AuthTockenServiceSP
-		{ get; private set; }
 	}
 }
