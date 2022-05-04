@@ -21,7 +21,6 @@ namespace Website.Services.SettingsProviders
 			this.SessionManagerServiceSP = new(configuration);
 			this.RandomDataSeederSP = new(configuration);
 			this.RequestsFromIpCounterServiceSP = new(configuration);
-			this.AuthTockenServiceSP = new(configuration);
 		}
 
 		public ConnectionStringsProvider ConnectionStringsP
@@ -38,7 +37,9 @@ namespace Website.Services.SettingsProviders
 		{ get; private set; }
 		public RequestsFromIpCounterServiceSettingsProvider RequestsFromIpCounterServiceSP
 		{ get; private set; }
+#if DEBUG
 		public AuthTockenServiceSettingsProvider AuthTockenServiceSP
 		{ get; private set; }
+#endif
 	}
 }

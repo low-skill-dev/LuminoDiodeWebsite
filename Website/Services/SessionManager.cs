@@ -61,7 +61,11 @@ namespace Website.Services
 
 		public void CreateSession(int UsedId, out string CreatedSessionId)
 		{
-			var SessionId = new string(System.Security.Cryptography.RandomNumberGenerator.GetBytes(this.SessionIdStringLength).Select(x => (char)x).ToArray());
+			string SessionId = null!;
+			do {
+				SessionId = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator
+					.GetBytes(this.SessionIdStringLength));
+			} while(this.Sessions.ContainsKey(SessionId));
 			var ValidThrough = DateTime.UtcNow.AddSeconds(this.SessionLifeTimeSecs);
 
 			CreatedSessionId = SessionId;

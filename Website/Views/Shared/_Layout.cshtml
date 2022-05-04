@@ -65,7 +65,10 @@
 	</nav>
 
 	<div class="container-fluid">
-		<partial name="~/Views/Shared/PartialViews/_AlertsListPartialView.cshtml" model=@TempData["PageTopAlerts"] />
+		<div>
+			@Html.Raw(TempData["PageTopAlerts"])
+		</div>
+		<!--<partial name="~/Views/Shared/PartialViews/_AlertsListPartialView.cshtml" model=@TempData["PageTopAlerts"] /> -->
 		<main role="main" class="container">
 			@RenderBody()
 		</main>

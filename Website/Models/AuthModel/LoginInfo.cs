@@ -18,5 +18,11 @@ namespace Website.Models.Auth
 		[Display(Name = "Password")]
 
 		public string PasswordPlainText { get; set; }
+
+		public void TrimSelf()
+		{
+			this.EmailPlainText = this.EmailPlainText.Trim();
+			this.PasswordPlainText = this.PasswordPlainText.Trim();
+		}
 	}
 }

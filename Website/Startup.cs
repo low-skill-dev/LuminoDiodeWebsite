@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Website.Repository;
 using Website.Services;
 using Website.Services.SettingsProviders;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace Website
@@ -23,6 +24,7 @@ namespace Website
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllersWithViews();
+			services.AddSession();
 
 			var AppSetProv = new AppSettingsProvider(this.configuration);
 			services.AddSingleton<AppSettingsProvider>(AppSetProv);
@@ -58,6 +60,7 @@ namespace Website
 
 			app.UseStaticFiles();
 			app.UseRouting();
+			app.UseSession();
 
 			app.UseEndpoints(endpoints =>
 			{

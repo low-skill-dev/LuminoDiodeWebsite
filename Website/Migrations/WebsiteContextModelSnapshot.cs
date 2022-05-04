@@ -139,11 +139,13 @@ namespace Website.Migrations
                         .HasMaxLength(3000)
                         .HasColumnType("character varying(3000)");
 
-                    b.Property<byte[]>("AuthHashedPassword")
-                        .HasColumnType("bytea");
+                    b.Property<string>("AuthHashedPasswordString64")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<byte[]>("AuthPasswordSalt")
-                        .HasColumnType("bytea");
+                    b.Property<string>("AuthPasswordSaltString64")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("City")
                         .HasMaxLength(50)

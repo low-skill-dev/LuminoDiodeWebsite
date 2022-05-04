@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "defaultProvider": "jsdelivr",
+  "libraries": [
+    {
+      "library": "base64url@3.0.1",
+      "destination": "wwwroot/JS/base64url/"
+    }
+  ]
+}
