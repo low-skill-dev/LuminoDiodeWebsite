@@ -207,10 +207,11 @@ namespace Website.Controllers
 			return View();
 		}
 
-		protected const string PasswordSaltString64 = "PasswordSaltString64";
-		protected const string AuthTockenName = "AuthTocken";
-		protected const string AuthHashKeyString64 = "AuthHashKeyString64";
-		protected const string LoginRouteValueName = "Login";
+		public const string PasswordSaltString64 = "PasswordSaltString64";
+		public const string AuthTockenName = "AuthTocken";
+		public const string AuthHashKeyString64 = "AuthHashKeyString64";
+		public const string LoginRouteValueName = "Login";
+		public const string PasswordHashedByClientFormName = "hashedPassword";
 		[HttpPost]
 		public async Task<IActionResult> NewAuthLogin(Website.Models.Auth.LoginOnly LO)
 		{
@@ -251,44 +252,47 @@ namespace Website.Controllers
 
 			this.authTockenService.CreateTocken(found.Id, out var AuthTocken, out var AuthHashKey);
 
-			var t1 = Convert.ToBase64String(found.AuthPasswordSalt);
-			var t2 = Convert.ToBase64String(AuthHashKey);
-
+			this.Response.Cookies.Append(PasswordSaltString64, Base64UrlEncoder.Encode(found.AuthPasswordSalt));
 			this.Response.Cookies.Append(AuthTockenName, AuthTocken);
-			this.ViewData[PasswordSaltString64] = Convert.ToBase64String(found.AuthPasswordSalt);
-			this.ViewData[AuthHashKeyString64] = Convert.ToBase64String(AuthHashKey);
-
-			this.Response.Cookies.Append(
-				PasswordSaltString64, new string(found.AuthPasswordSalt.Select(x => (char)x).ToArray()));
-			this.Response.Cookies.Append(
-				AuthTockenName, AuthTocken);
-			this.Response.Cookies.Append(
-				AuthHashKeyString64, ASCIIEncoding.UTF8.GetString(AuthHashKey));
+			this.Response.Cookies.Append(AuthHashKeyString64, Base64UrlEncoder.Encode(AuthHashKey));
 
 			return View();
 		}
 
 		//private static string Base64ToUrl(string s)=> s.Replace()
 		[HttpPost]
-		public async Task<IActionResult> NewAuthPassword(byte[] PasswordHashByClient)
+		public async Task<IActionResult> NewAuthPassword(object obj)
 		{
-			var ReqBody = this.Request.BodyReader.ReadAsync().Result;
+			if (!Request.Form.TryGetValue(PasswordHashedByClientFormName, out var Password64))
+			{
+				return new StatusCodeResult(400);// no password was sent to server
+			}
+			byte[] PasswordHashByClient = null!;
+			try
+			{
+				var t = Password64.FirstOrDefault();
+				PasswordHashByClient = Base64UrlEncoder.DecodeBytes(t);
+			}
+			catch(Exception ex)
+			{
+				return new StatusCodeResult(400);// incorrect was sent to server
+			}
 
-			var AuthLogin = (string?)this.Request.Query["Login"];
-			if (string.IsNullOrEmpty(AuthLogin))
+			var AuthTocken = this.Request.Cookies[AuthTockenName];
+			if (string.IsNullOrEmpty(AuthTocken))
 			{
 				AddAlertToPageTop(new("Unable to load auth tocken. Please retry.", Alert.ALERT_COLOR.Red));
 				return this.RedirectToAction(nameof(NewAuthLogin)); // no auth tocken
 			}
 
-			bool TockenCanBeValidated = this.authTockenService.AuthTockens.ContainsKey(AuthLogin);
+			bool TockenCanBeValidated = this.authTockenService.AuthTockens.ContainsKey(AuthTocken);
 			if (!TockenCanBeValidated)
 			{
 				AddAlertToPageTop(new("Auth tocken is outdated. Please retry.", Alert.ALERT_COLOR.Red));
 				return this.RedirectToAction(nameof(NewAuthLogin)); // tocken does not exists on the server
 			}
 
-			var Tocken = this.authTockenService.AuthTockens[AuthLogin];
+			var Tocken = this.authTockenService.AuthTockens[AuthTocken];
 			var FoundUser = await this.context.Users.FindAsync(Tocken.UserId);
 			if (FoundUser is null)
 			{
@@ -300,12 +304,11 @@ namespace Website.Controllers
 				return new StatusCodeResult(500); // should never be returned in prod
 			}
 
-			if (this.authTockenService.ConfirmPassword(AuthLogin, PasswordHashByClient, FoundUser.AuthHashedPassword, out var dummy))
+			if (this.authTockenService.ConfirmPassword(AuthTocken, PasswordHashByClient, FoundUser.AuthHashedPassword, out var dummy))
 			{
 				AddAlertToPageTop(new("Wrong password", Alert.ALERT_COLOR.Red));
 				return RedirectToAction(nameof(NewAuthPassword), new { Login = FoundUser.EmailAdress });
 			}
-
 
 			base.SM.CreateSession(FoundUser.Id, out var CreatedSessId);
 			this.Response.Cookies.Append(SessionManager.SessionIdCoockieName, CreatedSessId);
