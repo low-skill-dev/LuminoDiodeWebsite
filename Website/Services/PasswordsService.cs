@@ -2,8 +2,8 @@
 using System;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using Website.Services.SettingsProviders;
+using System.Text;
 
 namespace Website.Services
 {
@@ -19,36 +19,39 @@ namespace Website.Services
 
 		private const int KeySizeBytes = 64; // 512 bits
 		private readonly Func<byte[], byte[]> HashAlg = SHA512.HashData;
-		private static string GenerateSalt()
+		private static byte[] GenerateSalt()
 		{
 			var Bits = new byte[KeySizeBytes];
-
 			System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(Bits);
-			return Convert.ToBase64String(Bits);
+			return Bits;
 		}
-		public string HashPassword(string PlainTextPassword, out string GeneratedSalt)
+		public byte[] HashPassword(string PlainTextPassword, out byte[] GeneratedSalt)
 		{
 			var Salt = GenerateSalt();
+			var PasswordBytes = Encoding.UTF8.GetBytes(PlainTextPassword);
 
-			var SaltedPassword = PlainTextPassword + Salt;
+			var SaltedPassword = PasswordBytes.Concat(Salt).ToArray();
 
 			GeneratedSalt = Salt;
-			return Convert.ToBase64String(this.HashAlg(Encoding.UTF8.GetBytes(SaltedPassword))); // should better use PBKDF2 ?
+			return this.HashAlg(SaltedPassword); // should better use PBKDF2 ?
 		}
-		public bool ConfirmPassword(string PlainTextPassword, string HashedPassword, string Salt)
+		public bool ConfirmPassword(string PlainTextPassword, byte[] HashedPassword, byte[] Salt)
 		{
-			var SaltedPossiblePassword = PlainTextPassword + Salt;
+			var PasswordBytes = Encoding.UTF8.GetBytes(PlainTextPassword);
 
-			return this.HashAlg(Encoding.UTF8.GetBytes(SaltedPossiblePassword)).SequenceEqual(Convert.FromBase64String(HashedPassword));
+			var SaltedPossiblePassword = PasswordBytes.Concat(Salt).ToArray();
+
+			return this.HashAlg(SaltedPossiblePassword).SequenceEqual(HashedPassword);
 		}
 		public async void SetPassAndSaltForUser(int SelectedUserId, string PasswordPlaintText)
 		{
 			var ctx = this.DbContextScopeFactory.CreateScope().ServiceProvider
 				.GetRequiredService<Website.Repository.WebsiteContext>();
 			var User = (await ctx.Users.FindAsync(SelectedUserId));
+			//var Salt = GenerateSalt();
 			var Hashed = this.HashPassword(PasswordPlaintText, out var Salt);
-			User.AuthHashedPasswordString64 = Hashed;
-			User.AuthPasswordSaltString64 = Salt;
+			User.AuthHashedPassword = Hashed;
+			User.AuthPasswordSalt = Salt;
 			ctx.Update(User);
 			ctx.SaveChanges();
 		}

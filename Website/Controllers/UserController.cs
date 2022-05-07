@@ -17,7 +17,7 @@ namespace Website.Controllers
 		protected readonly IServiceScopeFactory ScopeFactory;
 		protected readonly Website.Services.RecentDocumentsBackgroundService recentDocumentsProvider;
 		protected readonly Website.Services.PasswordsService passwordsService;
-		//protected readonly Website.Services.AuthTockenService authTockenService;
+		protected readonly Website.Services.AuthTockenService authTockenService;
 		public UserController(IServiceScopeFactory Services, Website.Services.RecentDocumentsBackgroundService documentsBackgroundService, SessionManager SM)
 			: base(Services)
 		{
@@ -25,7 +25,7 @@ namespace Website.Controllers
 			var sp = Services.CreateScope().ServiceProvider;
 			this.recentDocumentsProvider = sp.GetRequiredService<RecentDocumentsBackgroundService>();
 			this.passwordsService = sp.GetRequiredService<PasswordsService>();
-			//this.authTockenService = sp.GetRequiredService<AuthTockenService>();
+			this.authTockenService = sp.GetRequiredService<AuthTockenService>();
 		}
 
 		[HttpGet]
@@ -67,12 +67,12 @@ namespace Website.Controllers
 				base.AddAlertToPageTop(new Alert("User not found", Alert.ALERT_TYPE.Danger));
 				return this.View(LI);
 			}
-			if (found.AuthHashedPasswordString64 is null || found.AuthPasswordSaltString64 is null)
+			if (found.AuthHashedPassword is null || found.AuthPasswordSalt is null)
 			{
 				return new StatusCodeResult(500); // should never be returned in prod
 			}
 
-			if (this.passwordsService.ConfirmPassword(LI.PasswordPlainText, found.AuthHashedPasswordString64, found.AuthPasswordSaltString64))
+			if (this.passwordsService.ConfirmPassword(LI.PasswordPlainText, found.AuthHashedPassword, found.AuthPasswordSalt))
 			{
 				base.SM.CreateSession(found.Id, out var CreatedSessId);
 				this.Response.Cookies.Append(SessionManager.SessionIdCoockieName, CreatedSessId);
@@ -127,8 +127,8 @@ namespace Website.Controllers
 				var UserToAdd = new Models.UserModel.User
 				{
 					EmailAdress = EmailPlainText,
-					AuthHashedPasswordString64 = hashedpass,
-					AuthPasswordSaltString64 = Salt,
+					AuthHashedPassword = hashedpass,
+					AuthPasswordSalt = Salt,
 					DisplayedName = "New User",
 					String64_ProfileImage = DefaultProfileImage_230x230
 				};
@@ -201,117 +201,116 @@ namespace Website.Controllers
 			return this.RedirectToAction("Show", "User", new { Id = this.AuthedUser.Id });
 		}
 
-		//[HttpGet]
-		//public IActionResult NewAuthLogin()
-		//{
-		//	return View();
-		//}
+		[HttpGet]
+		public IActionResult NewAuthLogin()
+		{
+			return View();
+		}
 
-		//protected const string PasswordSaltCoockieName = "PasswordSaltString64";
-		//protected const string AuthTockenCoockieName = "AuthTocken";
-		//protected const string AuthHashKeyCoockieName = "AuthHashKeyString64";
-		//protected const string LoginRouteValueName = "Login";
-		//[HttpPost]
-		//public async Task<IActionResult> NewAuthLogin(Website.Models.Auth.LoginOnly LO)
-		//{
-		//	if (!ModelState.IsValid)
-		//		return View(LO);
+		public const string PasswordSaltString64 = "PasswordSaltString64";
+		public const string AuthTockenName = "AuthTocken";
+		public const string AuthHashKeyString64 = "AuthHashKeyString64";
+		public const string LoginRouteValueName = "Login";
+		public const string PasswordHashedByClientFormName = "hashedPassword64";
+		public const string CurrentLoginCoockieName = "crrlgn";
+		[HttpPost]
+		public async Task<IActionResult> NewAuthLogin(Website.Models.Auth.LoginOnly LO)
+		{
+			if (!ModelState.IsValid)
+				return View(LO);
 
-		//	return RedirectToAction(nameof(NewAuthPassword), new { Login = LO.EmailPlainText });
-		//}
+			Response.Cookies.Append(CurrentLoginCoockieName, LO.EmailPlainText);
+			return RedirectToAction(nameof(NewAuthPassword));
+		}
 
-		//[HttpGet]
-		//public async Task<IActionResult> NewAuthPassword()
-		//{
-		//	var passedLogin = (string?)this.Request.Query["Login"];
-		//	if (passedLogin is null)
-		//	{
-		//		return new StatusCodeResult(400); // trying to enter password without entering login
-		//	}
+		[HttpGet]
+		public async Task<IActionResult> NewAuthPassword()
+		{
+			var passedLogin = Request.Cookies[CurrentLoginCoockieName];
+			if (passedLogin is null)
+			{
+				return new StatusCodeResult(400); // trying to enter password without entering login
+			}
 
-		//	Website.Models.Auth.LoginOnly LO = new() { EmailPlainText = passedLogin };
+			Website.Models.Auth.LoginOnly LO = new() { EmailPlainText = passedLogin };
 
-		//	if (!TryValidateModel(LO))
-		//	{
-		//		AddAlertToPageTop(new("Bad email format", Alert.ALERT_COLOR.Red));
-		//		return this.RedirectToAction(nameof(NewAuthLogin));
-		//	}
+			if (!TryValidateModel(LO))
+			{
+				AddAlertToPageTop(new("Bad email format", Alert.ALERT_COLOR.Red));
+				return this.RedirectToAction(nameof(NewAuthLogin));
+			}
 
-		//	var found = await this.context.Users.FirstOrDefaultAsync(x => x.EmailAdress!.Equals(LO.EmailPlainText));
+			var found = await this.context.Users.FirstOrDefaultAsync(x => x.EmailAdress!.Equals(LO.EmailPlainText));
 
-		//	if (found is null)
-		//	{
-		//		base.AddAlertToPageTop(new Alert("User not found", Alert.ALERT_TYPE.Danger));
-		//		return this.RedirectToAction(nameof(NewAuthLogin));
-		//	}
-		//	if (found.AuthHashedPasswordString64 is null || found.AuthPasswordSaltString64 is null)
-		//	{
-		//		return new StatusCodeResult(500); // should never be returned in prod
-		//	}
+			if (found is null)
+			{
+				base.AddAlertToPageTop(new Alert("User not found", Alert.ALERT_TYPE.Danger));
+				return this.RedirectToAction(nameof(NewAuthLogin));
+			}
+			if (found.AuthHashedPassword is null || found.AuthPasswordSalt is null)
+			{
+				return new StatusCodeResult(500); // should never be returned in prod
+			}
 
-		//	this.authTockenService.CreateTocken(found.Id, out var AuthTocken, out var AuthHashKey);
+			this.authTockenService.CreateTocken(found.Id, out var AuthTocken, out var AuthHashKey);
 
-		//	var t1 = Convert.ToBase64String(found.AuthPasswordSalt);
-		//	var t2 = Convert.ToBase64String(AuthHashKey);
+			this.Response.Cookies.Append(PasswordSaltString64, Base64UrlEncoder.Encode(found.AuthPasswordSalt));
+			this.Response.Cookies.Append(AuthTockenName, AuthTocken);
+			this.Response.Cookies.Append(AuthHashKeyString64, Base64UrlEncoder.Encode(AuthHashKey));
 
-		//	this.Response.Cookies.Append(
-		//		PasswordSaltCoockieName, new string(found.AuthPasswordSaltString64.Select(x => (char)x).ToArray()));
-		//	this.Response.Cookies.Append(
-		//		AuthTockenCoockieName, AuthTocken);
-		//	this.Response.Cookies.Append(
-		//		AuthHashKeyCoockieName, ASCIIEncoding.UTF8.GetString(AuthHashKey));
+			return View();
+		}
 
-		//	return View();
-		//}
+		//private static string Base64ToUrl(string s)=> s.Replace()
+		[HttpPost]
+		public async Task<IActionResult> NewAuthPassword(string hashedPassword64)
+		{
+			if (string.IsNullOrEmpty(hashedPassword64))
+				return new StatusCodeResult(400);// no password was sent to server
 
-		////private static string Base64ToUrl(string s)=> s.Replace()
-		//[HttpPost]
-		//public async Task<IActionResult> NewAuthPassword(string PasswordHashByClientString64)
-		//{
-		//	var ReqBody = this.Request.BodyReader.ReadAsync().Result;
-			
-		//	var AuthLogin = (string?)this.Request.Query["Login"];
-		//	if (string.IsNullOrEmpty(AuthLogin))
-		//	{
-		//		AddAlertToPageTop(new("Unable to load auth tocken. Please retry.", Alert.ALERT_COLOR.Red));
-		//		return this.RedirectToAction(nameof(NewAuthLogin)); // no auth tocken
-		//	}
+			byte[] PasswordHashByClient = null!;
+			try { PasswordHashByClient = Base64UrlEncoder.DecodeBytes(hashedPassword64); }
+			catch { return new StatusCodeResult(422); }// incorrect base64 was sent as password
 
-		//	bool TockenCanBeValidated = this.authTockenService.AuthTockens.ContainsKey(AuthLogin);
-		//	if (!TockenCanBeValidated)
-		//	{
-		//		AddAlertToPageTop(new("Auth tocken is outdated. Please retry.", Alert.ALERT_COLOR.Red));
-		//		return this.RedirectToAction(nameof(NewAuthLogin)); // tocken does not exists on the server
-		//	}
+			var AuthTockenId = this.Request.Cookies[AuthTockenName];
+			if (string.IsNullOrEmpty(AuthTockenId))
+			{
+				AddAlertToPageTop(new("Unable to load auth tocken. Please retry.", Alert.ALERT_COLOR.Red));
+				return this.RedirectToAction(nameof(NewAuthLogin)); // no auth tocken
+			}
 
-		//	var Tocken = this.authTockenService.AuthTockens[AuthLogin];
-		//	var FoundUser = await this.context.Users.FindAsync(Tocken.UserId);
-		//	if (FoundUser is null)
-		//	{
-		//		base.AddAlertToPageTop(new Alert("User not found", Alert.ALERT_TYPE.Danger));
-		//		return this.RedirectToAction(nameof(NewAuthLogin));
-		//	}
-		//	if (FoundUser.AuthHashedPasswordString64 is null || FoundUser.AuthPasswordSaltString64 is null)
-		//	{
-		//		return new StatusCodeResult(500); // should never be returned in prod
-		//	}
+			if (!this.authTockenService.TryGetTocken(AuthTockenId, out var Tocken))
+			{
+				AddAlertToPageTop(new("Auth tocken is outdated. Please retry.", Alert.ALERT_COLOR.Red));
+				return this.RedirectToAction(nameof(NewAuthLogin)); // tocken does not exists on the server
+			}
 
-		//	if (this.authTockenService.ConfirmPassword(AuthLogin, PasswordHashByClientString64, FoundUser.AuthHashedPasswordString64, out var dummy))
-		//	{
-		//		AddAlertToPageTop(new("Wrong password", Alert.ALERT_COLOR.Red));
-		//		return RedirectToAction(nameof(NewAuthPassword), new { Login = FoundUser.EmailAdress });
-		//	}
+			var FoundUser = await this.context.Users.FindAsync(Tocken.UserId);
+			if (FoundUser is null)
+			{
+				base.AddAlertToPageTop(new Alert("User not found", Alert.ALERT_TYPE.Danger));
+				return this.RedirectToAction(nameof(NewAuthLogin));
+			}
+			if (FoundUser.AuthHashedPassword is null || FoundUser.AuthPasswordSalt is null)
+			{
+				return new StatusCodeResult(500); // should never be returned in prod
+			}
 
+			if (!this.authTockenService.ConfirmPasswordAndInvalidateTocken(AuthTockenId, PasswordHashByClient, FoundUser.AuthHashedPassword, out var dummy))
+			{
+				AddAlertToPageTop(new("Wrong password", Alert.ALERT_COLOR.Red));
+				return RedirectToAction(nameof(NewAuthPassword));
+			}
 
-		//	base.SM.CreateSession(FoundUser.Id, out var CreatedSessId);
-		//	this.Response.Cookies.Append(SessionManager.SessionIdCoockieName, CreatedSessId);
+			base.SM.CreateSession(FoundUser.Id, out var CreatedSessId);
+			this.Response.Cookies.Append(SessionManager.SessionIdCoockieName, CreatedSessId);
 
-		//	this.Response.Cookies.Delete(PasswordSaltCoockieName);
-		//	this.Response.Cookies.Delete(AuthTockenCoockieName);
-		//	this.Response.Cookies.Delete(AuthHashKeyCoockieName);
+			this.Response.Cookies.Delete(PasswordSaltString64);
+			this.Response.Cookies.Delete(AuthTockenName);
+			this.Response.Cookies.Delete(AuthHashKeyString64);
 
-		//	return this.RedirectToAction("Show", "User", new { id = FoundUser.Id });
-		//}
+			return this.RedirectToAction("Show", "User", new { id = FoundUser.Id });
+		}
 
 	}
 }
