@@ -211,20 +211,22 @@ namespace Website.Controllers
 		public const string AuthTockenName = "AuthTocken";
 		public const string AuthHashKeyString64 = "AuthHashKeyString64";
 		public const string LoginRouteValueName = "Login";
-		public const string PasswordHashedByClientFormName = "hashedPassword";
+		public const string PasswordHashedByClientFormName = "hashedPassword64";
+		public const string CurrentLoginCoockieName = "crrlgn";
 		[HttpPost]
 		public async Task<IActionResult> NewAuthLogin(Website.Models.Auth.LoginOnly LO)
 		{
 			if (!ModelState.IsValid)
 				return View(LO);
 
-			return RedirectToAction(nameof(NewAuthPassword), new { Login = LO.EmailPlainText });
+			Response.Cookies.Append(CurrentLoginCoockieName, LO.EmailPlainText);
+			return RedirectToAction(nameof(NewAuthPassword));
 		}
 
 		[HttpGet]
 		public async Task<IActionResult> NewAuthPassword()
 		{
-			var passedLogin = (string?)this.Request.Query["Login"];
+			var passedLogin = Request.Cookies[CurrentLoginCoockieName];
 			if (passedLogin is null)
 			{
 				return new StatusCodeResult(400); // trying to enter password without entering login
@@ -261,38 +263,28 @@ namespace Website.Controllers
 
 		//private static string Base64ToUrl(string s)=> s.Replace()
 		[HttpPost]
-		public async Task<IActionResult> NewAuthPassword(object obj)
+		public async Task<IActionResult> NewAuthPassword(string hashedPassword64)
 		{
-			if (!Request.Form.TryGetValue(PasswordHashedByClientFormName, out var Password64))
-			{
+			if (string.IsNullOrEmpty(hashedPassword64))
 				return new StatusCodeResult(400);// no password was sent to server
-			}
-			byte[] PasswordHashByClient = null!;
-			try
-			{
-				var t = Password64.FirstOrDefault();
-				PasswordHashByClient = Base64UrlEncoder.DecodeBytes(t);
-			}
-			catch(Exception ex)
-			{
-				return new StatusCodeResult(400);// incorrect was sent to server
-			}
 
-			var AuthTocken = this.Request.Cookies[AuthTockenName];
-			if (string.IsNullOrEmpty(AuthTocken))
+			byte[] PasswordHashByClient = null!;
+			try { PasswordHashByClient = Base64UrlEncoder.DecodeBytes(hashedPassword64); }
+			catch { return new StatusCodeResult(422); }// incorrect base64 was sent as password
+
+			var AuthTockenId = this.Request.Cookies[AuthTockenName];
+			if (string.IsNullOrEmpty(AuthTockenId))
 			{
 				AddAlertToPageTop(new("Unable to load auth tocken. Please retry.", Alert.ALERT_COLOR.Red));
 				return this.RedirectToAction(nameof(NewAuthLogin)); // no auth tocken
 			}
 
-			bool TockenCanBeValidated = this.authTockenService.AuthTockens.ContainsKey(AuthTocken);
-			if (!TockenCanBeValidated)
+			if (!this.authTockenService.TryGetTocken(AuthTockenId, out var Tocken))
 			{
 				AddAlertToPageTop(new("Auth tocken is outdated. Please retry.", Alert.ALERT_COLOR.Red));
 				return this.RedirectToAction(nameof(NewAuthLogin)); // tocken does not exists on the server
 			}
 
-			var Tocken = this.authTockenService.AuthTockens[AuthTocken];
 			var FoundUser = await this.context.Users.FindAsync(Tocken.UserId);
 			if (FoundUser is null)
 			{
@@ -304,10 +296,10 @@ namespace Website.Controllers
 				return new StatusCodeResult(500); // should never be returned in prod
 			}
 
-			if (this.authTockenService.ConfirmPassword(AuthTocken, PasswordHashByClient, FoundUser.AuthHashedPassword, out var dummy))
+			if (!this.authTockenService.ConfirmPasswordAndInvalidateTocken(AuthTockenId, PasswordHashByClient, FoundUser.AuthHashedPassword, out var dummy))
 			{
 				AddAlertToPageTop(new("Wrong password", Alert.ALERT_COLOR.Red));
-				return RedirectToAction(nameof(NewAuthPassword), new { Login = FoundUser.EmailAdress });
+				return RedirectToAction(nameof(NewAuthPassword));
 			}
 
 			base.SM.CreateSession(FoundUser.Id, out var CreatedSessId);
