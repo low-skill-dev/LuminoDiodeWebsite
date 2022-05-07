@@ -13,33 +13,37 @@ using Website.Services.SettingsProviders;
 
 namespace Website.Services
 {
+	public class TockenInfo
+	{
+		public byte[] HashKey { get; private set; }
+		public DateTime ValidThrough { get; private set; }
+		public int UserId { get; private set; }
 
+		public TockenInfo(byte[] HashKey, DateTime ValidThrough, int UserId)
+		{
+			this.HashKey = HashKey; this.ValidThrough = ValidThrough; this.UserId = UserId;
+		}
+	}
 	public class AuthTockenService : BackgroundService
 	{
-		public const string TockenIdCoockieName = "AuthTocken";
-		public const string HashAlgUsed = "SHA512";
 		public Func<byte[], byte[]> HashAlg = SHA512.HashData;
 
-		public Dictionary<string, (byte[] HashKey, DateTime ValidThrough, int UserId)> AuthTockens { get; private set; } = new();
+		private Dictionary<string, TockenInfo> AuthTockens = new();
+		public bool TockenExists(string TockenId) => this.AuthTockens.ContainsKey(TockenId);
+		public bool TryGetTocken(string TockenId, out TockenInfo Tocken) => this.AuthTockens.TryGetValue(TockenId, out Tocken!);
 
 		private readonly AuthTockenServiceSettingsProvider SettingsProvider;
-		private int TockenLifeTimeSecs
-			=> this.SettingsProvider.TockenLifetime_secs;
-		private int TockenIdStringLength
-			=> this.SettingsProvider.TockenIdStringLength_chars;
-		private int TokenKeyLengthBytes
-			=> this.SettingsProvider.TokenKeyLength_bytes;
-		private int TockensCleanUpIntervalSecs
-			=> this.SettingsProvider.TokensCleanUpInterval_secs;
+		private int TockenLifeTimeSecs => this.SettingsProvider.TockenLifetime_secs;
+		private int TockenIdStringLength => this.SettingsProvider.TockenIdStringLength_chars;
+		private int TokenKeyLengthBytes => this.SettingsProvider.TokenKeyLength_bytes;
+		private int TockensCleanUpIntervalSecs => this.SettingsProvider.TokensCleanUpInterval_secs;
 
 		public AuthTockenService(AppSettingsProvider SettingsProvider)
-		{
-			this.SettingsProvider = SettingsProvider.AuthTockenServiceSP;
-		}
+			=> this.SettingsProvider = SettingsProvider.AuthTockenServiceSP;
 
 		public void CreateTocken(int UserId, out string CreatedAuthTockenId, out byte[] CreatedKey)
 		{
-			string TockenId = null;
+			string TockenId = null!;
 			do
 			{
 				TockenId = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator
@@ -55,22 +59,8 @@ namespace Website.Services
 
 			this.AuthTockens.Add(TockenId, new(Key, ValidThrough, UserId));
 		}
-
-		public bool ConfirmPassword(string TockenId, byte[] PasswordHashedByClient, byte[] PasswordFromDb, out int? UserId)
-		{
-			return this.ConfirmPasswordPrivate(TockenId, true, PasswordHashedByClient, PasswordFromDb, out UserId);
-		}
-		public bool ConfirmPasswordWithoutTockenInvalidation(string TockenId, byte[] PasswordHashedByClient, byte[] PasswordFromDb, out int? UserId)
-		{
-			return this.ConfirmPasswordPrivate(TockenId, false, PasswordHashedByClient, PasswordFromDb, out UserId);
-		}
-		public void InvalidateTocken(string TockenId)
-		{
-			if (this.AuthTockens.ContainsKey(TockenId))
-				this.AuthTockens.Remove(TockenId);
-		}
-
-		private bool ConfirmPasswordPrivate(string TockenId, bool InvalidateTocken, byte[] PasswordHashedByClient, byte[] PasswordFromDb, out int? UserId)
+		public bool ConfirmPasswordAndInvalidateTocken(
+			string TockenId, byte[] PasswordHashedByClient, byte[] PasswordFromDb, out int? UserId)
 		{
 			UserId = null;
 			if (!this.AuthTockens.TryGetValue(TockenId, out var GotTockenData))
@@ -79,7 +69,7 @@ namespace Website.Services
 			}
 			UserId = GotTockenData.UserId;
 
-			if (GotTockenData.ValidThrough > DateTime.UtcNow)
+			if (GotTockenData.ValidThrough < DateTime.UtcNow)
 			{
 				this.AuthTockens.Remove(TockenId);
 				return false;
@@ -87,11 +77,11 @@ namespace Website.Services
 
 			var MyTockenKey = GotTockenData.HashKey;
 
-			var HashedPasswordFromDb = SHA512.HashData(PasswordFromDb.Concat(MyTockenKey).ToArray());
+			var HashedPasswordFromDb = HashAlg(PasswordFromDb.Concat(MyTockenKey).ToArray());
 
 			if (HashedPasswordFromDb.SequenceEqual(PasswordHashedByClient))
 			{
-				if (InvalidateTocken) this.AuthTockens.Remove(TockenId);
+				this.AuthTockens.Remove(TockenId);
 				return true;
 			}
 
