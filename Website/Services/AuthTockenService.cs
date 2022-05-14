@@ -26,12 +26,8 @@ namespace Website.Services
 	}
 	public class AuthTockenService : BackgroundService
 	{
-		public Func<byte[], byte[]> HashAlg = SHA512.HashData;
-
+		private Func<byte[], byte[]> HashAlg = SHA512.HashData;
 		private Dictionary<string, TockenInfo> AuthTockens = new();
-		public bool TockenExists(string TockenId) => this.AuthTockens.ContainsKey(TockenId);
-		public bool TryGetTocken(string TockenId, out TockenInfo Tocken) => this.AuthTockens.TryGetValue(TockenId, out Tocken!);
-
 		private readonly AuthTockenServiceSettingsProvider SettingsProvider;
 		private int TockenLifeTimeSecs => this.SettingsProvider.TockenLifetime_secs;
 		private int TockenIdStringLength => this.SettingsProvider.TockenIdStringLength_chars;
@@ -40,6 +36,9 @@ namespace Website.Services
 
 		public AuthTockenService(AppSettingsProvider SettingsProvider)
 			=> this.SettingsProvider = SettingsProvider.AuthTockenServiceSP;
+
+		public bool TockenExists(string TockenId) => this.AuthTockens.ContainsKey(TockenId);
+		public bool TryGetTocken(string TockenId, out TockenInfo Tocken) => this.AuthTockens.TryGetValue(TockenId, out Tocken!);
 
 		public void CreateTocken(int UserId, out string CreatedAuthTockenId, out byte[] CreatedKey)
 		{

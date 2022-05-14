@@ -19,7 +19,7 @@ namespace Website.Services
 	/// </summary>
 	public class RequestsFromIpCounterService : BackgroundService
 	{
-		public Dictionary<IPAddress, float> RequestsByIpLastTime { get; private set; } = new();
+		private Dictionary<IPAddress, float> RequestsByIpLastTime = new();
 		private readonly AppSettingsProvider SettingsProvider;
 		private const int UpdateDelay_mins = 1;
 
@@ -27,8 +27,6 @@ namespace Website.Services
 			=> this.SettingsProvider.RequestsFromIpCounterServiceSP.AllowedNumOfRequestsPerMinute * this.SettingsProvider.RequestsFromIpCounterServiceSP.ControlledTime_mins;
 		private int Period_mins
 			=> this.SettingsProvider.RequestsFromIpCounterServiceSP.ControlledTime_mins;
-
-
 
 		public RequestsFromIpCounterService(AppSettingsProvider SettingsProvider)
 		{
@@ -76,8 +74,7 @@ namespace Website.Services
 		public bool IPAddressIsBanned(ActionExecutingContext context)
 		{
 			if (context.HttpContext.Connection.RemoteIpAddress is not null)
-				if (this.IPAddressIsBanned(context.HttpContext.Connection.RemoteIpAddress))
-					return true;
+				return this.IPAddressIsBanned(context.HttpContext.Connection.RemoteIpAddress);
 
 			return false;
 		}

@@ -5,15 +5,12 @@ using Website.Services;
 
 namespace Website.Controllers
 {
-	public class HomeController : AMyController
+	public sealed class HomeController : AMyController
 	{
-		private readonly IServiceScopeFactory ScopeFactory;
-		private readonly WebsiteContext context;
-		public HomeController(IServiceScopeFactory Services, SessionManager SM)
+		public HomeController(IServiceScopeFactory Services)
 			: base(Services)
 		{
-			this.ScopeFactory = Services;
-			this.context = Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();
+
 		}
 
 		[HttpGet]

@@ -22,8 +22,9 @@ namespace Website.Services
 			this.DbContextScopeFactory = DbContextScopeFactory;
 			this.FreqReqService = FreqReqService;
 		}
-		public DateTime ProceedDateTime;
 
+
+		public DateTime ProceedDateTime { get;private set; }
 		public string? Request { get; private set; }
 		public List<DbDocument>? Response { get; private set; }
 

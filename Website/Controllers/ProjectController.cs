@@ -6,15 +6,12 @@ using Website.Services;
 
 namespace Website.Controllers
 {
-	public class ProjectController : AMyController
+	public sealed class ProjectController : AMyController
 	{
-		private readonly IServiceScopeFactory ScopeFactory;
-		private readonly WebsiteContext context;
-		public ProjectController(IServiceScopeFactory Services, SessionManager SM)
+		public ProjectController(IServiceScopeFactory Services)
 			: base(Services)
 		{
-			this.ScopeFactory = Services;
-			this.context = Services.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();
+			
 		}
 		[HttpGet]
 		public ViewResult Summary()

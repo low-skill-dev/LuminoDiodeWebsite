@@ -25,23 +25,6 @@ namespace Website.Controllers
 		protected const string PageTopAlertsTempDataName = "PageTopAlerts";
 		//protected readonly List<Website.Models.ViewModels.Alert> PageTopAlerts = new(1);
 
-		protected Dictionary<string, string>? RouteAdditionalParams
-		{
-			get
-			{
-				if (Request.Path.Value is null) return null;
-				if (this._RouteAdditionalParams is null)
-				{
-					var startIndex = Request.Path.Value.LastIndexOf('?');
-					if (startIndex < 0) return null;
-					this._RouteAdditionalParams = Request.Path.Value.Substring(startIndex)
-						.Split('&').Select(x => x.Split("=", 2)).ToDictionary(x => x[0], x => x[1]);
-				}
-				return this._RouteAdditionalParams;
-			}
-		}
-		protected Dictionary<string, string>? _RouteAdditionalParams;
-
 		public AMyController(IServiceScopeFactory ScopeFactory)
 		{
 			var sp = ScopeFactory.CreateScope().ServiceProvider;
@@ -63,15 +46,16 @@ namespace Website.Controllers
 			this.LoadSessionAndAuthedUser();
 			this.RedirectToRegistrationStepIfNeeded(context);
 		}
-		protected void LoadSessionAndAuthedUser()
+		private void LoadSessionAndAuthedUser()
 		{
 			if (this.Request.Cookies.ContainsKey(SessionManager.SessionIdCoockieName))
 			{
-				SessionInfo? Info;
-#pragma warning disable CS8604
-				this.SM.ValidateSession(this.Request.Cookies[SessionManager.SessionIdCoockieName], out Info);
-#pragma warning restore CS8604
-				if (Info == null) return;
+				SessionInfo? Info=null;
+				if(this.Request.Cookies.TryGetValue(SessionManager.SessionIdCoockieName, out var cookieVal))
+					this.SM.ValidateSession(cookieVal!, out Info);
+
+				if (Info is null) return;
+
 				this.AuthedUser = this.context.Users.AsTracking(QueryTrackingBehavior.TrackAll).First(u => u.Id == Info.UserId); /* throw new System.AggregateException("Session cotains user id which cannot be found in DB")*/;
 				this.ViewBag.AuthedUser = this.AuthedUser;
 			}
@@ -103,7 +87,7 @@ namespace Website.Controllers
 			EnteringMetadataPage,
 			OtherPages
 		}
-		protected void RedirectToRegistrationStepIfNeeded(ActionExecutingContext context)
+		private void RedirectToRegistrationStepIfNeeded(ActionExecutingContext context)
 		{
 			if (this.AuthedUser == null) return; // RETURN; if no user authed
 

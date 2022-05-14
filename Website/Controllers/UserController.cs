@@ -12,18 +12,14 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Website.Controllers
 {
-	public class UserController : AMyController
+	public sealed class UserController : AMyController
 	{
-		protected readonly IServiceScopeFactory ScopeFactory;
-		protected readonly Website.Services.RecentDocumentsBackgroundService recentDocumentsProvider;
-		protected readonly Website.Services.PasswordsService passwordsService;
-		protected readonly Website.Services.AuthTockenService authTockenService;
+		private readonly Website.Services.PasswordsService passwordsService;
+		private readonly Website.Services.AuthTockenService authTockenService;
 		public UserController(IServiceScopeFactory Services, Website.Services.RecentDocumentsBackgroundService documentsBackgroundService, SessionManager SM)
 			: base(Services)
 		{
-			this.ScopeFactory = Services;
 			var sp = Services.CreateScope().ServiceProvider;
-			this.recentDocumentsProvider = sp.GetRequiredService<RecentDocumentsBackgroundService>();
 			this.passwordsService = sp.GetRequiredService<PasswordsService>();
 			this.authTockenService = sp.GetRequiredService<AuthTockenService>();
 		}

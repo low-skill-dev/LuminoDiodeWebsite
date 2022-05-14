@@ -6,14 +6,12 @@ using Website.Services;
 
 namespace Website.Controllers
 {
-	public class DbgController : AMyController
+	public sealed class DbgController : AMyController
 	{
-		private readonly Website.Repository.WebsiteContext context;
 		private readonly Website.Services.FrequentSearchRequestsService freqServ;
 		public DbgController(IServiceScopeFactory ScopeFactory) : base(ScopeFactory)
 		{
 			var sp = ScopeFactory.CreateScope().ServiceProvider;
-			this.context = sp.GetRequiredService<WebsiteContext>();
 			this.freqServ = sp.GetRequiredService<FrequentSearchRequestsService>();
 		}
 

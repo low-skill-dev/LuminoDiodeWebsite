@@ -18,10 +18,7 @@ namespace Website.Services
 	{
 		private readonly WebsiteContext context;
 		private readonly RecentDocumentsBackgroundServiceSettingsProvider SettingsProvider;
-		public int Interval_msec
-		{
-			get => this.SettingsProvider.Interval_msec;
-		}
+		private int Interval_msec => this.SettingsProvider.Interval_msec;
 
 		public RecentDocumentsBackgroundService(IServiceScopeFactory DbContextScopeFactory, AppSettingsProvider SettingsProvider)
 		{
@@ -30,6 +27,7 @@ namespace Website.Services
 		}
 
 		public List<Website.Models.DocumentModel.Document> RecentDocuments { get; private set; } = new List<Models.DocumentModel.Document>();
+
 		protected async override Task ExecuteAsync(CancellationToken ct)
 		{
 			while (!ct.IsCancellationRequested)
