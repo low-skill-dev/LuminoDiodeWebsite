@@ -36,59 +36,35 @@ namespace Website.Services
 
 		// to be private in release
 		// Хранит наиболее частые запросы
-#if DEBUG
-		public
-#endif
-#if RELEASE
-		private
-#endif
-			List<FrequenciedService> FrequentRequests;
+		private List<FrequenciedService> FrequentRequests;
 
 		// Интервал обработки последних запросов, даже если не набрано нужное количество
-		public int Interval_msec
-		{
-			get => this.SettingsProvider.FrequentSearchRequestsServiceSP.Interval_msec;
-		}
+		private int Interval_msec => this.SettingsProvider.Interval_msec;
 
 		// Количественный интервал обработки последних запросов
-		public int Interval_numOfRecentRequests
-		{
-			get => this.SettingsProvider.FrequentSearchRequestsServiceSP.Interval_numOfRecentRequests;
-		}
+		private int Interval_numOfRecentRequests => this.SettingsProvider.Interval_numOfRecentRequests;
+
 
 		// Интервал проверки необходимости провести обработку
-		public int Interval_updateNeededCheck_msec
-		{
-			get => this.SettingsProvider.FrequentSearchRequestsServiceSP.Interval_updateNeededCheck_msec;
-		}
+		private int Interval_updateNeededCheck_msec => this.SettingsProvider.Interval_updateNeededCheck_msec;
 
 		// Количество хранимых частых запросов
-		public int NumOfFrequentRequestsStored
-		{
-			get => this.SettingsProvider.FrequentSearchRequestsServiceSP.NumOfFrequentRequestsStored;
-		}
+		private int NumOfFrequentRequestsStored => this.SettingsProvider.NumOfFrequentRequestsStored;
 
 		// Очки сходства по методу Fuzz.TokenSortRation для засчитывания строк как одинаковых по токену
-		public int TokenSortRationNeededToCountAsSimilar
-		{
-			get => this.SettingsProvider.FrequentSearchRequestsServiceSP.TokenSortRationNeededToCountAsSimilar;
-		}
+		private int TokenSortRationNeededToCountAsSimilar => this.SettingsProvider.TokenSortRationNeededToCountAsSimilar;
 
 		// Время жизни сохранненого запроса. Если частый запрос существует более 5 минут, его следует обновить.
-		public int ResponseLifetime_msec
-		{
-			get => this.SettingsProvider.FrequentSearchRequestsServiceSP.ResponseLifetime_msec;
-		}
-
-		// Время последнего обновления
+		private int ResponseLifetime_msec => this.SettingsProvider.ResponseLifetime_msec;
+		
+		// Хранит время последнего обновления данных
 		private System.DateTime LastUpdateTime;
-
 		private readonly IServiceScopeFactory ScopeFactory;
-		private readonly AppSettingsProvider SettingsProvider;
+		private readonly FrequentSearchRequestsServiceSettingsProvider SettingsProvider;
 		public FrequentSearchRequestsService(IServiceScopeFactory ScopeFactory, AppSettingsProvider SettingsProvider)
 		{
 			this.ScopeFactory = ScopeFactory;
-			this.SettingsProvider = SettingsProvider;
+			this.SettingsProvider = SettingsProvider.FrequentSearchRequestsServiceSP;
 			this.RecentRequests_DocumentSearchServiceScopes = new List<DocumentSearchService>();
 			this.FrequentRequests = new List<FrequenciedService>();
 		}
@@ -113,7 +89,7 @@ namespace Website.Services
 				{
 					tryFind.DocumentSearchServiceScope = this.ScopeFactory.CreateScope().ServiceProvider.
 						GetRequiredService<DocumentSearchService>();
-					tryFind.DocumentSearchServiceScope.ProceedRequest(UserRequest);
+					tryFind.DocumentSearchServiceScope.ProceedRequest(UserRequest).Wait();
 				}
 
 				return tryFind.DocumentSearchServiceScope;

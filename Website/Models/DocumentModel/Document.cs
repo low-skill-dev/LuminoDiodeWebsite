@@ -12,7 +12,10 @@ namespace Website.Models.DocumentModel
 		public User? Author { get; set; } = null!;
 		public string[]? Tags { get; set; } = null!;
 		public DateTime CreatedDateTime { get; set; } = DateTime.UtcNow;
+		public DateTime UpdatedDateTime { get; set; } = DateTime.UtcNow;
 		public DocumentParagraph[] Paragraphs { get; set; } = null!;
+		public string TextPrerenderedHtml { get; set; } = null!;
+		public DateTime? PrerenderedHtmlCreationDateTime { get; set; } = null!;
 
 
 		public override string ToString()
@@ -36,5 +39,10 @@ namespace Website.Models.DocumentModel
 			};
 		}
 #endif
+
+		public void CreatePrerender()
+		{
+
+		}
 	}
 }

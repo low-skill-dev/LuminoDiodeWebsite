@@ -31,7 +31,7 @@ namespace Website.Controllers
 			var loadedDoc = await this.context.DbDocuments.Include("Author").FirstOrDefaultAsync(d => d.Id == Id);
 			if (loadedDoc == null) return new StatusCodeResult(404);
 
-			this.ViewBag.AutherUserIsOwner = this.AuthedUser?.Id.Equals(loadedDoc.Author?.Id) ?? false;
+			ViewBag.AuthedUserIsOwner = this.AuthedUser?.Id.Equals(loadedDoc.Author?.Id) ?? false;
 
 			return this.View(loadedDoc.ToDocument());
 		}
@@ -45,7 +45,7 @@ namespace Website.Controllers
 		[HttpPost]
 		public async Task<ViewResult> Search(string SearchRequest)
 		{
-			this.ViewBag.SearchRequest = SearchRequest;
+			this.TempData.Add("OriginalRequest", SearchRequest);
 			return this.View((await base.ServiceProvider.GetRequiredService<DocumentSearchService>().ProceedRequest(SearchRequest)).Select(x => x.ToDocument()));
 		}
 
@@ -75,10 +75,10 @@ namespace Website.Controllers
 						TextParts= new Website.Models.DocumentModel.WebText[] {new Models.DocumentModel.WebText { Text=Doc.Text} } } }
 			};
 
-			this.context.DbDocuments.Add(Website.Models.DocumentModel.DbDocument.FromDocument(DocForAddingToDb));
+			var toAdd = Website.Models.DocumentModel.DbDocument.FromDocument(DocForAddingToDb);
+			this.context.DbDocuments.Add(toAdd);
 			await this.context.SaveChangesAsync();
-
-			return this.RedirectToAction("Show", new { Id = DocForAddingToDb.Id });
+			return this.RedirectToAction("Show", new { Id = toAdd.Id });
 		}
 
 		[HttpGet]
@@ -115,7 +115,7 @@ namespace Website.Controllers
 			if (!int.TryParse(PassedId as string, out ParsedId)) 
 				return new StatusCodeResult(400);
 
-			// Not found. Server understood request and parsed id, but not such id was found in Db.
+			// Not found. Server understood request and parsed id, but no such id was found in Db.
 			var FoundDoc = await this.context.DbDocuments.Include("Author").FirstOrDefaultAsync(x=> x.Id==ParsedId);
 			if (FoundDoc is null)
 				return new StatusCodeResult(404);
@@ -132,6 +132,7 @@ namespace Website.Controllers
 			// Creating new document for replace
 			var DocForAddingToDb = new Website.Models.DocumentModel.Document
 			{
+				Id = FoundDoc.Id,
 				Title = Doc.Title,
 				Author = FoundDoc.Author,
 				CreatedDateTime = FoundDoc.CreatedDateTime,
@@ -139,14 +140,13 @@ namespace Website.Controllers
 						TextParts= new Website.Models.DocumentModel.WebText[] {new Models.DocumentModel.WebText { Text=Doc.Text} } } }
 			};
 
-			// Replacing entity for EF
-			FoundDoc = Website.Models.DocumentModel.DbDocument.FromDocument(DocForAddingToDb);
+			this.context.Entry(FoundDoc).CurrentValues.SetValues(DocForAddingToDb);
 
 			// Saving changes async
 			await this.context.SaveChangesAsync();
 
 			// returning View for edited document
-			return this.View("Show", FoundDoc.ToDocument());
+			return this.RedirectToAction("Show", new {id= FoundDoc.Id });
 		}
 
 		[HttpGet]

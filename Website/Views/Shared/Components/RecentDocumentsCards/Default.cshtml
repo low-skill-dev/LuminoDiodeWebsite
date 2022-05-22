@@ -1,0 +1,10 @@
+﻿@model IEnumerable<Website.Models.DocumentModel.Document>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<div>
+@foreach(var doc in Model){
+	<div class="p-1">
+		<partial name="~/Views/Shared/PartialViews/Document/_DocumentCardPartialView.cshtml" model=doc />
+	</div>
+}
+</div>

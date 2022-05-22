@@ -1,17 +1,14 @@
 ﻿using System;
+using System.Text;
 
 namespace Website.Models.DocumentModel
 {
 	public class WebText
 	{
-#pragma warning disable CS8618
-
-		public string Text;
+		public string Text = string.Empty;
 		public string? Link;
 		public bool? IsBold;
 		public bool? IsItalic;
-
-#pragma warning restore CS8618
 
 #if DEBUG
 		private static readonly Random rnd = new Random();
@@ -27,5 +24,48 @@ namespace Website.Models.DocumentModel
 
 		}
 #endif
+
+		public string ToHtmlString()
+		{
+			bool hasLink = !string.IsNullOrWhiteSpace(this.Link);
+			bool isBold = this.IsBold ?? false;
+			bool isItalic = this.IsItalic ?? false;
+
+			StringBuilder sb = new();
+
+			sb.Append("<div>");
+
+			if (hasLink)
+			{
+				sb.Append("<a href=\'{this.Link}\'>");
+			}
+			if (isBold)
+			{
+				sb.Append("<strong>");
+			}
+			if (isItalic)
+			{
+				sb.Append("<i>");
+			}
+
+			sb.AppendLine(this.Text);
+
+			if (hasLink)
+			{
+				sb.Append("</i>");
+			}
+			if (isBold)
+			{
+				sb.Append("</strong>");
+			}
+			if (isItalic)
+			{
+				sb.Append("</a>");
+			}
+
+			sb.Append("</div>");
+
+			return sb.ToString();
+		}
 	}
 }

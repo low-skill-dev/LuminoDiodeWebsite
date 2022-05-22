@@ -15,7 +15,8 @@
 			<partial name="~/Views/Shared/PartialViews/Document/_AuthorAndPublishTimePartialView.cshtml" model=@Model />
 		</div>
 
-		@if (ViewBag.AutherUserIsOwner == true)
+		
+		@if (TempData?["AuthedUserIsOwner"]?.Equals(true) ?? false)
 		{
 			<div class="mt-2 mb-2">
 				<button class="btn btn-sm btn-outline-dark" onclick="location.href='@Url.Action("Edit","Document",new {@Id=Model.Id})'">Edit</button>

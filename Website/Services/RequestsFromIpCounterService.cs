@@ -61,8 +61,13 @@ namespace Website.Services
 		{
 			var ip = context.HttpContext.Connection.RemoteIpAddress;
 			if (ip is not null)
+			{
 				if (!this.RequestsByIpLastTime.ContainsKey(ip))
 					this.RequestsByIpLastTime.Add(ip, 1);
+				else
+					RequestsByIpLastTime[ip] = RequestsByIpLastTime[ip]+1;
+			}
+				
 		}
 		public bool IPAddressIsBanned(IPAddress RequesterIp)
 		{

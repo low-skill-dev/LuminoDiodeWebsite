@@ -15,14 +15,9 @@ namespace Website.Services
 {
 	public class TockenInfo
 	{
-		public byte[] HashKey { get; private set; }
-		public DateTime ValidThrough { get; private set; }
-		public int UserId { get; private set; }
-
-		public TockenInfo(byte[] HashKey, DateTime ValidThrough, int UserId)
-		{
-			this.HashKey = HashKey; this.ValidThrough = ValidThrough; this.UserId = UserId;
-		}
+		public byte[] HashKey { get; init; } = null!;
+		public DateTime ValidThrough { get; init; }
+		public int UserId { get; init; }
 	}
 	public class AuthTockenService : BackgroundService
 	{
@@ -56,7 +51,7 @@ namespace Website.Services
 			CreatedAuthTockenId = TockenId;
 			CreatedKey = Key;
 
-			this.AuthTockens.Add(TockenId, new(Key, ValidThrough, UserId));
+			this.AuthTockens.Add(TockenId, new () { HashKey=Key, ValidThrough=ValidThrough, UserId=UserId });
 		}
 		public bool ConfirmPasswordAndInvalidateTocken(
 			string TockenId, byte[] PasswordHashedByClient, byte[] PasswordFromDb, out int? UserId)

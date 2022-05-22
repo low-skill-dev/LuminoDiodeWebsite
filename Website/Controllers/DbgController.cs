@@ -19,9 +19,11 @@ namespace Website.Controllers
 		{
 			return this.View(model: (this.context.DbDocuments.AsQueryable()));
 		}
+		/*
 		public ViewResult Show1()
 		{
 			return this.View(this.freqServ.FrequentRequests.Select(x => x.DocumentSearchServiceScope.Request + '\t' + x.Frequency.ToString()));
 		}
+		*/
 	}
 }

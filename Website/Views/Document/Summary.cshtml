@@ -37,15 +37,18 @@
 				<div class="w-100 text-center p-1">
 					<h5>Recent docs</h5>
 				</div>
+				@await Component.InvokeAsync(Website.ViewComponents.RecentDocumentsCardsViewComponent.nameofThis);
+				<!--
 					@{
 						foreach (var doc in @Model)
 						{
-							@:<div class="p-1">
-								<partial name="~/Views/Shared/PartialViews/Document/_DocumentCardPartialView.cshtml" model=doc />
+								@:<div class="p-1">
+									<partial name="~/Views/Shared/PartialViews/Document/_DocumentCardPartialView.cshtml" model=doc />
 							;
-							@:</div>
+								@:</div>
 						}
 					}
+				-->
 			</div>
 		</div>
 	</div>

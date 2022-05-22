@@ -16,7 +16,7 @@
 <div>
 	<div class="row">
 		<div class="col-lg-2"></div>
-		<div class=col-lg>
+		<div class=col-lg-6>
 			<div name="PhotoAndName">
 				<div class="row p-3">
 					@{
@@ -50,6 +50,11 @@
 				</div>
 			</div>
 		</div>
-		<div class=col-lg-2></div>
+		<div class=col-lg-4>
+			<div class="text-center p-3 display-6">
+				Last posted
+			</div>
+			@await Component.InvokeAsync(Website.ViewComponents.RecentDocumentsCardsViewComponent.nameofThis,new { MaxQuantity=5 })
+		</div>
 	</div>
 </div>

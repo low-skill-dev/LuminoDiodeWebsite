@@ -28,14 +28,14 @@ namespace Website.Services.SettingsProviders
 				}
 			}
 		}
-		public int SeedUntilAmountOfUsersIsLeesThen
+		public int SeedIfAmountOfUsersIsLeesThen
 		{
 			get
 			{
 				try
 				{
 					return this.config
-						.GetRequiredSection("DataSeederSettings:SeedUntilAmountOfUsersIsLeesThen")
+						.GetRequiredSection("DataSeederSettings:SeedIfAmountOfUsersIsLeesThen")
 						.Get<int>();
 				}
 				catch (Exception)
@@ -45,14 +45,14 @@ namespace Website.Services.SettingsProviders
 				}
 			}
 		}
-		public int SeedUntilAmountOfDocumentsLeesThen
+		public int SeedIfAmountOfDocumentsLeesThen
 		{
 			get
 			{
 				try
 				{
 					return this.config
-						.GetRequiredSection("DataSeederSettings:SeedUntilAmountOfDocumentsLeesThen")
+						.GetRequiredSection("DataSeederSettings:SeedIfAmountOfDocumentsLeesThen")
 						.Get<int>();
 				}
 				catch (Exception)
@@ -62,14 +62,14 @@ namespace Website.Services.SettingsProviders
 				}
 			}
 		}
-		public int SeedUntilAmountOfProjectsLeesThen
+		public int SeedIfAmountOfProjectsLeesThen
 		{
 			get
 			{
 				try
 				{
 					return this.config
-						.GetRequiredSection("DataSeederSettings:SeedUntilAmountOfProjectsLeesThen")
+						.GetRequiredSection("DataSeederSettings:SeedIfAmountOfProjectsLeesThen")
 						.Get<int>();
 				}
 				catch (Exception)
@@ -80,14 +80,14 @@ namespace Website.Services.SettingsProviders
 			}
 		}
 
-		public int SeedUntilAmountOfProjectsGroupsLeesThen
+		public int SeedIfAmountOfProjectsGroupsLeesThen
 		{
 			get
 			{
 				try
 				{
 					return this.config
-						.GetRequiredSection("DataSeederSettings:SeedUntilAmountOfProjectsGroupsLeesThen")
+						.GetRequiredSection("DataSeederSettings:SeedIfAmountOfProjectsGroupsLeesThen")
 						.Get<int>();
 				}
 				catch (Exception)

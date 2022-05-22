@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Website.Models.DocumentModel
 {
@@ -31,5 +32,24 @@ namespace Website.Models.DocumentModel
 			return OutDoc;
 		}
 #endif
+
+		public  string ToHtmlString()
+		{
+			StringBuilder sb = new();
+
+			sb.Append("<div class=\'text-wrap\'>");
+
+			if (this.TextParts is not null)
+			{
+				foreach(var t in TextParts)
+				{
+					sb.Append(t.ToHtmlString());
+				}
+			}
+
+			sb.Append("</div>");
+
+			return sb.ToString();
+		}
 	}
 }

@@ -7,11 +7,11 @@ namespace Website.Services
 	public class RandomDataSeederService
 	{
 		private readonly WebsiteContext context;
-		private readonly AppSettingsProvider SettingsProvider;
+		private readonly RandomDataSeederSettingsProvider SettingsProvider;
 		public RandomDataSeederService(AppSettingsProvider SettingsProvider, WebsiteContext ctx)
 		{
 			this.context = ctx;
-			this.SettingsProvider = SettingsProvider;
+			this.SettingsProvider = SettingsProvider.RandomDataSeederSP;
 		}
 
 		public void SeedData(bool SaveChanges = true)
@@ -19,10 +19,13 @@ namespace Website.Services
 			/* Be aware!
 			 * Seeding projects must be launched only if at least 1 user exists in DB.
 			 */
-			this.SeedData_Users();
-			this.SeedData_DbDocuments();
-			this.SeedData_Projects();
-			this.context.SaveChanges();
+			if (SettingsProvider.SeederIsEnabled)
+			{
+				this.SeedData_Users();
+				this.SeedData_DbDocuments();
+				this.SeedData_Projects();
+				this.context.SaveChanges();
+			}
 		}
 
 		private void SeedData_DbDocuments()
@@ -34,36 +37,32 @@ namespace Website.Services
 			// this checks if there is at least 10 raws in the db
 			// if (this.DbDocuments.Find(10000) != null && DoNotSeedIfDataExists) return;
 
-			int NumToAdd = this.SettingsProvider.RandomDataSeederSP.SeedUntilAmountOfDocumentsLeesThen - this.context.DbDocuments.Count();
+			int NumToAdd = this.SettingsProvider.SeedIfAmountOfDocumentsLeesThen - this.context.DbDocuments.Count();
 			if (NumToAdd < 0) NumToAdd = 0;
-			var ToAddUsers = new Website.Models.DocumentModel.DbDocument[NumToAdd];
-			int CurrCt = 0;
+			var ToAddDocs = new Website.Models.DocumentModel.DbDocument[NumToAdd];
 
-			for (int i = 0; i < ToAddUsers.Length; i++)
+			for (int i = 0; i < ToAddDocs.Length; i++)
 			{
 				var docToAdd = Models.DocumentModel.DbDocument.FromDocument(Website.Models.DocumentModel.Document.GenerateRandom());
 				docToAdd.Author = this.context.Users.First();
 				this.context.DbDocuments.Add(docToAdd);
-				if (CurrCt++ > 10 * 1000)
-				{
-					CurrCt = 0;
-					this.context.SaveChanges();
-				}
 			}
 			this.context.SaveChanges();
 		}
 		private void SeedData_Users()
 		{
-			int NumToAdd = this.SettingsProvider.RandomDataSeederSP.SeedUntilAmountOfUsersIsLeesThen - this.context.Users.Count();
+			int NumToAdd = this.SettingsProvider.SeedIfAmountOfUsersIsLeesThen - this.context.Users.Count();
 			if (NumToAdd < 0) NumToAdd = 0;
 			var ToAddUsers = new Website.Models.UserModel.User[NumToAdd];
 
+
+			var startEmailIndex = this.context.Users.Count();
 			for (int i = 0; i < ToAddUsers.Length; i++)
 			{
 				var ToAdd = new Models.UserModel.User
 				{
 					//Id = null,
-					EmailAdress = $"testemail{i}@gmail.com",
+					EmailAdress = $"testemail{startEmailIndex + i}@gmail.com",
 					DisplayedName = "Admin",
 				};
 				this.context.Users.Add(ToAdd);
@@ -72,7 +71,7 @@ namespace Website.Services
 		}
 		private void SeedData_Projects()
 		{
-			int NumToAdd = this.SettingsProvider.RandomDataSeederSP.SeedUntilAmountOfProjectsLeesThen - this.context.Projects.Count();
+			int NumToAdd = this.SettingsProvider.SeedIfAmountOfProjectsLeesThen - this.context.Projects.Count();
 			if (NumToAdd < 0) NumToAdd = 0;
 
 			var ToAddProjects = new Website.Models.ProjectModel.Project[NumToAdd];

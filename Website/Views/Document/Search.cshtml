@@ -2,11 +2,14 @@
 @model IEnumerable<Website.Models.DocumentModel.Document>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    string OriginalRequest = ViewBag.SearchRequest;
+    object? temp;
+    if (!TempData.TryGetValue("OriginalRequest", out temp)) temp = string.Empty;
+
+    var OriginalRequest = (string)temp!;
 }
 <div>
     <div class="p-1">
-        <partial name="~/Views/Shared/PartialViews/Document/_DocumentSearchFormPartialView.cshtml" model=OriginalRequest />
+        <partial name="~/Views/Shared/PartialViews/Document/_DocumentSearchFormPartialView.cshtml" model=temp />
     </div>
     <div>
         @{

@@ -13,7 +13,11 @@ namespace Website.Models.DocumentModel
 		public User? Author { get; set; }
 		public string[]? Tags { get; set; }
 		public DateTime CreatedDateTime { get; set; } = DateTime.UtcNow;
+		public DateTime UpdatedDateTime { get; set; } = DateTime.UtcNow;
 		public byte[] Utf8JsonSerializedParagraphs { get; set; } = null!;
+
+		public string TextPrerenderedHtml { get; set; } = null!;
+		public DateTime? PreRenderedHtmlCreationDateTime { get; set; } = null!;
 
 
 		public static DbDocument FromDocument(Document article) => new DbDocument
@@ -23,7 +27,10 @@ namespace Website.Models.DocumentModel
 			Author = article.Author,
 			Tags = article.Tags,
 			CreatedDateTime = article.CreatedDateTime,
-			Utf8JsonSerializedParagraphs = JsonSerializer.Serialize(article.Paragraphs)
+			UpdatedDateTime = article.UpdatedDateTime,
+			Utf8JsonSerializedParagraphs = JsonSerializer.Serialize(article.Paragraphs),
+			TextPrerenderedHtml = article.TextPrerenderedHtml,
+			PreRenderedHtmlCreationDateTime = article.PrerenderedHtmlCreationDateTime
 		};
 		public Document ToDocument() => new Document
 		{
@@ -32,7 +39,10 @@ namespace Website.Models.DocumentModel
 			Author = this.Author,
 			Tags = this.Tags,
 			CreatedDateTime = this.CreatedDateTime,
-			Paragraphs = JsonSerializer.Deserialize<DocumentParagraph[]>(this.Utf8JsonSerializedParagraphs)
+			UpdatedDateTime = this.UpdatedDateTime,
+			Paragraphs = JsonSerializer.Deserialize<DocumentParagraph[]>(this.Utf8JsonSerializedParagraphs),
+			TextPrerenderedHtml = this.TextPrerenderedHtml,
+			PrerenderedHtmlCreationDateTime = this.PreRenderedHtmlCreationDateTime			
 		};
 	}
 }

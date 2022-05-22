@@ -43,6 +43,8 @@ namespace Website.Controllers
 		[HttpGet]
 		public IActionResult Login()
 		{
+			return new StatusCodeResult(410);
+
 			var RequestDebug = this.Request;
 
 			if (base.AuthedUser != null) return new StatusCodeResult(409); // 409 "Conflict", already signed in
@@ -51,6 +53,8 @@ namespace Website.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Login([Bind] Website.Models.Auth.LoginInfo LI)
 		{
+			return new StatusCodeResult(410);
+
 			var RequestDebug = this.Request;
 
 			if (!this.ModelState.IsValid)
@@ -134,7 +138,7 @@ namespace Website.Controllers
 				await this.context.SaveChangesAsync();
 				base.AddAlertToPageTop(new Alert("Account created. Log in.", Alert.ALERT_TYPE.Info));
 				var t = TempData;
-				return this.RedirectToAction("Login");
+				return this.RedirectToAction(nameof(Website.Controllers.UserController.NewAuthLogin));
 			}
 		}
 
@@ -264,9 +268,9 @@ namespace Website.Controllers
 			if (string.IsNullOrEmpty(hashedPassword64))
 				return new StatusCodeResult(400);// no password was sent to server
 
-			byte[] PasswordHashByClient = null!;
-			try { PasswordHashByClient = Base64UrlEncoder.DecodeBytes(hashedPassword64); }
-			catch { return new StatusCodeResult(422); }// incorrect base64 was sent as password
+			byte[] PasswordHashedByClient = null!;
+			try { PasswordHashedByClient = Base64UrlEncoder.DecodeBytes(hashedPassword64); }
+			catch (System.FormatException) { return new StatusCodeResult(422); }// incorrect base64 was sent as password
 
 			var AuthTockenId = this.Request.Cookies[AuthTockenName];
 			if (string.IsNullOrEmpty(AuthTockenId))
@@ -292,13 +296,13 @@ namespace Website.Controllers
 				return new StatusCodeResult(500); // should never be returned in prod
 			}
 
-			if (!this.authTockenService.ConfirmPasswordAndInvalidateTocken(AuthTockenId, PasswordHashByClient, FoundUser.AuthHashedPassword, out var dummy))
+			if (!this.authTockenService.ConfirmPasswordAndInvalidateTocken(AuthTockenId, PasswordHashedByClient, FoundUser.AuthHashedPassword, out var dummy))
 			{
 				AddAlertToPageTop(new("Wrong password", Alert.ALERT_COLOR.Red));
-				return RedirectToAction(nameof(NewAuthPassword));
+				return this.RedirectToAction(nameof(NewAuthPassword));
 			}
 
-			base.SM.CreateSession(FoundUser.Id, out var CreatedSessId);
+			this.SM.CreateSession(FoundUser.Id, out var CreatedSessId);
 			this.Response.Cookies.Append(SessionManager.SessionIdCoockieName, CreatedSessId);
 
 			this.Response.Cookies.Delete(PasswordSaltString64);
@@ -307,6 +311,5 @@ namespace Website.Controllers
 
 			return this.RedirectToAction("Show", "User", new { id = FoundUser.Id });
 		}
-
 	}
 }

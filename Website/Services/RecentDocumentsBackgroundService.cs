@@ -32,12 +32,7 @@ namespace Website.Services
 		{
 			while (!ct.IsCancellationRequested)
 			{
-				var NewRecent = this.context.DbDocuments.TakeLast(5).Include("Author").Reverse(); // newest as first
-				await NewRecent.LoadAsync();
-
-				if (NewRecent.First().CreatedDateTime.Equals(this.RecentDocuments.First().CreatedDateTime))
-					return; // no new docs added
-
+				var NewRecent = this.context.DbDocuments.OrderByDescending(x=> x.CreatedDateTime).Take(5).Include("Author"); // newest as first
 				this.RecentDocuments = NewRecent.Select(x => x.ToDocument()).ToList();
 				await Task.Delay(this.Interval_msec);
 			}
