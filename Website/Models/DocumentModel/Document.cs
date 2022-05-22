@@ -14,7 +14,7 @@ namespace Website.Models.DocumentModel
 		public DateTime CreatedDateTime { get; set; } = DateTime.UtcNow;
 		public DateTime UpdatedDateTime { get; set; } = DateTime.UtcNow;
 		public DocumentParagraph[] Paragraphs { get; set; } = null!;
-		public string TextPrerenderedHtml { get; set; } = null!;
+		public string? TextPrerenderedHtml { get; set; } = null!;
 		public DateTime? PrerenderedHtmlCreationDateTime { get; set; } = null!;
 
 

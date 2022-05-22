@@ -16,7 +16,7 @@ namespace Website.Models.DocumentModel
 		public DateTime UpdatedDateTime { get; set; } = DateTime.UtcNow;
 		public byte[] Utf8JsonSerializedParagraphs { get; set; } = null!;
 
-		public string TextPrerenderedHtml { get; set; } = null!;
+		public string? TextPrerenderedHtml { get; set; } = null!;
 		public DateTime? PreRenderedHtmlCreationDateTime { get; set; } = null!;
 
 

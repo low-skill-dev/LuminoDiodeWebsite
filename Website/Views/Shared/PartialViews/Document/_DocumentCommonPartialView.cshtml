@@ -15,7 +15,7 @@
 			<partial name="~/Views/Shared/PartialViews/Document/_AuthorAndPublishTimePartialView.cshtml" model=@Model />
 		</div>
 
-		
+
 		@if (TempData?["AuthedUserIsOwner"]?.Equals(true) ?? false)
 		{
 			<div class="mt-2 mb-2">
@@ -24,7 +24,9 @@
 		}
 
 		<div class="p-2">
-			<partial name="~/Views/Shared/PartialViews/Document/_DococumentTextPartialView.cshtml" model=@Model />
+			@{
+					<partial name="~/Views/Shared/PartialViews/Document/_DococumentTextPartialView.cshtml" model=@Model />
+			}
 		</div>
 
 

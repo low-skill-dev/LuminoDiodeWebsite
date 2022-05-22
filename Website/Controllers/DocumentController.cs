@@ -33,7 +33,17 @@ namespace Website.Controllers
 
 			ViewBag.AuthedUserIsOwner = this.AuthedUser?.Id.Equals(loadedDoc.Author?.Id) ?? false;
 
-			return this.View(loadedDoc.ToDocument());
+			var asDoc = loadedDoc.ToDocument();
+			if (!asDoc.PrerenderedHtmlCreationDateTime.HasValue)
+			{
+				asDoc.CreatePrerender(); 
+				asDoc.PrerenderedHtmlCreationDateTime = DateTime.UtcNow;
+				context.Entry(loadedDoc).CurrentValues.SetValues(Website.Models.DocumentModel.DbDocument.FromDocument(asDoc));
+				context.Entry(loadedDoc).State = EntityState.Modified;
+				context.SaveChanges();
+			}
+
+			return this.View(asDoc);
 		}
 
 
@@ -140,6 +150,7 @@ namespace Website.Controllers
 						TextParts= new Website.Models.DocumentModel.WebText[] {new Models.DocumentModel.WebText { Text=Doc.Text} } } }
 			};
 
+			FoundDoc.UpdatedDateTime = DateTime.UtcNow;
 			this.context.Entry(FoundDoc).CurrentValues.SetValues(DocForAddingToDb);
 
 			// Saving changes async

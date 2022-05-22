@@ -54,7 +54,7 @@
 			<div class="text-center p-3 display-6">
 				Last posted
 			</div>
-			@await Component.InvokeAsync(Website.ViewComponents.RecentDocumentsCardsViewComponent.nameofThis,new { MaxQuantity=5 })
+			@await Component.InvokeAsync(Website.ViewComponents.RecentDocumentsCardsViewComponent.nameofThis,new { filterByUserId=Model.Id, MaxQuantity=5 })
 		</div>
 	</div>
 </div>
