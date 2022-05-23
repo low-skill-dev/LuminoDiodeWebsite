@@ -16,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using Microsoft.IdentityModel.Tokens;
+using WebsiteTests.ServicesTests;
 
 
 namespace FastTestConsoleApp
@@ -27,6 +28,8 @@ namespace FastTestConsoleApp
          */
 		static void Main(string[] args)
 		{
+			WebsiteTests.ServicesTests.RequestsFromIpCounterServiceTests t = new RequestsFromIpCounterServiceTests();
+			t.WillUnban().Wait();
 		}
 	}
 }

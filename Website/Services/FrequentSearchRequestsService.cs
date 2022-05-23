@@ -61,10 +61,10 @@ namespace Website.Services
 		private System.DateTime LastUpdateTime;
 		private readonly IServiceScopeFactory ScopeFactory;
 		private readonly FrequentSearchRequestsServiceSettingsProvider SettingsProvider;
-		public FrequentSearchRequestsService(IServiceScopeFactory ScopeFactory, AppSettingsProvider SettingsProvider)
+		public FrequentSearchRequestsService(IServiceScopeFactory ScopeFactory, FrequentSearchRequestsServiceSettingsProvider SettingsProvider)
 		{
 			this.ScopeFactory = ScopeFactory;
-			this.SettingsProvider = SettingsProvider.FrequentSearchRequestsServiceSP;
+			this.SettingsProvider = SettingsProvider;
 			this.RecentRequests_DocumentSearchServiceScopes = new List<DocumentSearchService>();
 			this.FrequentRequests = new List<FrequenciedService>();
 		}

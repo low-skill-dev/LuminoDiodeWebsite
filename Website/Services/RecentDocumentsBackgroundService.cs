@@ -20,10 +20,10 @@ namespace Website.Services
 		private readonly RecentDocumentsBackgroundServiceSettingsProvider SettingsProvider;
 		private int Interval_msec => this.SettingsProvider.Interval_msec;
 
-		public RecentDocumentsBackgroundService(IServiceScopeFactory DbContextScopeFactory, AppSettingsProvider SettingsProvider)
+		public RecentDocumentsBackgroundService(IServiceScopeFactory DbContextScopeFactory, RecentDocumentsBackgroundServiceSettingsProvider SettingsProvider)
 		{
 			this.context = DbContextScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();
-			this.SettingsProvider = SettingsProvider.RecentDocumentsBackgroundServiceSP;
+			this.SettingsProvider = SettingsProvider;
 		}
 
 		public List<Website.Models.DocumentModel.Document> RecentDocuments { get; private set; } = new List<Models.DocumentModel.Document>();

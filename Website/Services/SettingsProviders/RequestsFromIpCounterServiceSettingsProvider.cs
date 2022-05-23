@@ -11,14 +11,14 @@ namespace Website.Services.SettingsProviders
 			this.config = configuration;
 		}
 
-		public int ControlledTime_mins
+		public virtual int ControlledPeriod_secs // MOCKable
 		{
 			get
 			{
 				try
 				{
 					return this.config
-						.GetRequiredSection("RequestsFromIpCounterServiceSettings:ControlledTime_mins")
+						.GetRequiredSection("RequestsFromIpCounterServiceSettings:ControlledPeriod_secs")
 						.Get<int>();
 				}
 				catch (Exception)
@@ -28,20 +28,37 @@ namespace Website.Services.SettingsProviders
 				}
 			}
 		}
-		public int AllowedNumOfRequestsPerMinute
+		public virtual int AllowedNumOfRequestsPerPeriod // MOCKable
 		{
 			get
 			{
 				try
 				{
 					return this.config
-						.GetRequiredSection("RequestsFromIpCounterServiceSettings:AllowedNumOfRequestsPerMinute")
+						.GetRequiredSection("RequestsFromIpCounterServiceSettings:AllowedNumOfRequestsPerPeriod")
 						.Get<int>();
 				}
 				catch (Exception)
 				{
 					// default
 					return 20;
+				}
+			}
+		}
+		public virtual int UnbanInterval_secs // MOCKable
+		{
+			get
+			{
+				try
+				{
+					return this.config
+						.GetRequiredSection("RequestsFromIpCounterServiceSettings:UnbanInterval_secs")
+						.Get<int>();
+				}
+				catch (Exception)
+				{
+					// default
+					return 120;
 				}
 			}
 		}

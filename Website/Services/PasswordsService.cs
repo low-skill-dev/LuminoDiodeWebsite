@@ -10,8 +10,8 @@ namespace Website.Services
 	public class PasswordsService
 	{
 		private readonly IServiceScopeFactory DbContextScopeFactory;
-		private readonly AppSettingsProvider SettingsProvider;
-		public PasswordsService(IServiceScopeFactory DbContextScopeFactory, AppSettingsProvider SettingsProvider)
+		private readonly PasswordsCryptographyServiceSettingsProvider SettingsProvider;
+		public PasswordsService(IServiceScopeFactory DbContextScopeFactory, PasswordsCryptographyServiceSettingsProvider SettingsProvider)
 		{
 			this.DbContextScopeFactory = DbContextScopeFactory;
 			this.SettingsProvider = SettingsProvider;

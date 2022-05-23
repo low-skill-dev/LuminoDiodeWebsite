@@ -28,17 +28,17 @@ namespace Website.Services
 		/// Dictionary with SessiodId as key, (int UserId, DateTime ValidThrough) as Value.
 		/// </summary>
 		private Dictionary<string, SessionInfo> Sessions;
-		private readonly AppSettingsProvider SettingsProvider;
+		private readonly SessionManagerServiceSettingsProvider SettingsProvider;
 		private int SessionLifeTimeSecs
-			=> this.SettingsProvider.SessionManagerServiceSP.SessionLifetime_secs;
+			=> this.SettingsProvider.SessionLifetime_secs;
 		private int SessionIdStringLength
-			=> this.SettingsProvider.SessionManagerServiceSP.SessionIdStringLength_chars;
+			=> this.SettingsProvider.SessionIdStringLength_chars;
 		private int SessionsCleanUpIntervalSecs
-			=> this.SettingsProvider.SessionManagerServiceSP.SessionsCleanUpInterval_secs;
+			=> this.SettingsProvider.SessionsCleanUpInterval_secs;
 
 		public SessionInfo this[string SessionId] => this.Sessions[SessionId];
 
-		public SessionManager(AppSettingsProvider SettingsProvider)
+		public SessionManager(SessionManagerServiceSettingsProvider SettingsProvider)
 		{
 			this.SettingsProvider = SettingsProvider;
 			this.Sessions = new();

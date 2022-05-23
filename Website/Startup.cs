@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Builder;
+ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +28,15 @@ namespace Website
 
 			var AppSetProv = new AppSettingsProvider(this.configuration);
 			services.AddSingleton<AppSettingsProvider>(AppSetProv);
+
+			services.AddSingleton<AuthTockenServiceSettingsProvider>(AppSetProv.AuthTockenServiceSP);
+			services.AddSingleton<FrequentSearchRequestsServiceSettingsProvider>(AppSetProv.FrequentSearchRequestsServiceSP);
+			services.AddSingleton<PasswordsCryptographyServiceSettingsProvider>(AppSetProv.PasswordsCryptographyServiceSP);
+			services.AddSingleton<RandomDataSeederSettingsProvider>(AppSetProv.RandomDataSeederSP);
+			services.AddSingleton<RecentDocumentsBackgroundServiceSettingsProvider>(AppSetProv.RecentDocumentsBackgroundServiceSP);
+			services.AddSingleton<RequestsFromIpCounterServiceSettingsProvider>(AppSetProv.RequestsFromIpCounterServiceSP);
+			services.AddSingleton<SessionManagerServiceSettingsProvider>(AppSetProv.SessionManagerServiceSP);
+
 			services.AddSingleton<Website.Services.RecentDocumentsBackgroundService>();
 			services.AddSingleton<Website.Services.FrequentSearchRequestsService>();
 			services.AddSingleton<Website.Services.SessionManager>();

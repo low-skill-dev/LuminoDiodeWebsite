@@ -29,8 +29,8 @@ namespace Website.Services
 		private int TokenKeyLengthBytes => this.SettingsProvider.TokenKeyLength_bytes;
 		private int TockensCleanUpIntervalSecs => this.SettingsProvider.TokensCleanUpInterval_secs;
 
-		public AuthTockenService(AppSettingsProvider SettingsProvider)
-			=> this.SettingsProvider = SettingsProvider.AuthTockenServiceSP;
+		public AuthTockenService(AuthTockenServiceSettingsProvider SettingsProvider)
+			=> this.SettingsProvider = SettingsProvider;
 
 		public bool TockenExists(string TockenId) => this.AuthTockens.ContainsKey(TockenId);
 		public bool TryGetTocken(string TockenId, out TockenInfo Tocken) => this.AuthTockens.TryGetValue(TockenId, out Tocken!);

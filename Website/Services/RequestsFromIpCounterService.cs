@@ -19,60 +19,57 @@ namespace Website.Services
 	/// </summary>
 	public class RequestsFromIpCounterService : BackgroundService
 	{
-		private Dictionary<IPAddress, float> RequestsByIpLastTime = new();
-		private readonly AppSettingsProvider SettingsProvider;
-		private const int UpdateDelay_mins = 1;
+		private Dictionary<long, int> RequestsByIpLastTime = new();
+		private readonly RequestsFromIpCounterServiceSettingsProvider SettingsProvider;
 
 		private int MaxRequestsPerPeriod
-			=> this.SettingsProvider.RequestsFromIpCounterServiceSP.AllowedNumOfRequestsPerMinute * this.SettingsProvider.RequestsFromIpCounterServiceSP.ControlledTime_mins;
-		private int Period_mins
-			=> this.SettingsProvider.RequestsFromIpCounterServiceSP.ControlledTime_mins;
+			=> this.SettingsProvider.AllowedNumOfRequestsPerPeriod;
+		private int Period_secs
+			=> this.SettingsProvider.ControlledPeriod_secs;
+		private int UnbanInterval_secs
+			=> this.SettingsProvider.UnbanInterval_secs;
 
-		public RequestsFromIpCounterService(AppSettingsProvider SettingsProvider)
+		public RequestsFromIpCounterService(RequestsFromIpCounterServiceSettingsProvider SettingsProvider)
 		{
 			this.SettingsProvider = SettingsProvider;
 		}
 
-		protected override Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			while (true)
 			{
-				Task.Delay(UpdateDelay_mins * 60 * 1000);
+				await Task.Delay(UnbanInterval_secs * 1000);
 				/* Переменная содержит то, насколько будет умньшено число запросов на каждой итерации сервиса. 
 				 * Вычисляется как (допустимое число запросов за период) * (период обновления/длинна периода).
 				 * Таким образом, максимальное число запросов за период будет сниматься за один, собственно, период.
 				 */
-				float DecreaseRateInDelay = (float)this.MaxRequestsPerPeriod * ((float)UpdateDelay_mins / (float)this.Period_mins);
+				int DecreaseInDelay = (int)System.Math.Ceiling((float)this.MaxRequestsPerPeriod * ((float)this.UnbanInterval_secs / (float)this.Period_secs));
 				foreach (var k in this.RequestsByIpLastTime.Keys)
 				{
-					this.RequestsByIpLastTime[k] = this.RequestsByIpLastTime[k] - DecreaseRateInDelay;
+					this.RequestsByIpLastTime[k] = this.RequestsByIpLastTime[k] - DecreaseInDelay;
 					if (this.RequestsByIpLastTime[k] < 0) this.RequestsByIpLastTime[k] = 0;
 				}
 			}
 		}
 		public void CountRequest(IPAddress RequesterIp)
 		{
-			if (!this.RequestsByIpLastTime.ContainsKey(RequesterIp))
-				this.RequestsByIpLastTime.Add(RequesterIp, 1);
+			if (!this.RequestsByIpLastTime.ContainsKey(RequesterIp.Address))
+				this.RequestsByIpLastTime.Add(RequesterIp.Address, 1);
 			else
-				this.RequestsByIpLastTime[RequesterIp]++;
+				this.RequestsByIpLastTime[RequesterIp.Address]++;
 		}
 		public void CountRequest(ActionExecutingContext context)
 		{
 			var ip = context.HttpContext.Connection.RemoteIpAddress;
 			if (ip is not null)
 			{
-				if (!this.RequestsByIpLastTime.ContainsKey(ip))
-					this.RequestsByIpLastTime.Add(ip, 1);
-				else
-					RequestsByIpLastTime[ip] = RequestsByIpLastTime[ip]+1;
+				this.CountRequest(ip);
 			}
-				
 		}
 		public bool IPAddressIsBanned(IPAddress RequesterIp)
 		{
-			if (this.RequestsByIpLastTime.ContainsKey(RequesterIp))
-				if (this.RequestsByIpLastTime[RequesterIp] > this.MaxRequestsPerPeriod) return true;
+			if (this.RequestsByIpLastTime.ContainsKey(RequesterIp.Address))
+				if (this.RequestsByIpLastTime[RequesterIp.Address] > this.MaxRequestsPerPeriod) return true;
 
 			return false;
 		}

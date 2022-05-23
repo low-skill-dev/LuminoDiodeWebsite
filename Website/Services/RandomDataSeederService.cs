@@ -8,10 +8,10 @@ namespace Website.Services
 	{
 		private readonly WebsiteContext context;
 		private readonly RandomDataSeederSettingsProvider SettingsProvider;
-		public RandomDataSeederService(AppSettingsProvider SettingsProvider, WebsiteContext ctx)
+		public RandomDataSeederService(RandomDataSeederSettingsProvider SettingsProvider, WebsiteContext ctx)
 		{
 			this.context = ctx;
-			this.SettingsProvider = SettingsProvider.RandomDataSeederSP;
+			this.SettingsProvider = SettingsProvider;
 		}
 
 		public void SeedData(bool SaveChanges = true)
