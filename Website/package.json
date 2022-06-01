@@ -1,8 +1,0 @@
-{
-  "version": "1.0.0",
-  "name": "asp.net",
-  "private": true,
-  "devDependencies": {
-    "base64url": "^3.0.1"
-  }
-}
