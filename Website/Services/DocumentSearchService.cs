@@ -34,8 +34,8 @@ namespace Website.Services
 		{
 			this.ProceedDateTime = DateTime.UtcNow;
 
-			var TryGetFromFreq = this.FreqReqService.GetSimilarRequestOrNull(UserRequest);
-			if (TryGetFromFreq is not null)
+			var TryGetFromFreq = await this.FreqReqService.GetSimilarRequestOrNull(UserRequest);
+			if (TryGetFromFreq is not null && TryGetFromFreq.Response is not null)
 			{
 				return TryGetFromFreq.Response;
 			}

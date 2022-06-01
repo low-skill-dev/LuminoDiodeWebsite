@@ -6,9 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\StaticFiles\DataSeed\" />
+    <Compile Remove="wwwroot\StaticFiles\DataSeed\**" />
+    <Compile Remove="wwwroot\StaticFiles\Images\NewFolder\**" />
+    <Content Remove="wwwroot\StaticFiles\DataSeed\**" />
+    <Content Remove="wwwroot\StaticFiles\Images\NewFolder\**" />
+    <EmbeddedResource Remove="wwwroot\StaticFiles\DataSeed\**" />
+    <EmbeddedResource Remove="wwwroot\StaticFiles\Images\NewFolder\**" />
+    <None Remove="wwwroot\StaticFiles\DataSeed\**" />
+    <None Remove="wwwroot\StaticFiles\Images\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Views\ProjectsGroup\" />
-    <Folder Include="wwwroot\StaticFiles\Images\NewFolder\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,6 +11,8 @@ namespace Website.Repository
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			base.OnModelCreating(modelBuilder);
+
 			modelBuilder.Entity<Website.Models.DocumentModel.DbDocument>()
 				.HasGeneratedTsVectorColumn(p => p.TitleTsVector, "english", p => new { p.Title })
 				.HasIndex(p => p.TitleTsVector)

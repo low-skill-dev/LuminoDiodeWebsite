@@ -19,7 +19,7 @@ namespace Website.Services
 	/// </summary>
 	public class RequestsFromIpCounterService : BackgroundService
 	{
-		private Dictionary<long, int> RequestsByIpLastTime = new();
+		private Dictionary<IPAddress, int> RequestsByIpLastTime = new();
 		private readonly RequestsFromIpCounterServiceSettingsProvider SettingsProvider;
 
 		private int MaxRequestsPerPeriod
@@ -36,7 +36,7 @@ namespace Website.Services
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			while (true)
+			while (!stoppingToken.IsCancellationRequested)
 			{
 				await Task.Delay(UnbanInterval_secs * 1000);
 				/* Переменная содержит то, насколько будет умньшено число запросов на каждой итерации сервиса. 
@@ -47,16 +47,16 @@ namespace Website.Services
 				foreach (var k in this.RequestsByIpLastTime.Keys)
 				{
 					this.RequestsByIpLastTime[k] = this.RequestsByIpLastTime[k] - DecreaseInDelay;
-					if (this.RequestsByIpLastTime[k] < 0) this.RequestsByIpLastTime[k] = 0;
+					if (this.RequestsByIpLastTime[k] < 0) this.RequestsByIpLastTime.Remove(k);
 				}
 			}
 		}
 		public void CountRequest(IPAddress RequesterIp)
 		{
-			if (!this.RequestsByIpLastTime.ContainsKey(RequesterIp.Address))
-				this.RequestsByIpLastTime.Add(RequesterIp.Address, 1);
+			if (!this.RequestsByIpLastTime.ContainsKey(RequesterIp))
+				this.RequestsByIpLastTime.Add(RequesterIp, 1);
 			else
-				this.RequestsByIpLastTime[RequesterIp.Address]++;
+				this.RequestsByIpLastTime[RequesterIp]++;
 		}
 		public void CountRequest(ActionExecutingContext context)
 		{
@@ -68,8 +68,8 @@ namespace Website.Services
 		}
 		public bool IPAddressIsBanned(IPAddress RequesterIp)
 		{
-			if (this.RequestsByIpLastTime.ContainsKey(RequesterIp.Address))
-				if (this.RequestsByIpLastTime[RequesterIp.Address] > this.MaxRequestsPerPeriod) return true;
+			if (this.RequestsByIpLastTime.ContainsKey(RequesterIp))
+				if (this.RequestsByIpLastTime[RequesterIp] > this.MaxRequestsPerPeriod) return true;
 
 			return false;
 		}

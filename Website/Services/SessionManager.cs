@@ -9,7 +9,7 @@ namespace Website.Services
 {
 	public class SessionInfo
 	{
-		public int UserId { get; set; }
+		public int UserId { get; init; }
 		public DateTime ValidThrough { get; set; }
 
 		public SessionInfo(int UserId, DateTime ValidThrough)
@@ -31,8 +31,8 @@ namespace Website.Services
 		private readonly SessionManagerServiceSettingsProvider SettingsProvider;
 		private int SessionLifeTimeSecs
 			=> this.SettingsProvider.SessionLifetime_secs;
-		private int SessionIdStringLength
-			=> this.SettingsProvider.SessionIdStringLength_chars;
+		private int SessionIdLength
+			=> this.SettingsProvider.SessionIdStringLength_bytes;
 		private int SessionsCleanUpIntervalSecs
 			=> this.SettingsProvider.SessionsCleanUpInterval_secs;
 
@@ -52,7 +52,7 @@ namespace Website.Services
 			if (!this.Sessions.TryGetValue(SessionId, out FoundSession)) return false;
 
 			// if session is outdated
-			if ((FoundSession.ValidThrough.Ticks - DateTime.UtcNow.Ticks) < 0) return false;
+			if (!FoundSession.IsValidNow) return false;
 
 			// if session is valid, validate it for the next 24 hours (by default)
 			FoundSession.ValidThrough = DateTime.UtcNow.AddSeconds(this.SessionLifeTimeSecs);
@@ -64,7 +64,7 @@ namespace Website.Services
 			string SessionId = null!;
 			do {
 				SessionId = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator
-					.GetBytes(this.SessionIdStringLength));
+					.GetBytes(this.SessionIdLength));
 			} while(this.Sessions.ContainsKey(SessionId));
 			var ValidThrough = DateTime.UtcNow.AddSeconds(this.SessionLifeTimeSecs);
 

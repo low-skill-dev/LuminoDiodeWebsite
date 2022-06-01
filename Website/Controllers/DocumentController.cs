@@ -15,14 +15,13 @@ namespace Website.Controllers
 		public DocumentController(IServiceScopeFactory ScopeFactory)
 			: base(ScopeFactory)
 		{
-			this.recentDocumentsProvider = base.ServiceProvider.GetRequiredService<RecentDocumentsBackgroundService>();
-			base.ServiceProvider.GetRequiredService<RandomDataSeederService>().SeedData();
+			
 		}
 
 		[HttpGet]
 		public ViewResult Summary()
 		{
-			return this.View(this.recentDocumentsProvider.RecentDocuments);
+			return this.View();
 		}
 
 		[HttpGet]
@@ -74,7 +73,10 @@ namespace Website.Controllers
 				return new StatusCodeResult(401); // 401 Unauthorized
 
 			if (!this.ModelState.IsValid)
+			{
+				base.AddAlertToPageTop(new("Could not post document with such text or title", Models.ViewModels.Alert.ALERT_COLOR.Red));
 				return this.View(Doc);
+			}
 
 			var DocForAddingToDb = new Website.Models.DocumentModel.Document
 			{

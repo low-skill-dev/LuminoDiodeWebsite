@@ -1,6 +1,12 @@
 ﻿using System.Linq;
 using Website.Repository;
 using Website.Services.SettingsProviders;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
+using System.Security.Cryptography;
+using Website.Services.SettingsProviders;
+using System.Text;
 
 namespace Website.Services
 {
@@ -8,17 +14,14 @@ namespace Website.Services
 	{
 		private readonly WebsiteContext context;
 		private readonly RandomDataSeederSettingsProvider SettingsProvider;
-		public RandomDataSeederService(RandomDataSeederSettingsProvider SettingsProvider, WebsiteContext ctx)
+		public RandomDataSeederService(RandomDataSeederSettingsProvider SettingsProvider, IServiceScopeFactory ctxFactory)
 		{
-			this.context = ctx;
+			this.context = ctxFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();
 			this.SettingsProvider = SettingsProvider;
 		}
 
-		public void SeedData(bool SaveChanges = true)
+		public void SeedData()
 		{
-			/* Be aware!
-			 * Seeding projects must be launched only if at least 1 user exists in DB.
-			 */
 			if (SettingsProvider.SeederIsEnabled)
 			{
 				this.SeedData_Users();
@@ -37,8 +40,8 @@ namespace Website.Services
 			// this checks if there is at least 10 raws in the db
 			// if (this.DbDocuments.Find(10000) != null && DoNotSeedIfDataExists) return;
 
-			int NumToAdd = this.SettingsProvider.SeedIfAmountOfDocumentsLeesThen - this.context.DbDocuments.Count();
-			if (NumToAdd < 0) NumToAdd = 0;
+			int NumToAdd = this.SettingsProvider.SeedIfQuantityOfDocumentsIsLessThan - this.context.DbDocuments.Count();
+			if (NumToAdd <= 0) return;
 			var ToAddDocs = new Website.Models.DocumentModel.DbDocument[NumToAdd];
 
 			for (int i = 0; i < ToAddDocs.Length; i++)
@@ -51,8 +54,8 @@ namespace Website.Services
 		}
 		private void SeedData_Users()
 		{
-			int NumToAdd = this.SettingsProvider.SeedIfAmountOfUsersIsLeesThen - this.context.Users.Count();
-			if (NumToAdd < 0) NumToAdd = 0;
+			int NumToAdd = this.SettingsProvider.SeedIfQuantityOfUsersIsLessThan - this.context.Users.Count();
+			if (NumToAdd <= 0) return;
 			var ToAddUsers = new Website.Models.UserModel.User[NumToAdd];
 
 
@@ -71,7 +74,7 @@ namespace Website.Services
 		}
 		private void SeedData_Projects()
 		{
-			int NumToAdd = this.SettingsProvider.SeedIfAmountOfProjectsLeesThen - this.context.Projects.Count();
+			int NumToAdd = this.SettingsProvider.SeedIfQuantityOfProjectsIsLessThan - this.context.Projects.Count();
 			if (NumToAdd < 0) NumToAdd = 0;
 
 			var ToAddProjects = new Website.Models.ProjectModel.Project[NumToAdd];
@@ -85,7 +88,7 @@ namespace Website.Services
 		}
 		private void SeedData_ProjectsGroups()
 		{
-
+			throw new System.NotImplementedException();
 		}
 	}
 }

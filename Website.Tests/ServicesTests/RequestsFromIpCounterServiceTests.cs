@@ -50,11 +50,9 @@ namespace WebsiteTests.ServicesTests
 			MockAntispamSP.SetupGet(sp => sp.UnbanInterval_secs).Returns(3); // check for unbans every 3 secs
 
 			var serv = new RequestsFromIpCounterService(MockAntispamSP.Object);
-			serv.StartAsync(new System.Threading.CancellationToken(false)); //starting service execution
+			await serv.StartAsync(new System.Threading.CancellationToken(false)); // starting service execution
 
-			serv.CountRequest(new System.Net.IPAddress(this.defaultIPBytes));
-			serv.CountRequest(new System.Net.IPAddress(this.defaultIPBytes));
-			serv.CountRequest(new System.Net.IPAddress(this.defaultIPBytes)); // gets ban here
+			for(int i =0; i<3;i++)	serv.CountRequest(new System.Net.IPAddress(this.defaultIPBytes)); // gets ban here
 
 			Assert.True(serv.IPAddressIsBanned(new System.Net.IPAddress(this.defaultIPBytes)));
 

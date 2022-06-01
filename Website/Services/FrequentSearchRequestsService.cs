@@ -11,11 +11,11 @@ using Website.Services.SettingsProviders;
 
 namespace Website.Services
 {
-	public class FrequenciedService
+	public class FrequenciedScopes
 	{
 		public int Frequency { get; private set; }
 		public DocumentSearchService DocumentSearchServiceScope { get; set; }
-		public FrequenciedService(int Frequency, DocumentSearchService DocumentSearchServiceScope)
+		public FrequenciedScopes(int Frequency, DocumentSearchService DocumentSearchServiceScope)
 		{
 			this.Frequency = Frequency;
 			this.DocumentSearchServiceScope = DocumentSearchServiceScope;
@@ -24,7 +24,7 @@ namespace Website.Services
 		public void DecFreq(int count = 1) => this.Frequency = this.Frequency - count;
 	}
 
-	public class FrequentSearchRequestsService : BackgroundService
+	public sealed class FrequentSearchRequestsService : BackgroundService
 	{
 		/* Длинные названия для полей необходимы чтобы человек мог понять смысл
 		 * поля без просмотра исходного кода класса, однако в скрытых методах
@@ -32,48 +32,46 @@ namespace Website.Services
 		 */
 
 		// Хранит последние, еще не обработанные запросы
-		private readonly List<DocumentSearchService> RecentRequests_DocumentSearchServiceScopes;
+		private readonly List<DocumentSearchService> RecentRequests_DocumentSearchServiceScopes = new();
 
 		// to be private in release
 		// Хранит наиболее частые запросы
-		private List<FrequenciedService> FrequentRequests;
+		private List<FrequenciedScopes> FrequentRequests = new();
 
 		// Интервал обработки последних запросов, даже если не набрано нужное количество
-		private int Interval_msec => this.SettingsProvider.Interval_msec;
+		private int Interval_msec => this.SP.Interval_msec;
 
 		// Количественный интервал обработки последних запросов
-		private int Interval_numOfRecentRequests => this.SettingsProvider.Interval_numOfRecentRequests;
+		private int Interval_numOfRecentRequests => this.SP.Interval_numOfRecentRequests;
 
 
 		// Интервал проверки необходимости провести обработку
-		private int Interval_updateNeededCheck_msec => this.SettingsProvider.Interval_updateNeededCheck_msec;
+		private int Interval_updateNeededCheck_msec => this.SP.Interval_updateNeededCheck_msec;
 
 		// Количество хранимых частых запросов
-		private int NumOfFrequentRequestsStored => this.SettingsProvider.NumOfFrequentRequestsStored;
+		private int NumOfFrequentRequestsStored => this.SP.NumOfFrequentRequestsStored;
 
 		// Очки сходства по методу Fuzz.TokenSortRation для засчитывания строк как одинаковых по токену
-		private int TokenSortRationNeededToCountAsSimilar => this.SettingsProvider.TokenSortRationNeededToCountAsSimilar;
+		private int TokenSortRationNeededToCountAsSimilar => this.SP.TokenSortRationNeededToCountAsSimilar;
 
 		// Время жизни сохранненого запроса. Если частый запрос существует более 5 минут, его следует обновить.
-		private int ResponseLifetime_msec => this.SettingsProvider.ResponseLifetime_msec;
-		
+		private int ResponseLifetime_msec => this.SP.ResponseLifetime_msec;
+
 		// Хранит время последнего обновления данных
 		private System.DateTime LastUpdateTime;
 		private readonly IServiceScopeFactory ScopeFactory;
-		private readonly FrequentSearchRequestsServiceSettingsProvider SettingsProvider;
+		private readonly FrequentSearchRequestsServiceSettingsProvider SP;
 		public FrequentSearchRequestsService(IServiceScopeFactory ScopeFactory, FrequentSearchRequestsServiceSettingsProvider SettingsProvider)
 		{
 			this.ScopeFactory = ScopeFactory;
-			this.SettingsProvider = SettingsProvider;
-			this.RecentRequests_DocumentSearchServiceScopes = new List<DocumentSearchService>();
-			this.FrequentRequests = new List<FrequenciedService>();
+			this.SP = SettingsProvider;
 		}
 
 		/// <summary>
 		/// Tries to find frequent request which is similar to passed.
 		/// If found, returns it, otherwise returns null.
 		/// </summary>
-		public DocumentSearchService? GetSimilarRequestOrNull(string UserRequest)
+		public async Task<DocumentSearchService?> GetSimilarRequestOrNull(string UserRequest)
 		{
 			// Пытается найти подходящий ответ на переданный запрос среди частых запросов
 			try
@@ -89,7 +87,7 @@ namespace Website.Services
 				{
 					tryFind.DocumentSearchServiceScope = this.ScopeFactory.CreateScope().ServiceProvider.
 						GetRequiredService<DocumentSearchService>();
-					tryFind.DocumentSearchServiceScope.ProceedRequest(UserRequest).Wait();
+					await tryFind.DocumentSearchServiceScope.ProceedRequest(UserRequest);
 				}
 
 				return tryFind.DocumentSearchServiceScope;
@@ -97,11 +95,9 @@ namespace Website.Services
 			// Ничего не найдено (следует обработать запрос через БД)
 			catch (System.InvalidOperationException)
 			{
-				return null;
+				return await Task.FromResult<DocumentSearchService?>(null);
 			}
 		}
-
-		public List<DocumentSearchService> GetFrequentSearchesScopes() => this.FrequentRequests.Select(x => x.DocumentSearchServiceScope).ToList();
 
 		public void AddDocumentSearchServiceScope(DocumentSearchService SearchScope)
 			=> this.RecentRequests_DocumentSearchServiceScopes.Add(SearchScope);
@@ -110,10 +106,10 @@ namespace Website.Services
 		 * Это фактически статический метод, ибо если получать SearchService через
 		 * this, то вызов на мой взгляд выглядит непонятно/неоднозначно с чем он работает.
 		 */
-		private int IndexOfMostCommonByTokenSortRatio(IList<FrequenciedService> SearchServices, string SearchRequest, out int SimilarityScore)
+		private int IndexOfMostSimilarByTokenSortRatio(IList<FrequenciedScopes> SearchServices, string SearchRequest, out int SimilarityScore)
 		{
 			SimilarityScore = 0;
-			int IndexOfMostCommon = 0;
+			int IndexOfMostSimilar = 0;
 
 			for (int i = 0; i < SearchServices.Count; i++)
 			{
@@ -121,78 +117,71 @@ namespace Website.Services
 				if (score > SimilarityScore)
 				{
 					SimilarityScore = score;
-					IndexOfMostCommon = i;
+					IndexOfMostSimilar = i;
 				}
 			}
 
-			return IndexOfMostCommon;
+			return IndexOfMostSimilar;
 		}
-		public void Update()
+
+		private List<FrequenciedScopes> GetReducedRecent()
 		{
-			// Установка последнего времени обновления
-			this.LastUpdateTime = System.DateTime.UtcNow;
+			// Присвоение каждому недавнему запросы частоты 0
+			var recent = this.RecentRequests_DocumentSearchServiceScopes
+				.Select(SearchServiceScope => new FrequenciedScopes(0, SearchServiceScope)).ToList();
 
-			/* Теоретически, блокировка доступа не нужна, ибо во всех методах кроме этого используется
-			 * перебор через First, который использует перебор через цикл foreach, а не for, за исключением метода IndexOfMostCommonByTokenSortRatio, но он вызывается единственный раз
-			 * собственно в этом методе.
-			 */
-			// lock (this.RecentRequests_DocumentSearchServiceScopes)
-			//	lock (this.FrequentRequests)
+			// Вычисление действительной частоты для каждого недавнего запроса и удаление походих
+			for (int i = 0; i < recent.Count - 1; i++)
 			{
-				// Присвоение каждому недавнему запросы частоты 0
-				var recent = this.RecentRequests_DocumentSearchServiceScopes
-					.Select(SearchServiceScope => new FrequenciedService(0, SearchServiceScope)).ToList();
-
-				// Вычисление действительной частоты для каждого недавнего запроса и удаление походих
-				for (int i = 0; i < recent.Count - 1; i++)
+				for (int r = i + 1; r < recent.Count; r++)
 				{
-					for (int r = i + 1; r < recent.Count; r++)
-					{
-						/* Если найдены две похожие строки, то одной добавить частоты, а вторую удалить.
-						 * В идеале данный алгоритм должен быть улучшен, и сначала из двух похожих
-						 * строк выводить наиболее популярную, далее оставлять её, а не просто первую
-						 * из двух, однако сайт не про поиск, поэтому это может быть реализовано только в будущем.
-						 */
-						var DebugVar1 = Fuzz.TokenSortRatio(recent[i].DocumentSearchServiceScope.Request, recent[r].DocumentSearchServiceScope.Request);
-						if (Fuzz.TokenSortRatio(recent[i].DocumentSearchServiceScope.Request, recent[r].DocumentSearchServiceScope.Request)
-							> this.TokenSortRationNeededToCountAsSimilar)
-						{
-							recent[i].IncFreq(recent[r].Frequency + 1);
-							recent.RemoveAt(r--);
-						}
-					}
-				}
-
-
-				// Учет обработанных недавних запросов в общей статистике частых запросов
-				for (int i = 0; i < recent.Count; i++)
-				{
-					/* Если похожая строка существует, то инкрементировать её
+					/* Если найдены две похожие строки, то одной добавить частоты, а вторую удалить.
+					 * В идеале данный алгоритм должен быть улучшен, и сначала из двух похожих
+					 * строк выводить наиболее популярную, далее оставлять её, а не просто первую
+					 * из двух, однако сайт не про поиск, поэтому это может быть реализовано только в будущем.
 					 */
-					int score;
-					int index = this.IndexOfMostCommonByTokenSortRatio(this.FrequentRequests, recent[i].DocumentSearchServiceScope.Request, out score);
-					if (score > this.TokenSortRationNeededToCountAsSimilar)
+					if (Fuzz.TokenSortRatio(recent[i].DocumentSearchServiceScope.Request, recent[r].DocumentSearchServiceScope.Request)
+						> this.TokenSortRationNeededToCountAsSimilar)
 					{
-						this.FrequentRequests[index].IncFreq(recent[i].Frequency + 1);
-						recent.RemoveAt(i--);
-						continue;
+						recent[i].IncFreq(recent[r].Frequency + 1);
+						recent.RemoveAt(r--);
 					}
 				}
-				// Если строка не совпадает ни с одним из уже существующих частых - добавить её
-				this.FrequentRequests.AddRange(recent);
-
-				// Сортировка запросов по убыванию популярности
-				this.FrequentRequests = this.FrequentRequests.OrderByDescending(x => x.Frequency).Take(this.NumOfFrequentRequestsStored).ToList();
-
-				// Снижение частоты каждого запроса с целью вытеснения устаревших частых запросов
-				for (int i = 0; i < this.FrequentRequests.Count; i++)
-				{
-					this.FrequentRequests[i].DecFreq();
-				}
-
-				// Опустошение коллекции недавних запросов
-				this.RecentRequests_DocumentSearchServiceScopes.Clear();
 			}
+			return recent;
+		}
+		private void Update()
+		{
+			var recent = GetReducedRecent();
+			// Учет обработанных недавних запросов в общей статистике частых запросов
+			for (int i = 0; i < recent.Count; i++)
+			{
+				/* Если похожая строка существует, то инкрементировать её
+				 */
+				int score;
+				int index = this.IndexOfMostSimilarByTokenSortRatio(this.FrequentRequests, recent[i].DocumentSearchServiceScope.Request, out score);
+				if (score > this.TokenSortRationNeededToCountAsSimilar)
+				{
+					this.FrequentRequests[index].IncFreq(recent[i].Frequency + 1);
+					recent.RemoveAt(i--);
+					continue;
+				}
+			}
+			// Если строка не совпадает ни с одним из уже существующих частых - добавить её
+			this.FrequentRequests.AddRange(recent);
+
+			// Сортировка запросов по убыванию популярности
+			this.FrequentRequests = this.FrequentRequests.OrderByDescending(x => x.Frequency).Take(this.NumOfFrequentRequestsStored).ToList();
+
+			// Снижение частоты каждого запроса с целью вытеснения устаревших частых запросов
+			for (int i = 0; i < this.FrequentRequests.Count; i++)
+			{
+				this.FrequentRequests[i].DecFreq();
+			}
+
+			// Опустошение коллекции недавних запросов
+			this.RecentRequests_DocumentSearchServiceScopes.Clear();
+
 		}
 
 		/// <summary>

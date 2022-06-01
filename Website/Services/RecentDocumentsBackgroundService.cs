@@ -20,6 +20,19 @@ namespace Website.Services
 		private readonly RecentDocumentsBackgroundServiceSettingsProvider SettingsProvider;
 		private int Interval_msec => this.SettingsProvider.Interval_msec;
 
+		private int _NumberOfStoredDocs = 5;
+		public int NumberOfStoredDocs
+		{
+			get
+			{
+				return this._NumberOfStoredDocs;
+			}
+			set
+			{
+				if (0 < value && value < 1000) this._NumberOfStoredDocs = value;
+				else throw new System.ArgumentOutOfRangeException();
+			}
+		}
 		public RecentDocumentsBackgroundService(IServiceScopeFactory DbContextScopeFactory, RecentDocumentsBackgroundServiceSettingsProvider SettingsProvider)
 		{
 			this.context = DbContextScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebsiteContext>();
@@ -32,7 +45,7 @@ namespace Website.Services
 		{
 			while (!ct.IsCancellationRequested)
 			{
-				var NewRecent = this.context.DbDocuments.OrderByDescending(x=> x.CreatedDateTime).Take(5).Include("Author"); // newest as first
+				var NewRecent = this.context.DbDocuments.OrderByDescending(x=> x.CreatedDateTime).Take(this.NumberOfStoredDocs).Include("Author"); // newest as first
 				this.RecentDocuments = NewRecent.Select(x => x.ToDocument()).ToList();
 				await Task.Delay(this.Interval_msec);
 			}

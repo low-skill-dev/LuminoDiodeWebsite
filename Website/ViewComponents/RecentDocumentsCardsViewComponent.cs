@@ -39,6 +39,5 @@ namespace Website.ViewComponents
 
 			return View(result);
 		}
-
 	}
 }

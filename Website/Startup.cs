@@ -42,11 +42,9 @@ namespace Website
 			services.AddSingleton<Website.Services.SessionManager>();
 			services.AddSingleton<Website.Services.RequestsFromIpCounterService>();
 			services.AddSingleton<Website.Services.AuthTockenService>();
+			services.AddSingleton<Website.Services.RandomDataSeederService>();
 			services.AddScoped<Website.Services.DocumentSearchService>();
 			services.AddScoped<Website.Services.PasswordsService>();
-			services.AddScoped<Website.Services.RandomDataSeederService>();
-
-			DbContextOptions<WebsiteContext> dbContextOptions = new DbContextOptions<WebsiteContext>();
 
 			services.AddDbContext<WebsiteContext>(opts =>
 			{
@@ -64,9 +62,10 @@ namespace Website
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.ApplicationServices.GetService<RecentDocumentsBackgroundService>().StartAsync(new System.Threading.CancellationToken());
-			app.ApplicationServices.GetService<FrequentSearchRequestsService>().StartAsync(new System.Threading.CancellationToken());
-			app.ApplicationServices.GetService<SessionManager>().StartAsync(new System.Threading.CancellationToken());
+			app.ApplicationServices.GetRequiredService<RecentDocumentsBackgroundService>().StartAsync(new System.Threading.CancellationToken());
+			app.ApplicationServices.GetRequiredService<FrequentSearchRequestsService>().StartAsync(new System.Threading.CancellationToken());
+			app.ApplicationServices.GetRequiredService<SessionManager>().StartAsync(new System.Threading.CancellationToken());
+			app.ApplicationServices.GetRequiredService<RandomDataSeederService>().SeedData();
 
 			app.UseStaticFiles();
 			app.UseRouting();

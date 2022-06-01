@@ -28,14 +28,14 @@ namespace Website.Services.SettingsProviders
 				}
 			}
 		}
-		public int SessionIdStringLength_chars
+		public int SessionIdStringLength_bytes
 		{
 			get
 			{
 				try
 				{
 					return this.config
-						.GetRequiredSection("SessionManagerSettings:SessionIdStringLength_chars")
+						.GetRequiredSection("SessionManagerSettings:SessionIdStringLength_bytes")
 						.Get<int>();
 				}
 				catch (Exception)

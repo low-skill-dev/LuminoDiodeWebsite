@@ -12,17 +12,13 @@ namespace Website.Models.ProjectModel
 			Common = 0
 		}
 
-#pragma warning disable CS8618
-
 		public int Id { get; set; }
 		public PROJECT_TYPE ProjectType { get; set; }
-		public string Name { get; set; }
-		public string ShortDescription { get; set; }
-		public User Owner { get; set; }
-		public User[] Admins { get; set; }
-		public IEnumerable<DbDocument> OrderedDocumentsId { get; set; }
-
-#pragma warning restore CS8618
+		public string? Name { get; set; }
+		public string? ShortDescription { get; set; }
+		public User? Owner { get; set; }
+		public User[]? Admins { get; set; }
+		public IEnumerable<DbDocument>? OrderedDocumentsId { get; set; }
 
 		public static Project GenerateRandom(Website.Repository.WebsiteContext documentsSourceContext)
 		{
