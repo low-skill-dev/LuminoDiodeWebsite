@@ -22,7 +22,7 @@ namespace WebsiteTests.ServicesTests
 		}
 
 		[Fact]
-		public void WillBan()
+		public void CanBan()
 		{
 			Mock<RequestsFromIpCounterServiceSettingsProvider> MockAntispamSP=new(null);
 			MockAntispamSP.SetupGet(sp => sp.AllowedNumOfRequestsPerPeriod).Returns(2); // Allows 2 requests, ban on 3rd
@@ -42,7 +42,7 @@ namespace WebsiteTests.ServicesTests
 		}
 
 		[Fact]
-		public async Task WillUnban()
+		public async Task CanUnban()
 		{
 			Mock<RequestsFromIpCounterServiceSettingsProvider> MockAntispamSP = new(null);
 			MockAntispamSP.SetupGet(sp => sp.AllowedNumOfRequestsPerPeriod).Returns(2); // Allows 2 requests, ban on 3rd

@@ -28,8 +28,8 @@ namespace FastTestConsoleApp
          */
 		static void Main(string[] args)
 		{
-			WebsiteTests.ServicesTests.RequestsFromIpCounterServiceTests t = new RequestsFromIpCounterServiceTests();
-			t.WillUnban().Wait();
+			WebsiteTests.ServicesTests.SessionManagerTests t = new();
+			t.CanCreateSessionWithGivenLifetime();
 		}
 	}
 }

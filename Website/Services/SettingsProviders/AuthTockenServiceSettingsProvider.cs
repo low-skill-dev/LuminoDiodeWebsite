@@ -11,7 +11,7 @@ namespace Website.Services.SettingsProviders
 			this.config = configuration;
 		}
 
-		public int TockenIdStringLength_chars
+		public virtual int TockenIdStringLength_chars
 		{
 			get
 			{
@@ -21,14 +21,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("AuthTockensServiceSettings:TockenIdStringLength_chars")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 100;
 				}
 			}
 		}
-		public int TockenLifetime_secs
+		public virtual int TockenLifetime_secs
 		{
 			get
 			{
@@ -38,14 +38,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("AuthTockensServiceSettings:TockenLifetime_secs")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 600;
 				}
 			}
 		}
-		public int TokenKeyLength_bytes
+		public virtual int TokenKeyLength_bytes
 		{
 			get
 			{
@@ -55,14 +55,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("AuthTockensServiceSettings:TokenKeyLength_bytes")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 64;
 				}
 			}
 		}
-		public int TokensCleanUpInterval_secs
+		public virtual int TokensCleanUpInterval_secs
 		{
 			get
 			{
@@ -72,7 +72,7 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("AuthTockensServiceSettings:TokensCleanUpInterval_secs")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 1200;

@@ -11,7 +11,7 @@ namespace Website.Services.SettingsProviders
 			this.config = configuration;
 		}
 
-		public string DefaultNpgsqlConnection
+		public virtual string DefaultNpgsqlConnection
 		{
 			get
 			{

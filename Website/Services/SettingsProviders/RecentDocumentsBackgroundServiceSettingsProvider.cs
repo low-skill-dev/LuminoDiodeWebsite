@@ -11,7 +11,7 @@ namespace Website.Services.SettingsProviders
 			this.config = configuration;
 		}
 
-		public int Interval_msec
+		public virtual int Interval_msec
 		{
 			get
 			{
@@ -21,7 +21,7 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("RecentDocumentsBackgroundServiceSettings:Interval_msec")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 300000;

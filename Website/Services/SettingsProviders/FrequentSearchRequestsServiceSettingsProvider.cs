@@ -11,7 +11,7 @@ namespace Website.Services.SettingsProviders
 			this.config = configuration;
 		}
 
-		public int Interval_msec
+		public virtual int Interval_msec
 		{
 			get
 			{
@@ -21,14 +21,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("FrequentSearchRequestsServiceSettings:Interval_msec")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 300000;
 				}
 			}
 		}
-		public int Interval_numOfRecentRequests
+		public virtual  int Interval_numOfRecentRequests
 		{
 			get
 			{
@@ -38,14 +38,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("FrequentSearchRequestsServiceSettings:Interval_numOfRecentRequests")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 50;
 				}
 			}
 		}
-		public int Interval_updateNeededCheck_msec
+		public virtual  int Interval_updateNeededCheck_msec
 		{
 			get
 			{
@@ -55,14 +55,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("FrequentSearchRequestsServiceSettings:Interval_updateNeededCheck_msec")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 10000;
 				}
 			}
 		}
-		public int NumOfFrequentRequestsStored
+		public virtual int NumOfFrequentRequestsStored
 		{
 			get
 			{
@@ -72,14 +72,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("FrequentSearchRequestsServiceSettings:NumOfFrequentRequestsStored")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 50;
 				}
 			}
 		}
-		public int TokenSortRationNeededToCountAsSimilar
+		public virtual int TokenSortRationNeededToCountAsSimilar
 		{
 			get
 			{
@@ -89,14 +89,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("FrequentSearchRequestsServiceSettings:TokenSortRationNeededToCountAsSimilar")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 90;
 				}
 			}
 		}
-		public int ResponseLifetime_msec
+		public virtual int ResponseLifetime_msec
 		{
 			get
 			{
@@ -106,7 +106,7 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("FrequentSearchRequestsServiceSettings:ResponseLifetime_msec")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 300000;

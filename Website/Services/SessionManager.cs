@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Website.Services.SettingsProviders;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Website.Services
 {
@@ -63,7 +64,7 @@ namespace Website.Services
 		{
 			string SessionId = null!;
 			do {
-				SessionId = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator
+				SessionId = Base64UrlEncoder.Encode(System.Security.Cryptography.RandomNumberGenerator
 					.GetBytes(this.SessionIdLength));
 			} while(this.Sessions.ContainsKey(SessionId));
 			var ValidThrough = DateTime.UtcNow.AddSeconds(this.SessionLifeTimeSecs);

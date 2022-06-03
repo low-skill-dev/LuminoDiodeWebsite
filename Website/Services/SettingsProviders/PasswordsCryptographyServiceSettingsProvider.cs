@@ -13,5 +13,23 @@ namespace Website.Services.SettingsProviders
 		{
 			this.config = configuration;
 		}
+
+		public virtual int SaltSizeBytes
+		{
+			get
+			{
+				try
+				{
+					return this.config
+						.GetRequiredSection("PasswordsCryptographyServiceSettings:SaltSize_bytes")
+						.Get<int>();
+				}
+				catch
+				{
+					// default
+					return 128;
+				}
+			}
+		}
 	}
 }

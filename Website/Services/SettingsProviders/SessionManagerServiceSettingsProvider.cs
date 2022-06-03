@@ -11,7 +11,7 @@ namespace Website.Services.SettingsProviders
 			this.config = configuration;
 		}
 
-		public int SessionLifetime_secs
+		public virtual int SessionLifetime_secs
 		{
 			get
 			{
@@ -21,14 +21,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("SessionManagerSettings:SessionLifetime_secs")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 86400;
 				}
 			}
 		}
-		public int SessionIdStringLength_bytes
+		public virtual int SessionIdStringLength_bytes
 		{
 			get
 			{
@@ -38,14 +38,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("SessionManagerSettings:SessionIdStringLength_bytes")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 100;
 				}
 			}
 		}
-		public int SessionsCleanUpInterval_secs
+		public virtual int SessionsCleanUpInterval_secs
 		{
 			get
 			{
@@ -55,7 +55,7 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("SessionManagerSettings:SessionsCleanUpInterval_secs")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 600;

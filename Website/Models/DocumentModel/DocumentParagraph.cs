@@ -10,8 +10,6 @@ namespace Website.Models.DocumentModel
 		public string? String64Image;
 		public string? ImageSubtext;
 
-
-#if DEBUG
 		private static readonly System.Random rnd = new System.Random();
 		public static DocumentParagraph GenerateRandom()
 		{
@@ -31,7 +29,6 @@ namespace Website.Models.DocumentModel
 
 			return OutDoc;
 		}
-#endif
 
 		public  string ToHtmlString()
 		{

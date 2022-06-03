@@ -23,7 +23,6 @@ namespace Website.Models.DocumentModel
 			return Utf8Json.JsonSerializer.ToJsonString(this);
 		}
 
-#if DEBUG
 		private static readonly Random rnd = new Random();
 		public static Document GenerateRandom()
 		{
@@ -38,7 +37,6 @@ namespace Website.Models.DocumentModel
 				Paragraphs = new DocumentParagraph[rnd.Next(2, 15)].Select(x => DocumentParagraph.GenerateRandom()).ToArray()
 			};
 		}
-#endif
 
 		public void CreatePrerender()
 		{

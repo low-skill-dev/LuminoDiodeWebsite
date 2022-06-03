@@ -10,7 +10,6 @@ namespace Website.Models.DocumentModel
 		public bool? IsBold;
 		public bool? IsItalic;
 
-#if DEBUG
 		private static readonly Random rnd = new Random();
 		public static WebText GenerateRandomProps(string OrigString)
 		{
@@ -23,7 +22,6 @@ namespace Website.Models.DocumentModel
 			};
 
 		}
-#endif
 
 		public string ToHtmlString()
 		{

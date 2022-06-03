@@ -11,20 +11,18 @@ namespace Website.Services
 	{
 		private readonly IServiceScopeFactory DbContextScopeFactory;
 		private readonly PasswordsCryptographyServiceSettingsProvider SettingsProvider;
+		private readonly Func<byte[], byte[]> HashAlg = SHA512.HashData;
+
+		private int SaltSizeBytes => this.SettingsProvider.SaltSizeBytes;
+
 		public PasswordsService(IServiceScopeFactory DbContextScopeFactory, PasswordsCryptographyServiceSettingsProvider SettingsProvider)
 		{
 			this.DbContextScopeFactory = DbContextScopeFactory;
 			this.SettingsProvider = SettingsProvider;
 		}
 
-		private const int KeySizeBytes = 64; // 512 bits
-		private readonly Func<byte[], byte[]> HashAlg = SHA512.HashData;
-		private static byte[] GenerateSalt()
-		{
-			var Bits = new byte[KeySizeBytes];
-			System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(Bits);
-			return Bits;
-		}
+		private byte[] GenerateSalt()
+			=> System.Security.Cryptography.RandomNumberGenerator.GetBytes(SaltSizeBytes);
 		public byte[] HashPassword(string PlainTextPassword, out byte[] GeneratedSalt)
 		{
 			var Salt = GenerateSalt();
@@ -48,7 +46,6 @@ namespace Website.Services
 			var ctx = this.DbContextScopeFactory.CreateScope().ServiceProvider
 				.GetRequiredService<Website.Repository.WebsiteContext>();
 			var User = (await ctx.Users.FindAsync(SelectedUserId));
-			//var Salt = GenerateSalt();
 			var Hashed = this.HashPassword(PasswordPlaintText, out var Salt);
 			User.AuthHashedPassword = Hashed;
 			User.AuthPasswordSalt = Salt;

@@ -21,7 +21,7 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("RequestsFromIpCounterServiceSettings:ControlledPeriod_secs")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 5;
@@ -38,7 +38,7 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("RequestsFromIpCounterServiceSettings:AllowedNumOfRequestsPerPeriod")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 20;
@@ -55,7 +55,7 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("RequestsFromIpCounterServiceSettings:UnbanInterval_secs")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 120;

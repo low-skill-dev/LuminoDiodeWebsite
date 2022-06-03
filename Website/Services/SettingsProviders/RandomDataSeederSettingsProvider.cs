@@ -11,7 +11,7 @@ namespace Website.Services.SettingsProviders
 			this.config = configuration;
 		}
 
-		public bool SeederIsEnabled
+		public virtual bool SeederIsEnabled
 		{
 			get
 			{
@@ -21,14 +21,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("DataSeederSettings:SeederIsEnabled")
 						.Get<bool>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return false;
 				}
 			}
 		}
-		public int SeedIfQuantityOfUsersIsLessThan
+		public virtual int SeedIfQuantityOfUsersIsLessThan
 		{
 			get
 			{
@@ -38,14 +38,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("DataSeederSettings:SeedIfQuantityOfUsersIsLessThan")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 3;
 				}
 			}
 		}
-		public int SeedIfQuantityOfDocumentsIsLessThan
+		public virtual int SeedIfQuantityOfDocumentsIsLessThan
 		{
 			get
 			{
@@ -55,14 +55,14 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("DataSeederSettings:SeedIfQuantityOfDocumentsIsLessThan")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 100 * 1000;
 				}
 			}
 		}
-		public int SeedIfQuantityOfProjectsIsLessThan
+		public virtual int SeedIfQuantityOfProjectsIsLessThan
 		{
 			get
 			{
@@ -72,7 +72,7 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("DataSeederSettings:SeedIfQuantityOfProjectsIsLessThan")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 10 * 1000;
@@ -80,7 +80,7 @@ namespace Website.Services.SettingsProviders
 			}
 		}
 
-		public int SeedIfQuantityOfProjectsGroupsIsLessThan
+		public virtual int SeedIfQuantityOfProjectsGroupsIsLessThan
 		{
 			get
 			{
@@ -90,7 +90,7 @@ namespace Website.Services.SettingsProviders
 						.GetRequiredSection("DataSeederSettings:SeedIfQuantityOfProjectsGroupsIsLessThan")
 						.Get<int>();
 				}
-				catch (Exception)
+				catch
 				{
 					// default
 					return 10;
