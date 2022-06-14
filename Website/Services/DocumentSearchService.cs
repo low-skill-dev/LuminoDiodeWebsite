@@ -23,10 +23,9 @@ namespace Website.Services
 			this.FreqReqService = FreqReqService;
 		}
 
-
-		public DateTime ProceedDateTime { get;private set; }
-		public string? Request { get; private set; }
-		public List<DbDocument>? Response { get; private set; }
+		public virtual DateTime ProceedDateTime { get;private set; }
+		public virtual string? Request { get; private set; }
+		public virtual List<DbDocument>? Response { get; private set; }
 
 
 		// ДОБАВИТЬ ОБНОВЛЕНИЕ ОТВЕТОВ ДЛЯ ЗАПРОСОВ КОТРЫЕ ОСТАЮТСЯ ЧАСТЫМИ ДОЛГОЕ ВРЕМЯ

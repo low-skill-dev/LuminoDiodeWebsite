@@ -11,21 +11,23 @@ using Website.Services.SettingsProviders;
 
 namespace Website.Services
 {
-	public class FrequenciedScopes
-	{
-		public int Frequency { get; private set; }
-		public DocumentSearchService DocumentSearchServiceScope { get; set; }
-		public FrequenciedScopes(int Frequency, DocumentSearchService DocumentSearchServiceScope)
-		{
-			this.Frequency = Frequency;
-			this.DocumentSearchServiceScope = DocumentSearchServiceScope;
-		}
-		public void IncFreq(int count = 1) => this.Frequency = this.Frequency + count;
-		public void DecFreq(int count = 1) => this.Frequency = this.Frequency - count;
-	}
 
 	public sealed class FrequentSearchRequestsService : BackgroundService
 	{
+		public class FrequenciedScopes
+		{
+			public int Frequency { get; private set; }
+			public DocumentSearchService DocumentSearchServiceScope { get; set; }
+			public FrequenciedScopes(int Frequency, DocumentSearchService DocumentSearchServiceScope)
+			{
+				this.Frequency = Frequency;
+				this.DocumentSearchServiceScope = DocumentSearchServiceScope;
+			}
+			public void IncFreq(int count = 1) => this.Frequency = this.Frequency + count;
+			public void DecFreq(int count = 1) => this.Frequency = this.Frequency - count;
+		}
+
+
 		/* Длинные названия для полей необходимы чтобы человек мог понять смысл
 		 * поля без просмотра исходного кода класса, однако в скрытых методах
 		 * можно прибегнуть к сокращениям.
