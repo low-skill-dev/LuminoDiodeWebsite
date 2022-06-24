@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Website", "Website\Website.csproj", "{CF31EF77-BB7F-4E70-BF9B-6FD334E5CC11}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastTestConsoleApp", "FastTestConsoleApp\FastTestConsoleApp.csproj", "{B5F64C9B-241D-4C8F-AB07-82BA396BBBE8}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebsiteTests", "Website.Tests\WebsiteTests.csproj", "{8CE9482A-79B9-4136-969F-42BB1DD44773}"
 EndProject
 Global
@@ -19,10 +17,6 @@ Global
 		{CF31EF77-BB7F-4E70-BF9B-6FD334E5CC11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF31EF77-BB7F-4E70-BF9B-6FD334E5CC11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF31EF77-BB7F-4E70-BF9B-6FD334E5CC11}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B5F64C9B-241D-4C8F-AB07-82BA396BBBE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B5F64C9B-241D-4C8F-AB07-82BA396BBBE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B5F64C9B-241D-4C8F-AB07-82BA396BBBE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B5F64C9B-241D-4C8F-AB07-82BA396BBBE8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8CE9482A-79B9-4136-969F-42BB1DD44773}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8CE9482A-79B9-4136-969F-42BB1DD44773}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CE9482A-79B9-4136-969F-42BB1DD44773}.Release|Any CPU.ActiveCfg = Release|Any CPU

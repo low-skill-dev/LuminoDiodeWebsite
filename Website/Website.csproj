@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <StartupObject>Website.Program</StartupObject>
+		<ServerGarbageCollection>false</ServerGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,15 +20,6 @@
     <None Remove="Views\ProjectsGroup\**" />
     <None Remove="wwwroot\StaticFiles\DataSeed\**" />
     <None Remove="wwwroot\StaticFiles\Images\NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\StaticFiles\Images\Logo\PRACC_full.jpeg" />
-    <None Include="wwwroot\StaticFiles\Images\Logo\PRACC_full_string64.txt" />
-    <None Include="wwwroot\StaticFiles\Images\Logo\PRACC_small.png" />
-    <None Include="wwwroot\StaticFiles\Images\Logo\PRACC_small_long.png" />
-    <None Include="wwwroot\StaticFiles\Images\Logo\PRACC_small_long_string64.txt" />
-    <None Include="wwwroot\StaticFiles\Images\Logo\PRACC_small_string64.txt" />
   </ItemGroup>
 
   <ItemGroup>
