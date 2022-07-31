@@ -71,6 +71,7 @@ namespace Website
 			app.UseMiddleware<Website.Middleware.AntispamMiddleware>();
 			app.UseMiddleware<Website.Middleware.AuthenticationMiddleware>();
 			app.UseMiddleware<Website.Middleware.RegistrationStepsMiddleware>();
+			app.UseMiddleware<Website.Middleware.ErrorPageGenerationMiddleware>();
 
 			app.UseEndpoints(endpoints =>
 			{
