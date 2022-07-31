@@ -16,7 +16,7 @@ namespace Website.Controllers
 	{
 		private readonly Website.Services.PasswordsService passwordsService;
 		private readonly Website.Services.AuthTockenService authTockenService;
-		public UserController(IServiceScopeFactory Services, Website.Services.RecentDocumentsBackgroundService documentsBackgroundService, SessionManager SM)
+		public UserController(IServiceScopeFactory Services)
 			: base(Services)
 		{
 			var sp = Services.CreateScope().ServiceProvider;

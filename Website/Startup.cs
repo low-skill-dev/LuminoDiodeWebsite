@@ -20,7 +20,6 @@ namespace Website
 			this.configuration = config;
 		}
 
-		private IServiceCollection services;
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllersWithViews();
@@ -50,8 +49,6 @@ namespace Website
 			{
 				opts.UseNpgsql(AppSetProv.ConnectionStringsP.DefaultNpgsqlConnection);
 			});
-
-			this.services = services;
 		}
 
 
@@ -70,6 +67,10 @@ namespace Website
 			app.UseStaticFiles();
 			app.UseRouting();
 			app.UseSession();
+
+			app.UseMiddleware<Website.Middleware.AntispamMiddleware>();
+			app.UseMiddleware<Website.Middleware.AuthenticationMiddleware>();
+			app.UseMiddleware<Website.Middleware.RegistrationStepsMiddleware>();
 
 			app.UseEndpoints(endpoints =>
 			{
